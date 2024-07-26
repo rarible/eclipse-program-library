@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/libreplex_nft.json`.
  */
 export type LibreplexNft = {
-  "address": "9SXDHUdtfvBGT3H2uPCNEkxmWREoqdeS1qdBudLDD6KX",
+  "address": "5xF73z82K2Hwn3Dk66hpGu7vVEawdc8RtNNTGVrhmeJY",
   "metadata": {
     "name": "libreplexNft",
     "version": "0.10.0",

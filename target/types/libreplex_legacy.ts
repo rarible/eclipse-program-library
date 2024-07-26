@@ -92,7 +92,7 @@ export type LibreplexLegacy = {
         },
         {
           "name": "inscriptionsProgram",
-          "address": "inscokhJarcjaEs59QbQ7hYjrKz25LEPRfCbP8EmdUp"
+          "address": "5z4SW24pPdEG33W4Ud7Dn7qQhs6YzJifbS9icBhGnn3E"
         }
       ],
       "args": []
@@ -190,7 +190,7 @@ export type LibreplexLegacy = {
         },
         {
           "name": "inscriptionsProgram",
-          "address": "inscokhJarcjaEs59QbQ7hYjrKz25LEPRfCbP8EmdUp"
+          "address": "5z4SW24pPdEG33W4Ud7Dn7qQhs6YzJifbS9icBhGnn3E"
         }
       ],
       "args": [
@@ -273,7 +273,7 @@ export type LibreplexLegacy = {
         },
         {
           "name": "inscriptionsProgram",
-          "address": "inscokhJarcjaEs59QbQ7hYjrKz25LEPRfCbP8EmdUp"
+          "address": "5z4SW24pPdEG33W4Ud7Dn7qQhs6YzJifbS9icBhGnn3E"
         }
       ],
       "args": []
@@ -359,7 +359,7 @@ export type LibreplexLegacy = {
         },
         {
           "name": "inscriptionsProgram",
-          "address": "inscokhJarcjaEs59QbQ7hYjrKz25LEPRfCbP8EmdUp"
+          "address": "5z4SW24pPdEG33W4Ud7Dn7qQhs6YzJifbS9icBhGnn3E"
         }
       ],
       "args": [
@@ -447,7 +447,7 @@ export type LibreplexLegacy = {
         },
         {
           "name": "inscriptionsProgram",
-          "address": "inscokhJarcjaEs59QbQ7hYjrKz25LEPRfCbP8EmdUp"
+          "address": "5z4SW24pPdEG33W4Ud7Dn7qQhs6YzJifbS9icBhGnn3E"
         }
       ],
       "args": [
@@ -532,7 +532,7 @@ export type LibreplexLegacy = {
         },
         {
           "name": "inscriptionsProgram",
-          "address": "inscokhJarcjaEs59QbQ7hYjrKz25LEPRfCbP8EmdUp"
+          "address": "5z4SW24pPdEG33W4Ud7Dn7qQhs6YzJifbS9icBhGnn3E"
         }
       ],
       "args": [

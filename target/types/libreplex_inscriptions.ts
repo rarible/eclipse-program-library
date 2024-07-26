@@ -8,7 +8,7 @@ export type LibreplexInscriptions = {
   "address": "",
   "metadata": {
     "name": "libreplexInscriptions",
-    "version": "0.5.0",
+    "version": "0.5.1",
     "spec": "0.1.0",
     "description": "Inscriptions from LibrePlex",
     "repository": "https://github.com/LibrePlex/libreplex-program-library"
