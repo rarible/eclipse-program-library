@@ -1,0 +1,1 @@
+pub const MINIMUM_INSCRIPTION_LAMPORTS : u64 = 0; //70490880; goodbye fees
