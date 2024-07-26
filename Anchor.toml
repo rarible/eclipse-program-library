@@ -1,19 +1,22 @@
+[toolchain]
+
 [features]
-seeds = true
+resolution = true
 skip-lint = false
 
 [programs.localnet]
-libreplex_metadata="LibrQsXf9V1DmTtJLkEghoaF1kjJcAzWiEGoJn8mz7p"
-libreplex_default_renderer="rndbQFmFfiQ4tTG9QPhfJeq1J9fLCSBMAPj3EbLQ7Co"
-libreplex_inscriptions="inscokhJarcjaEs59QbQ7hYjrKz25LEPRfCbP8EmdUp"
-libreplex_creator="78deTr7qycJ6498vSd3pNMhdCKKWxMipniitVHQcM8RM"
-libreplex_shop="ListjawGEdhxuAErSyYwcTEGWQswFoi6FScnGG1RKSB"
-libreplex_creator_controls="G9whLiLT9nSkxwWzWvbiKKrTL6yWxvzh2UXqNht5VXqV"
-libreplex_nft="9SXDHUdtfvBGT3H2uPCNEkxmWREoqdeS1qdBudLDD6KX"
-libreplex_legacy_inscribers="Leg1xVbrpq5gY6mprak3Ud4q4mBwcJi5C9ZruYjWv7n"
-libreplex_editions="Eddy2qpzTgTfUvNJ271Wgfw3RF2LsbmRJdNTSnZajmU3"
-libreplex_editions_controls="EdCo6pePXJX3PuEPRLSE59gKXp4KDwWjATEXRpztvu9X"
-libreplex_monoswap_deprecated="MonoRPwMWxcsVEJV27jyEt1f5VoWg3szDBRYUenm221"
+libreplex_creator = "78deTr7qycJ6498vSd3pNMhdCKKWxMipniitVHQcM8RM"
+libreplex_creator_controls = "G9whLiLT9nSkxwWzWvbiKKrTL6yWxvzh2UXqNht5VXqV"
+libreplex_default_renderer = "Hnw68yc4RNgu1CuB3zY9gc81QCWX94CMF115gnkHHHhX"
+libreplex_editions = "CZKqDLVZs2SwX11to5qVU7wNtPCPRSmG1Xx4nbJQUZep"
+libreplex_editions_controls = "5bs8fTH9SNQyhDCTGr6zP1x8eSVMWTcDjLLFpePwMhcV"
+libreplex_inscriptions = "5z4SW24pPdEG33W4Ud7Dn7qQhs6YzJifbS9icBhGnn3E"
+libreplex_legacy_inscribers = "Leg1xVbrpq5gY6mprak3Ud4q4mBwcJi5C9ZruYjWv7n"
+libreplex_metadata = "LibrQsXf9V1DmTtJLkEghoaF1kjJcAzWiEGoJn8mz7p"
+libreplex_monoswap_deprecated = "4R22WNL3ZKjt9hSDQLZPSGggP5sMMB1exkTVTAvarUH2"
+libreplex_nft = "5xF73z82K2Hwn3Dk66hpGu7vVEawdc8RtNNTGVrhmeJY"
+libreplex_shop = "ListjawGEdhxuAErSyYwcTEGWQswFoi6FScnGG1RKSB"
+
 [registry]
 url = "https://api.apr.dev"
 
@@ -21,11 +24,19 @@ url = "https://api.apr.dev"
 cluster = "Localnet"
 wallet = "~/.config/solana/id.json"
 
+[scripts]
+test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 js-tests/**/*.ts"
+
 [test]
 startup_wait = 100000
+shutdown_wait = 2000
+upgradeable = false
 
 [test.validator]
+bind_address = "0.0.0.0"
 url = "https://api.mainnet-beta.solana.com"
+ledger = ".anchor/test-ledger"
+rpc_port = 8899
 
 [[test.validator.clone]]
 address = "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
@@ -38,6 +49,3 @@ address = "cmtDvXumGCrqC1Age74AVPhSRVXJMd8PJS91L8KbNCK"
 
 [[test.validator.clone]]
 address = "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
-
-[scripts]
-test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 js-tests/**/*.ts"

@@ -7,7 +7,7 @@ pub mod instructions;
 pub mod errors;
 pub mod state;
 
-declare_id!("9SXDHUdtfvBGT3H2uPCNEkxmWREoqdeS1qdBudLDD6KX");
+declare_id!("5xF73z82K2Hwn3Dk66hpGu7vVEawdc8RtNNTGVrhmeJY");
 
 #[program]
 pub mod libreplex_nft {

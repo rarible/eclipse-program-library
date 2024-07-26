@@ -10,7 +10,7 @@ pub mod instructions;
 
 
 
-declare_id!("rndbQFmFfiQ4tTG9QPhfJeq1J9fLCSBMAPj3EbLQ7Co");
+declare_id!("Hnw68yc4RNgu1CuB3zY9gc81QCWX94CMF115gnkHHHhX");
 
 
 #[program]

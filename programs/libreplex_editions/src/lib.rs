@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 
 pub mod instructions;
 pub use instructions::*;
-declare_id!("Eddy2qpzTgTfUvNJ271Wgfw3RF2LsbmRJdNTSnZajmU3");
+declare_id!("CZKqDLVZs2SwX11to5qVU7wNtPCPRSmG1Xx4nbJQUZep");
 
 pub mod errors;
 pub mod state;
@@ -14,7 +14,7 @@ pub use state::*;
 
 pub mod group_extension_program {
     use anchor_lang::declare_id;
-    declare_id!("TGRPp2mDGxSyH3We9hH8pwcmhajtszPAvWjVdVgsPa5");
+    declare_id!("5hx15GaPPqsYA61v6QpcGPpo125v7rfvEfZQ4dJErG5V");
 }
 
 #[program]
