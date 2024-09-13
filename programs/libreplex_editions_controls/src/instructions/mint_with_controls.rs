@@ -149,8 +149,12 @@ pub fn mint_with_controls(ctx: Context<MintWithControlsCtx>, mint_input: MintInp
             panic!("Attempted to mint with phase {} (max phase {})", mint_input.phase_index, editions_controls.phases.len());
         }
     }
-    let current_phase = &editions_controls.phases[mint_input.phase_index as usize]; 
-    check_phase_constraints(current_phase,
+
+    let phase_index = mint_input.phase_index as usize;
+    let price_amount = editions_controls.phases[phase_index].price_amount;
+
+    check_phase_constraints(
+        &editions_controls.phases[phase_index],
         minter_stats,
         minter_stats_phase,
         editions_controls);
@@ -161,9 +165,10 @@ pub fn mint_with_controls(ctx: Context<MintWithControlsCtx>, mint_input: MintInp
     minter_stats.wallet = minter.key();
     minter_stats.mint_count += 1; 
 
-
     minter_stats_phase.wallet = minter.key();
     minter_stats_phase.mint_count += 1; 
+
+    editions_controls.phases[phase_index].current_mints += 1;
 
     
     // ok, we are gucci. transfer funds to treasury if applicable
@@ -176,7 +181,7 @@ pub fn mint_with_controls(ctx: Context<MintWithControlsCtx>, mint_input: MintInp
                 to: treasury.to_account_info(),
             },
         ),
-        current_phase.price_amount,
+        price_amount
     )?;
 
 
