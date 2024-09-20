@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/libreplex_editions.json`.
  */
 export type LibreplexEditions = {
-  "address": "6EhZc3zugRpHnQXzvBWQyLJz11JoQKpmUSGk4dHiLwPU",
+  "address": "5hx15GaPPqsYA61v6QpcGPpo125v7rfvEfZQ4dJErG5V",
   "metadata": {
     "name": "libreplexEditions",
     "version": "0.2.1",
@@ -14,6 +14,91 @@ export type LibreplexEditions = {
     "repository": "https://github.com/Libreplex/libreplex-program-library"
   },
   "instructions": [
+    {
+      "name": "addRoyalties",
+      "docs": [
+        "add royalties to mint"
+      ],
+      "discriminator": [
+        195,
+        251,
+        126,
+        230,
+        187,
+        134,
+        168,
+        210
+      ],
+      "accounts": [
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "authority",
+          "signer": true
+        },
+        {
+          "name": "mint",
+          "writable": true
+        },
+        {
+          "name": "extraMetasAccount",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  120,
+                  116,
+                  114,
+                  97,
+                  45,
+                  97,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116,
+                  45,
+                  109,
+                  101,
+                  116,
+                  97,
+                  115
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "tokenProgram",
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": {
+              "name": "updateRoyaltiesArgs"
+            }
+          }
+        }
+      ]
+    },
     {
       "name": "initialise",
       "discriminator": [
@@ -291,6 +376,55 @@ export type LibreplexEditions = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "modifyRoyalties",
+      "docs": [
+        "modify royalties of mint"
+      ],
+      "discriminator": [
+        199,
+        95,
+        20,
+        107,
+        136,
+        161,
+        93,
+        137
+      ],
+      "accounts": [
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "authority",
+          "signer": true
+        },
+        {
+          "name": "mint",
+          "writable": true
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "tokenProgram",
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": {
+              "name": "updateRoyaltiesArgs"
+            }
+          }
+        }
+      ]
     }
   ],
   "accounts": [
@@ -337,56 +471,62 @@ export type LibreplexEditions = {
   "errors": [
     {
       "code": 6000,
-      "name": "tickerTooLong",
-      "msg": "Ticker too long"
+      "name": "sizeExceedsMaxSize",
+      "msg": "Collection size exceeds max size."
     },
     {
       "code": 6001,
-      "name": "mintTemplateTooLong",
-      "msg": "Mint template too long"
+      "name": "maxSizeBelowCurrentSize",
+      "msg": "Max size cannot be reduced below current size."
     },
     {
       "code": 6002,
-      "name": "deploymentTemplateTooLong",
-      "msg": "Deployment template too long"
+      "name": "creatorShareInvalid",
+      "msg": "Creators shares must add up to 100."
     },
     {
       "code": 6003,
-      "name": "rootTypeTooLong",
-      "msg": "Root type too long"
+      "name": "missingApproveAccount",
+      "msg": "Missing approve account."
     },
     {
       "code": 6004,
-      "name": "mintedOut",
-      "msg": "Minted out"
+      "name": "expiredApproveAccount",
+      "msg": "Approve account has expired."
     },
     {
       "code": 6005,
-      "name": "legacyMigrationsAreMintedOut",
-      "msg": "Legacy migrations are minted out"
+      "name": "invalidField",
+      "msg": "Invalid field. You cannot use a public key as a field."
     },
     {
       "code": 6006,
-      "name": "missingGlobalTreeDelegate",
-      "msg": "Global tree delegate is missing"
+      "name": "creatorAddressInvalid",
+      "msg": "The Address you provided is invalid. Please provide a valid address."
     },
     {
       "code": 6007,
-      "name": "incorrectMintType",
-      "msg": "Incorrect mint type"
-    },
-    {
-      "code": 6008,
-      "name": "invalidMetadata",
-      "msg": "Invalid Metadata"
-    },
-    {
-      "code": 6009,
-      "name": "creatorFeeTooHigh",
-      "msg": "Creator fee too high"
+      "name": "royaltyBasisPointsInvalid",
+      "msg": "Royalty basis points must be less than or equal to 10000."
     }
   ],
   "types": [
+    {
+      "name": "creatorWithShare",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "address",
+            "type": "pubkey"
+          },
+          {
+            "name": "share",
+            "type": "u8"
+          }
+        ]
+      }
+    },
     {
       "name": "editionsDeployment",
       "type": {
@@ -512,6 +652,20 @@ export type LibreplexEditions = {
             "type": {
               "option": "pubkey"
             }
+          },
+          {
+            "name": "royaltyBasisPoints",
+            "type": "u16"
+          },
+          {
+            "name": "creators",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "creatorWithShare"
+                }
+              }
+            }
           }
         ]
       }
@@ -528,6 +682,28 @@ export type LibreplexEditions = {
           {
             "name": "order",
             "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "updateRoyaltiesArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "royaltyBasisPoints",
+            "type": "u16"
+          },
+          {
+            "name": "creators",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "creatorWithShare"
+                }
+              }
+            }
           }
         ]
       }

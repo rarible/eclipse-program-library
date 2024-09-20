@@ -1,7 +1,5 @@
 use anchor_lang::{prelude::*, system_program};
-use libreplex_editions::{
-    cpi::accounts::InitialiseCtx, program::LibreplexEditions, group_extension_program, InitialiseInput
-};
+use libreplex_editions::{cpi::accounts::InitialiseCtx, group_extension_program, program::LibreplexEditions, CreatorWithShare, InitialiseInput};
 
 use crate::EditionsControls;
 
@@ -24,6 +22,10 @@ pub struct InitialiseControlInput {
     // without curlies the url is the same for all mints 
     pub offchain_url: String,
     pub cosigner_program_id: Option<Pubkey>,
+
+    pub royalty_basis_points: u16,
+    
+    pub creators: Vec<CreatorWithShare>,
 }
 
 
@@ -76,7 +78,7 @@ pub struct InitialiseEditionControlsCtx<'info> {
      #[account(address = group_extension_program::ID)]
      pub group_extension_program: AccountInfo<'info>,
 
-    pub libreplex_editions_program: Program<'info, LibreplexEditions>
+    pub libreplex_editions_program: Program<'info, LibreplexEditions>,
 }
 
 pub fn initialise_editions_controls(ctx: Context<InitialiseEditionControlsCtx>, input: InitialiseControlInput) -> Result<()> {
@@ -96,14 +98,14 @@ pub fn initialise_editions_controls(ctx: Context<InitialiseEditionControlsCtx>, 
     let group_extension_program = &ctx.accounts.group_extension_program;
     
 
-    
-
     let core_input = InitialiseInput {
         max_number_of_tokens: input.max_number_of_tokens,
         symbol: input.symbol,
         name: input.name,
         offchain_url: input.offchain_url,
         creator_cosign_program_id: Some(crate::ID),
+        royalty_basis_points: input.royalty_basis_points,
+        creators: input.creators,
     };
 
 
@@ -139,8 +141,6 @@ pub fn initialise_editions_controls(ctx: Context<InitialiseEditionControlsCtx>, 
         phases: vec![],
         treasury: input.treasury, 
     });
-
-
 
     Ok(())
 }

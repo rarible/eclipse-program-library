@@ -8,6 +8,8 @@ pub mod errors;
 pub mod state;
 
 pub mod logic;
+mod utils;
+
 pub use logic::*;
 
 pub use state::*;
@@ -35,5 +37,16 @@ pub mod libreplex_editions {
         instructions::mint(ctx)
     }
 
-    
+    /// add royalties to mint
+    pub fn add_royalties(ctx: Context<AddRoyalties>, args: UpdateRoyaltiesArgs) -> Result<()> {
+        add::handler(ctx, args)
+    }
+
+    /// modify royalties of mint
+    pub fn modify_royalties(
+        ctx: Context<ModifyRoyalties>,
+        args: UpdateRoyaltiesArgs,
+    ) -> Result<()> {
+        modify::handler(ctx, args)
+    }
 }

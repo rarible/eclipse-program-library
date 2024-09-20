@@ -3,7 +3,7 @@ use libreplex_shared::{create_token_2022_and_metadata, MintAccounts2022, TokenGr
 use spl_pod::optional_keys::OptionalNonZeroPubkey;
 use spl_token_metadata_interface::state::TokenMetadata;
 
-use crate::{group_extension_program, EditionsDeployment, Hashlist, NAME_LIMIT, OFFCHAIN_URL_LIMIT, SYMBOL_LIMIT};
+use crate::{group_extension_program, CreatorWithShare, EditionsDeployment, Hashlist, NAME_LIMIT, OFFCHAIN_URL_LIMIT, SYMBOL_LIMIT};
 
 
 
@@ -21,6 +21,8 @@ pub struct InitialiseInput {
     pub offchain_url: String,
     pub creator_cosign_program_id: Option<Pubkey>,
 
+    pub royalty_basis_points: u16,
+    pub creators: Vec<CreatorWithShare>,
 }
 
 
@@ -136,6 +138,22 @@ pub fn initialise(ctx: Context<InitialiseCtx>, input: InitialiseInput) -> Result
             &[ctx.bumps.editions_deployment],
         ];
 
+    // Prepare additional metadata for royalties
+    let mut additional_metadata: Vec<(String, String)> = vec![];
+
+    // Add royalty_basis_points
+    additional_metadata.push( (
+         "royalty_basis_points".to_string(),
+         input.royalty_basis_points.to_string(),
+    ));
+
+    // Add creators and their shares
+    for creator in input.creators.iter() {
+        additional_metadata.push((
+            creator.address.to_string(),
+             creator.share.to_string(),
+        ));
+    }
 
     // msg!("Create token 2022 w/ metadata");
     create_token_2022_and_metadata(
@@ -153,7 +171,7 @@ pub fn initialise(ctx: Context<InitialiseCtx>, input: InitialiseInput) -> Result
             uri: editions_deployment.offchain_url.clone(),
             update_authority,
             mint: group_mint.key(),
-            additional_metadata: vec![],
+            additional_metadata,
         }),
         Some(TokenGroupInput {
             group: group.to_account_info(),

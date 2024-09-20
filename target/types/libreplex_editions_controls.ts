@@ -463,6 +463,22 @@ export type LibreplexEditionsControls = {
   ],
   "types": [
     {
+      "name": "creatorWithShare",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "address",
+            "type": "pubkey"
+          },
+          {
+            "name": "share",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
       "name": "editionsControls",
       "type": {
         "kind": "struct",
@@ -603,6 +619,20 @@ export type LibreplexEditionsControls = {
             "name": "cosignerProgramId",
             "type": {
               "option": "pubkey"
+            }
+          },
+          {
+            "name": "royaltyBasisPoints",
+            "type": "u16"
+          },
+          {
+            "name": "creators",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "creatorWithShare"
+                }
+              }
             }
           }
         ]
