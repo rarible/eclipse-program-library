@@ -10,7 +10,7 @@ use anchor_spl::token_interface::{
 use crate::utils::update_account_lamports_to_minimum_balance;
 use crate::{errors::MetadataErrors, EditionsDeployment};
 
-#[derive(AnchorDeserialize, AnchorSerialize)]
+#[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub struct AddMetadataArgs {
     pub field: String,
     pub value: String,

@@ -14,6 +14,7 @@ pub struct InitialiseControlInput {
     pub cosigner_program_id: Option<Pubkey>,
     pub royalty_basis_points: u16,
     pub creators: Vec<CreatorWithShare>,
+    pub extra_meta: Vec<AddMetadataArgs>,
 }
 
 #[derive(Accounts)]
@@ -110,15 +111,6 @@ pub fn initialise_editions_controls(
         core_input,
     )?;
 
-    // Add metadata using signer seeds
-    let mut metadata: Vec<AddMetadataArgs> = vec![];
-    let metadata_input = AddMetadataArgs {
-        field: "test_key".to_string(),
-        value: "test_value".to_string(),
-    };
-
-
-
     // Set the editions control state
     editions_controls.set_inner(EditionsControls {
         editions_deployment: editions_deployment.key(),
@@ -138,7 +130,6 @@ pub fn initialise_editions_controls(
     ];
 
     // Add metadata CPI call
-    metadata.push(metadata_input);
     libreplex_editions::cpi::add_metadata(
         CpiContext::new_with_signer(
             libreplex_editions_program.to_account_info(),
@@ -152,7 +143,7 @@ pub fn initialise_editions_controls(
             },
             &[seeds]
         ),
-        metadata,
+        input.extra_meta,
     )?;
 
     Ok(())

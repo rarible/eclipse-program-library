@@ -463,6 +463,22 @@ export type LibreplexEditionsControls = {
   ],
   "types": [
     {
+      "name": "addMetadataArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "field",
+            "type": "string"
+          },
+          {
+            "name": "value",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
       "name": "creatorWithShare",
       "type": {
         "kind": "struct",
@@ -631,6 +647,16 @@ export type LibreplexEditionsControls = {
               "vec": {
                 "defined": {
                   "name": "creatorWithShare"
+                }
+              }
+            }
+          },
+          {
+            "name": "extraMeta",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "addMetadataArgs"
                 }
               }
             }
