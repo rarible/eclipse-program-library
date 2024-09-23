@@ -171,30 +171,25 @@ pub fn initialise(ctx: Context<InitialiseCtx>, input: InitialiseInput) -> Result
         Some(group_extension_program.key())
     )?;
 
-    // Now, manually construct the royalties metadata string
-    let mut royalties_metadata = String::new();
+    // Now, manually construct the royalties metadata vector
+    let mut royalties_metadata: Vec<(String, String)> = vec![];
 
     // Add royalty_basis_points
-    royalties_metadata.push_str(&format!(
-        "royalty_basis_points={}\n",
-        input.royalty_basis_points
-    ));
+    royalties_metadata.push(("royalty__basis_points".to_string(), input.royalty_basis_points.to_string()));
 
-    // Add creators and their shares with prefixes
+    // Add creators and their shares with double underscore for hierarchical structure
     for (index, creator) in input.creators.iter().enumerate() {
-        royalties_metadata.push_str(&format!(
-            "royalty_creator_{}_address={}\n",
-            index,
-            creator.address
+        royalties_metadata.push((
+            format!("royalty__creators__{}_address", index),
+            creator.address.to_string(),
         ));
-        royalties_metadata.push_str(&format!(
-            "royalty_creator_{}_share={}\n",
-            index,
-            creator.share
+        royalties_metadata.push((
+            format!("royalty__creators__{}_share", index),
+            creator.share.to_string(),
         ));
     }
 
-    msg!("Royalties Metadata:\n{}", royalties_metadata);
+    msg!("Royalties Metadata:\n{}", input.royalty_basis_points.to_string());
 
     // Prepare the signer seeds
     let deployment_seeds = &[
@@ -204,27 +199,29 @@ pub fn initialise(ctx: Context<InitialiseCtx>, input: InitialiseInput) -> Result
     ];
     let signer_seeds: &[&[&[u8]]] = &[deployment_seeds];
 
-    // Prepare the accounts for the CPI call
-    let cpi_accounts = TokenMetadataUpdateField {
-        token_program_id: token_program.to_account_info(),
-        metadata: group_mint.to_account_info(),
-        update_authority: editions_deployment.to_account_info(),
-    };
+    // Iterate over royalties metadata and call `token_metadata_update_field` for each key-value pair
+    for (key, value) in royalties_metadata.iter() {
+        // Prepare the accounts for the CPI call
+        let cpi_accounts = TokenMetadataUpdateField {
+            token_program_id: token_program.to_account_info(),
+            metadata: group_mint.to_account_info(),
+            update_authority: editions_deployment.to_account_info(),
+        };
 
-    msg!("Seeds EDITION: {:?}", signer_seeds);
-    // Create the CPI context with signer seeds
-    let cpi_ctx = CpiContext::new_with_signer(
-        token_program.to_account_info(),
-        cpi_accounts,
-        signer_seeds,
-    );
+        // Create the CPI context with signer seeds
+        let cpi_ctx = CpiContext::new_with_signer(
+            token_program.to_account_info(),
+            cpi_accounts,
+            signer_seeds,
+        );
 
-    // Call the token_metadata_update_field function
-    token_metadata_update_field(
-        cpi_ctx,
-        Field::Key("royalty".to_string()),
-        royalties_metadata,
-    )?;
+        // Call the `token_metadata_update_field` function for each metadata entry
+        token_metadata_update_field(
+            cpi_ctx,
+            Field::Key(key.to_string()),
+            value.to_string(),
+        )?;
+    }
 
     // transfer minimum rent to mint account
     update_account_lamports_to_minimum_balance(

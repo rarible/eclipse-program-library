@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/libreplex_editions_controls.json`.
  */
 export type LibreplexEditionsControls = {
-  "address": "66QcBZ5sQurkTPAU4BsVicKE6z7r3oPYMbFmkqK3L5ge",
+  "address": "AkVEpM9cAvdgaU9Q6XrnoQcrFGXyNWSSfkWPokqaS246",
   "metadata": {
     "name": "libreplexEditionsControls",
     "version": "0.2.1",
@@ -51,7 +51,7 @@ export type LibreplexEditionsControls = {
         },
         {
           "name": "libreplexEditionsProgram",
-          "address": "2x7FfK2AFwgnNHCHRJXz9ttvwHxJewzb4HBfSPFpyzNR"
+          "address": "CcAQiZw4YpwzDj15dqMfeDvxjpBZPjhjuzjUMX4JmZPL"
         }
       ],
       "args": [
@@ -152,7 +152,7 @@ export type LibreplexEditionsControls = {
         },
         {
           "name": "libreplexEditionsProgram",
-          "address": "2x7FfK2AFwgnNHCHRJXz9ttvwHxJewzb4HBfSPFpyzNR"
+          "address": "CcAQiZw4YpwzDj15dqMfeDvxjpBZPjhjuzjUMX4JmZPL"
         }
       ],
       "args": [
@@ -353,7 +353,7 @@ export type LibreplexEditionsControls = {
         },
         {
           "name": "libreplexEditionsProgram",
-          "address": "2x7FfK2AFwgnNHCHRJXz9ttvwHxJewzb4HBfSPFpyzNR"
+          "address": "CcAQiZw4YpwzDj15dqMfeDvxjpBZPjhjuzjUMX4JmZPL"
         }
       ],
       "args": [
