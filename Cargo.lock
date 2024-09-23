@@ -2206,6 +2206,8 @@ dependencies = [
  "arrayref",
  "dyn-fmt",
  "libreplex_shared",
+ "serde",
+ "serde_json",
  "solana-program",
  "solana-program-test",
  "solana-sdk",

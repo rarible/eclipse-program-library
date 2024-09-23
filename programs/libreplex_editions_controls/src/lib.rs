@@ -6,7 +6,7 @@ pub use logic::*;
 
 pub mod instructions;
 pub use instructions::*;
-declare_id!("6W2eGoGaLDCA24AYA18A9ar9Svza5daeSNJbZnJTzC64");
+declare_id!("9bJPrhW2Pskrd5u6HctUC4nuF9JyizqXmsFGsG1Taa8Q");
 
 pub mod errors;
 pub mod state;

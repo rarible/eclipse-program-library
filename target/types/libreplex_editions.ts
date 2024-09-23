@@ -15,6 +15,96 @@ export type LibreplexEditions = {
   },
   "instructions": [
     {
+      "name": "addMetadata",
+      "docs": [
+        "add additional metadata to mint"
+      ],
+      "discriminator": [
+        231,
+        195,
+        40,
+        240,
+        67,
+        231,
+        53,
+        136
+      ],
+      "accounts": [
+        {
+          "name": "editionsDeployment",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  100,
+                  105,
+                  116,
+                  105,
+                  111,
+                  110,
+                  115,
+                  95,
+                  100,
+                  101,
+                  112,
+                  108,
+                  111,
+                  121,
+                  109,
+                  101,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "editions_deployment.symbol",
+                "account": "editionsDeployment"
+              }
+            ]
+          }
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "mint",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "tokenProgram",
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "vec": {
+              "defined": {
+                "name": "addMetadataArgs"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
       "name": "addRoyalties",
       "docs": [
         "add royalties to mint"
@@ -425,6 +515,57 @@ export type LibreplexEditions = {
           }
         }
       ]
+    },
+    {
+      "name": "removeMetadata",
+      "docs": [
+        "remove additional metadata to mint"
+      ],
+      "discriminator": [
+        81,
+        68,
+        231,
+        49,
+        91,
+        8,
+        111,
+        160
+      ],
+      "accounts": [
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "authority",
+          "signer": true
+        },
+        {
+          "name": "mint",
+          "writable": true
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "tokenProgram",
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "vec": {
+              "defined": {
+                "name": "removeMetadataArgs"
+              }
+            }
+          }
+        }
+      ]
     }
   ],
   "accounts": [
@@ -511,6 +652,22 @@ export type LibreplexEditions = {
     }
   ],
   "types": [
+    {
+      "name": "addMetadataArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "field",
+            "type": "string"
+          },
+          {
+            "name": "value",
+            "type": "string"
+          }
+        ]
+      }
+    },
     {
       "name": "creatorWithShare",
       "type": {
@@ -682,6 +839,22 @@ export type LibreplexEditions = {
           {
             "name": "order",
             "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "removeMetadataArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "field",
+            "type": "string"
+          },
+          {
+            "name": "value",
+            "type": "string"
           }
         ]
       }
