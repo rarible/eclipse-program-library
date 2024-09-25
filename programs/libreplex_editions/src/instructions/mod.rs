@@ -11,5 +11,6 @@ pub use royalties::*;
 pub use metadata::*;
 
 pub mod mint;
+
 pub use mint::*;
 

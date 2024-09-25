@@ -8,8 +8,8 @@ use libreplex_shared::{create_token_2022_and_metadata, operations::mint_non_fung
 use spl_pod::optional_keys::OptionalNonZeroPubkey;
 use spl_token_metadata_interface::state::{Field, TokenMetadata};
 
-use crate::utils::{update_account_lamports_to_minimum_balance};
-use crate::{add_to_hashlist, errors::EditionsError, group_extension_program, metadata, EditionsDeployment, GetMetadata, HashlistMarker};
+use crate::utils::{get_mint_metadata, update_account_lamports_to_minimum_balance};
+use crate::{add_to_hashlist, errors::EditionsError, group_extension_program, metadata, EditionsDeployment, HashlistMarker};
 
 #[derive(Accounts)]
 pub struct MintCtx<'info> {
@@ -189,12 +189,14 @@ pub fn mint<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> Result<()
         &mint.key(),
         editions_deployment.number_of_tokens_issued,
     )?;
+    msg!("Mint: get meta start");
+    let meta = get_mint_metadata(&mut group_mint.to_account_info());
+    let additional_meta = meta?.additional_metadata;
+    msg!("Mint: get meta end: meta len {}", additional_meta.len());
 
-    let meta = metadata::get::handler(GetMetadata {
-        metadata_account: group_mint.to_account_info(),
-    });
-
-    for additional_metadatum in meta.unwrap().additional_metadata {
+    for additional_metadatum in additional_meta {
+        msg!("Mint: meta key {}", additional_metadatum.0);
+        msg!("Mint: meta value {}", additional_metadatum.1);
         let deployment_seeds: &[&[u8]] = &[
             "editions_deployment".as_bytes(),
             editions_deployment.symbol.as_ref(),
@@ -209,13 +211,13 @@ pub fn mint<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> Result<()
         let cpi_ctx = CpiContext::new_with_signer(token_program.to_account_info(), cpi_accounts, signer_seeds);
         token_metadata_update_field(cpi_ctx, Field::Key(additional_metadatum.0), additional_metadatum.1)?;
     }
-
+    msg!("Mint: transfer minimum rent to mint account");
     // transfer minimum rent to mint account
     update_account_lamports_to_minimum_balance(
         ctx.accounts.mint.to_account_info(),
         ctx.accounts.payer.to_account_info(),
         ctx.accounts.system_program.to_account_info(),
     )?;
-
+    msg!("Mint: done");
     Ok(())
 }
