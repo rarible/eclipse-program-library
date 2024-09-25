@@ -88,6 +88,11 @@ pub struct MintWithControlsCtx<'info> {
     constraint = editions_deployment.group == group.key())]
     pub group: UncheckedAccount<'info>,
 
+    /// CHECK: Checked in constraint
+    #[account(mut,
+        constraint = editions_deployment.group_mint == group_mint.key())]
+    pub group_mint: UncheckedAccount<'info>,
+
     /// CHECK: passed in via CPI to mpl_token_metadata program
     #[account(mut)]
     pub token_account: UncheckedAccount<'info>,
@@ -135,6 +140,7 @@ pub fn mint_with_controls(ctx: Context<MintWithControlsCtx>, mint_input: MintInp
     let associated_token_program = &ctx.accounts.associated_token_program;
     let minter = &ctx.accounts.minter;
     let group = &ctx.accounts.group;
+    let group_mint = &ctx.accounts.group_mint;
     let system_program = &ctx.accounts.system_program;
     let token_program = &ctx.accounts.token_program;
     let minter_stats = &mut ctx.accounts.minter_stats;
@@ -184,6 +190,8 @@ pub fn mint_with_controls(ctx: Context<MintWithControlsCtx>, mint_input: MintInp
         price_amount
     )?;
 
+    // take all the data for platform fee and transfer
+    // editions_deployment.group_mint.
 
 
     let editions_deployment_key = editions_deployment.key();
@@ -205,6 +213,7 @@ pub fn mint_with_controls(ctx: Context<MintWithControlsCtx>, mint_input: MintInp
                 minter: minter.to_account_info(),
                 mint: mint.to_account_info(),
                 group: group.to_account_info(),
+                group_mint: group_mint.to_account_info(),
                 token_account: token_account.to_account_info(),
                 token_program: token_program.to_account_info(),
                 associated_token_program: associated_token_program.to_account_info(),
@@ -214,5 +223,6 @@ pub fn mint_with_controls(ctx: Context<MintWithControlsCtx>, mint_input: MintInp
             },
             &[seeds]
         ))?;
+
     Ok(())
 }

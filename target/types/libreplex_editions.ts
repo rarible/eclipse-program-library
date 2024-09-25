@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/libreplex_editions.json`.
  */
 export type LibreplexEditions = {
-  "address": "CcAQiZw4YpwzDj15dqMfeDvxjpBZPjhjuzjUMX4JmZPL",
+  "address": "42YGvqcaAkwmipR9qMc6Da2WYMEULBjnu4uYaxRYeN8H",
   "metadata": {
     "name": "libreplexEditions",
     "version": "0.2.1",
@@ -121,20 +121,7 @@ export type LibreplexEditions = {
       ],
       "accounts": [
         {
-          "name": "payer",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "authority",
-          "signer": true
-        },
-        {
-          "name": "mint",
-          "writable": true
-        },
-        {
-          "name": "extraMetasAccount",
+          "name": "editionsDeployment",
           "writable": true,
           "pda": {
             "seeds": [
@@ -142,32 +129,48 @@ export type LibreplexEditions = {
                 "kind": "const",
                 "value": [
                   101,
-                  120,
+                  100,
+                  105,
                   116,
-                  114,
-                  97,
-                  45,
-                  97,
-                  99,
-                  99,
+                  105,
                   111,
-                  117,
                   110,
-                  116,
-                  45,
+                  115,
+                  95,
+                  100,
+                  101,
+                  112,
+                  108,
+                  111,
+                  121,
                   109,
                   101,
-                  116,
-                  97,
-                  115
+                  110,
+                  116
                 ]
               },
               {
                 "kind": "account",
-                "path": "mint"
+                "path": "editions_deployment.symbol",
+                "account": "editionsDeployment"
               }
             ]
           }
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "mint",
+          "writable": true,
+          "signer": true
         },
         {
           "name": "systemProgram",
@@ -443,6 +446,10 @@ export type LibreplexEditions = {
         },
         {
           "name": "group",
+          "writable": true
+        },
+        {
+          "name": "groupMint",
           "writable": true
         },
         {
@@ -811,18 +818,12 @@ export type LibreplexEditions = {
             }
           },
           {
-            "name": "royaltyBasisPoints",
-            "type": "u16"
+            "name": "itemBaseUri",
+            "type": "string"
           },
           {
-            "name": "creators",
-            "type": {
-              "vec": {
-                "defined": {
-                  "name": "creatorWithShare"
-                }
-              }
-            }
+            "name": "itemName",
+            "type": "string"
           }
         ]
       }

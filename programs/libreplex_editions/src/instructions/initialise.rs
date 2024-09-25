@@ -1,19 +1,19 @@
+use crate::{group_extension_program, utils::update_account_lamports_to_minimum_balance, CreatorWithShare, EditionsDeployment, Hashlist, NAME_LIMIT, OFFCHAIN_URL_LIMIT, SYMBOL_LIMIT};
 use anchor_lang::prelude::*;
 use anchor_spl::token_interface::{
     spl_token_metadata_interface::state::Field, token_metadata_update_field,
     TokenMetadataUpdateField,
 };
 use libreplex_shared::{create_token_2022_and_metadata, MintAccounts2022, TokenGroupInput};
+use solana_program::system_program;
 use spl_pod::optional_keys::OptionalNonZeroPubkey;
 use spl_token_metadata_interface::state::TokenMetadata;
-use solana_program::system_program;
-use crate::{group_extension_program, utils::update_account_lamports_to_minimum_balance, CreatorWithShare, EditionsDeployment, Hashlist, NAME_LIMIT, OFFCHAIN_URL_LIMIT, SYMBOL_LIMIT};
 
 #[derive(AnchorDeserialize, AnchorSerialize, Clone)]
 pub struct InitialiseInput {
     pub max_number_of_tokens: u64, // this is the max *number* of tokens
     pub symbol: String,
-     // add curlies if you want this to be created dynamically. For example
+    // add curlies if you want this to be created dynamically. For example
     // hippo #{} -> turns into hippo #0, hippo #1, etc
     // without curlies the url is the same for all mints 
     pub name: String,
@@ -22,19 +22,17 @@ pub struct InitialiseInput {
     // without curlies the url is the same for all mints 
     pub offchain_url: String,
     pub creator_cosign_program_id: Option<Pubkey>,
-
-    pub royalty_basis_points: u16,
-    pub creators: Vec<CreatorWithShare>,
+    pub item_base_uri: String,
+    pub item_name: String,
 }
 
 
 #[derive(Accounts)]
 #[instruction(input: InitialiseInput)]
-pub struct InitialiseCtx<'info>  {
+pub struct InitialiseCtx<'info> {
     #[account(init, payer = payer, space = 8 + EditionsDeployment::INIT_SPACE, 
         seeds = ["editions_deployment".as_ref(), input.symbol.as_ref()], bump)]
     pub editions_deployment: Account<'info, EditionsDeployment>,
-
 
     /// CHECK: Checked in PDA. Not deserialized because it can be rather big
     #[account(init, seeds = ["hashlist".as_bytes(), 
@@ -48,7 +46,6 @@ pub struct InitialiseCtx<'info>  {
     /// CHECK: can be different from payer for PDA integration
     #[account(mut)]
     pub creator: UncheckedAccount<'info>,
-
 
     #[account(mut)]
     pub group_mint: Signer<'info>,
@@ -70,7 +67,6 @@ pub struct InitialiseCtx<'info>  {
 
 
 pub fn initialise(ctx: Context<InitialiseCtx>, input: InitialiseInput) -> Result<()> {
-   
     if input.offchain_url.len() > OFFCHAIN_URL_LIMIT {
         panic!("Offchain url too long");
     }
@@ -86,8 +82,7 @@ pub fn initialise(ctx: Context<InitialiseCtx>, input: InitialiseInput) -> Result
     let group = &ctx.accounts.group;
 
 
-
-    let url_is_template = match input.offchain_url.matches("{}").count() {
+    let url_is_template = match input.item_base_uri.matches("{}").count() {
         0 => false,
         1 => true,
         _ => {
@@ -96,14 +91,14 @@ pub fn initialise(ctx: Context<InitialiseCtx>, input: InitialiseInput) -> Result
     };
 
 
-    let name_is_template = match input.name.matches("{}").count() {
+    let name_is_template = match input.item_name.matches("{}").count() {
         0 => false,
         1 => true,
         _ => {
             panic!("Only one set of curlies ({{}}) can be specified. name had multiple");
         }
     };
-  
+
 
     ctx.accounts.editions_deployment.set_inner(EditionsDeployment {
         creator: ctx.accounts.creator.key(),
@@ -116,10 +111,10 @@ pub fn initialise(ctx: Context<InitialiseCtx>, input: InitialiseInput) -> Result
             _ => system_program::ID
         },
         symbol: input.symbol,
-        name: input.name,
+        name: input.item_name,
         url_is_template,
         name_is_template,
-        offchain_url: input.offchain_url,
+        offchain_url: input.item_base_uri,
         padding: [0; 98],
     });
 
@@ -129,7 +124,6 @@ pub fn initialise(ctx: Context<InitialiseCtx>, input: InitialiseInput) -> Result
     let group_mint = &ctx.accounts.group_mint;
     let token_program = &ctx.accounts.token_program;
     let group_extension_program = &ctx.accounts.group_extension_program;
-
 
     let update_authority =
         OptionalNonZeroPubkey::try_from(Some(editions_deployment.key())).expect("Bad update auth");
@@ -151,16 +145,16 @@ pub fn initialise(ctx: Context<InitialiseCtx>, input: InitialiseInput) -> Result
         },
         0,
         Some(TokenMetadata {
-            name: editions_deployment.name.clone(),
+            name: input.name.clone(),
             symbol: editions_deployment.symbol.clone(),
-            uri: editions_deployment.offchain_url.clone(),
+            uri: input.offchain_url.clone(),
             update_authority,
             mint: group_mint.key(),
             additional_metadata: vec![], // Leave this empty for now,
         }),
         Some(TokenGroupInput {
             group: group.to_account_info(),
-            max_size: match editions_deployment.max_number_of_tokens  {
+            max_size: match editions_deployment.max_number_of_tokens {
                 0 => u32::MAX,
                 _ => editions_deployment.max_number_of_tokens as u32
             },
@@ -168,68 +162,8 @@ pub fn initialise(ctx: Context<InitialiseCtx>, input: InitialiseInput) -> Result
         None,
         Some(deployment_seeds),
         None,
-        Some(group_extension_program.key())
-    )?;
-
-    // Now, manually construct the royalties metadata vector
-    let mut royalties_metadata: Vec<(String, String)> = vec![];
-
-    // Add royalty_basis_points
-    royalties_metadata.push(("royalty__basis_points".to_string(), input.royalty_basis_points.to_string()));
-
-    // Add creators and their shares with double underscore for hierarchical structure
-    for (index, creator) in input.creators.iter().enumerate() {
-        royalties_metadata.push((
-            format!("royalty__creators__{}_address", index),
-            creator.address.to_string(),
-        ));
-        royalties_metadata.push((
-            format!("royalty__creators__{}_share", index),
-            creator.share.to_string(),
-        ));
-    }
-
-    msg!("Royalties Metadata:\n{}", input.royalty_basis_points.to_string());
-
-    // Prepare the signer seeds
-    let deployment_seeds = &[
-        "editions_deployment".as_bytes(),
-        editions_deployment.symbol.as_ref(),
-        &[ctx.bumps.editions_deployment],
-    ];
-    let signer_seeds: &[&[&[u8]]] = &[deployment_seeds];
-
-    // Iterate over royalties metadata and call `token_metadata_update_field` for each key-value pair
-    for (key, value) in royalties_metadata.iter() {
-        // Prepare the accounts for the CPI call
-        let cpi_accounts = TokenMetadataUpdateField {
-            token_program_id: token_program.to_account_info(),
-            metadata: group_mint.to_account_info(),
-            update_authority: editions_deployment.to_account_info(),
-        };
-
-        // Create the CPI context with signer seeds
-        let cpi_ctx = CpiContext::new_with_signer(
-            token_program.to_account_info(),
-            cpi_accounts,
-            signer_seeds,
-        );
-
-        // Call the `token_metadata_update_field` function for each metadata entry
-        token_metadata_update_field(
-            cpi_ctx,
-            Field::Key(key.to_string()),
-            value.to_string(),
-        )?;
-    }
-
-    // transfer minimum rent to mint account
-    update_account_lamports_to_minimum_balance(
-        group_mint.to_account_info(),
-        ctx.accounts.payer.to_account_info(),
-        ctx.accounts.system_program.to_account_info(),
+        Some(group_extension_program.key()),
     )?;
 
     Ok(())
-
 }

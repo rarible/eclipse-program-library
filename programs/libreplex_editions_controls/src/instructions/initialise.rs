@@ -1,6 +1,7 @@
 use anchor_lang::{prelude::*, system_program};
-use libreplex_editions::{cpi::accounts::InitialiseCtx, group_extension_program, program::LibreplexEditions, AddMetadataArgs, CreatorWithShare, InitialiseInput};
+use libreplex_editions::{cpi::accounts::InitialiseCtx, group_extension_program, program::LibreplexEditions, AddMetadataArgs, CreatorWithShare, InitialiseInput, UpdateRoyaltiesArgs};
 use libreplex_editions::cpi::accounts::AddMetadata;
+use libreplex_editions::cpi::accounts::AddRoyalties;
 use crate::EditionsControls;
 
 #[derive(AnchorDeserialize, AnchorSerialize, Clone)]
@@ -12,9 +13,10 @@ pub struct InitialiseControlInput {
     pub name: String,
     pub offchain_url: String,
     pub cosigner_program_id: Option<Pubkey>,
-    pub royalty_basis_points: u16,
-    pub creators: Vec<CreatorWithShare>,
+    pub royalties: UpdateRoyaltiesArgs,
     pub extra_meta: Vec<AddMetadataArgs>,
+    pub item_base_uri: String,
+    pub item_name: String,
 }
 
 #[derive(Accounts)]
@@ -81,6 +83,8 @@ pub fn initialise_editions_controls(
     let system_program = &ctx.accounts.system_program;
     let token_program = &ctx.accounts.token_program;
     let group_extension_program = &ctx.accounts.group_extension_program;
+    let item_name = input.item_name.clone();
+    let item_base_uri = input.item_base_uri.clone();
 
     let core_input = InitialiseInput {
         max_number_of_tokens: input.max_number_of_tokens,
@@ -88,8 +92,8 @@ pub fn initialise_editions_controls(
         name: input.name,
         offchain_url: input.offchain_url,
         creator_cosign_program_id: Some(crate::ID),
-        royalty_basis_points: input.royalty_basis_points,
-        creators: input.creators,
+        item_name: input.item_name,
+        item_base_uri: input.item_base_uri
     };
 
     // Initialize the editions using CPI
@@ -129,6 +133,23 @@ pub fn initialise_editions_controls(
         &[ctx.bumps.editions_controls],
     ];
 
+    // Add royalties
+    libreplex_editions::cpi::add_royalties(
+        CpiContext::new_with_signer(
+            libreplex_editions_program.to_account_info(),
+            AddRoyalties {
+                editions_deployment: editions_deployment.to_account_info(),
+                payer: payer.to_account_info(),
+                system_program: system_program.to_account_info(),
+                token_program: token_program.to_account_info(),
+                mint: group_mint.to_account_info(),
+                signer: editions_controls.to_account_info(),
+            },
+            &[seeds]
+        ),
+        input.royalties,
+    )?;
+
     // Add metadata CPI call
     libreplex_editions::cpi::add_metadata(
         CpiContext::new_with_signer(
@@ -145,6 +166,8 @@ pub fn initialise_editions_controls(
         ),
         input.extra_meta,
     )?;
+
+    // Add platform fee
 
     Ok(())
 }

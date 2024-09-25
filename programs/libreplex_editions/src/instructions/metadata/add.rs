@@ -1,6 +1,6 @@
-use std::str::FromStr;
-use anchor_lang::{system_program};
+use anchor_lang::system_program;
 use anchor_lang::{prelude::*, solana_program::entrypoint::ProgramResult};
+use std::str::FromStr;
 
 use anchor_spl::token_interface::{
     spl_token_metadata_interface::state::Field, token_metadata_update_field, Token2022,
@@ -27,7 +27,8 @@ pub struct AddMetadata<'info> {
     // when deployment.require_creator_cosign is true, this must be equal to the creator
     // of the deployment otherwise, can be any signer account
     #[account(mut,
-        constraint = editions_deployment.cosigner_program_id == system_program::ID || signer.key() == editions_deployment.creator)]
+        constraint = editions_deployment.cosigner_program_id == system_program::ID || signer.key() == editions_deployment.creator
+    )]
     pub signer: Signer<'info>,
     #[account(mut)]
     pub mint: Signer<'info>,
@@ -43,12 +44,12 @@ impl<'info> AddMetadata<'info> {
             &[bump_edition],
         ];
         let signer_seeds: &[&[&[u8]]] = &[deployment_seeds];
-        msg!("Seeds AddMetadata: {:?}", signer_seeds);
         let cpi_accounts = TokenMetadataUpdateField {
             token_program_id: self.token_program.to_account_info(),
             metadata: self.mint.to_account_info(),
             update_authority: self.editions_deployment.to_account_info(),
         };
+
         let cpi_ctx = CpiContext::new_with_signer(self.token_program.to_account_info(), cpi_accounts, signer_seeds);
         token_metadata_update_field(cpi_ctx, field, value)?;
         Ok(())

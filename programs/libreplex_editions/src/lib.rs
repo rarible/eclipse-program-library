@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 
 pub mod instructions;
 pub use instructions::*;
-declare_id!("CcAQiZw4YpwzDj15dqMfeDvxjpBZPjhjuzjUMX4JmZPL");
+declare_id!("42YGvqcaAkwmipR9qMc6Da2WYMEULBjnu4uYaxRYeN8H");
 
 pub mod errors;
 pub mod state;
@@ -21,7 +21,6 @@ pub mod group_extension_program {
 
 #[program]
 pub mod libreplex_editions {
-    
     use super::*;
 
     // v2 endpoints. Prefer these over the original ones. 
