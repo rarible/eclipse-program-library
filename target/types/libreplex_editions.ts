@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/libreplex_editions.json`.
  */
 export type LibreplexEditions = {
-  "address": "5hx15GaPPqsYA61v6QpcGPpo125v7rfvEfZQ4dJErG5V",
+  "address": "Fb9o5V3ZrvSVAfoAZ3P2cRyUCmSPzHdKCf7FzGv42AGD",
   "metadata": {
     "name": "libreplexEditions",
     "version": "0.2.1",
@@ -578,17 +578,54 @@ export type LibreplexEditions = {
       ],
       "accounts": [
         {
+          "name": "editionsDeployment",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  100,
+                  105,
+                  116,
+                  105,
+                  111,
+                  110,
+                  115,
+                  95,
+                  100,
+                  101,
+                  112,
+                  108,
+                  111,
+                  121,
+                  109,
+                  101,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "editions_deployment.symbol",
+                "account": "editionsDeployment"
+              }
+            ]
+          }
+        },
+        {
           "name": "payer",
           "writable": true,
           "signer": true
         },
         {
-          "name": "authority",
+          "name": "signer",
+          "writable": true,
           "signer": true
         },
         {
-          "name": "mint",
-          "writable": true
+          "name": "mint"
         },
         {
           "name": "systemProgram",
@@ -657,53 +694,43 @@ export type LibreplexEditions = {
   "errors": [
     {
       "code": 6000,
-      "name": "tickerTooLong",
-      "msg": "Ticker too long"
+      "name": "sizeExceedsMaxSize",
+      "msg": "Collection size exceeds max size."
     },
     {
       "code": 6001,
-      "name": "mintTemplateTooLong",
-      "msg": "Mint template too long"
+      "name": "maxSizeBelowCurrentSize",
+      "msg": "Max size cannot be reduced below current size."
     },
     {
       "code": 6002,
-      "name": "deploymentTemplateTooLong",
-      "msg": "Deployment template too long"
+      "name": "creatorShareInvalid",
+      "msg": "Creators shares must add up to 100."
     },
     {
       "code": 6003,
-      "name": "rootTypeTooLong",
-      "msg": "Root type too long"
+      "name": "missingApproveAccount",
+      "msg": "Missing approve account."
     },
     {
       "code": 6004,
-      "name": "mintedOut",
-      "msg": "Minted out"
+      "name": "expiredApproveAccount",
+      "msg": "Approve account has expired."
     },
     {
       "code": 6005,
-      "name": "legacyMigrationsAreMintedOut",
-      "msg": "Legacy migrations are minted out"
+      "name": "invalidField",
+      "msg": "Invalid field. You cannot use a public key as a field."
     },
     {
       "code": 6006,
-      "name": "missingGlobalTreeDelegate",
-      "msg": "Global tree delegate is missing"
+      "name": "creatorAddressInvalid",
+      "msg": "The Address you provided is invalid. Please provide a valid address."
     },
     {
       "code": 6007,
-      "name": "incorrectMintType",
-      "msg": "Incorrect mint type"
-    },
-    {
-      "code": 6008,
-      "name": "invalidMetadata",
-      "msg": "Invalid Metadata"
-    },
-    {
-      "code": 6009,
-      "name": "creatorFeeTooHigh",
-      "msg": "Creator fee too high"
+      "name": "royaltyBasisPointsInvalid",
+      "msg": "Royalty basis points must be less than or equal to 10000."
     }
   ],
   "types": [
