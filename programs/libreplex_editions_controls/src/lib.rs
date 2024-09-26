@@ -1,12 +1,11 @@
 use anchor_lang::prelude::*;
 
-
 pub mod logic;
 pub use logic::*;
 
 pub mod instructions;
 pub use instructions::*;
-declare_id!("Ey4RSJfxsKrRfKdnetiFrhZuQU9XkQASjkjdFSxep1yL");
+declare_id!("3c6wKJRj2BGWyS6pSyncncZvgG6h3Gtydindak1x1LVM");
 
 pub mod errors;
 pub mod state;
@@ -38,5 +37,11 @@ pub mod libreplex_editions_controls {
 
     pub fn mint_with_controls<'info>(ctx: Context<'_, '_, '_, 'info, MintWithControlsCtx<'info>>, mint_input: MintInput) -> Result<()> {
         instructions::mint_with_controls(ctx, mint_input)
+    }
+
+    pub fn modify_royalties(
+        ctx: Context<UpdateRoyaltiesCtx>,
+        input: libreplex_editions::UpdateRoyaltiesArgs) -> Result<()> {
+        instructions::update_royalties(ctx, input)
     }
 }

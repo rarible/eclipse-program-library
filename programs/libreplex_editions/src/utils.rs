@@ -20,7 +20,7 @@ use anchor_spl::token_interface::{
     },
     spl_token_metadata_interface::state::TokenMetadata,
 };
-use spl_tlv_account_resolution::{account::ExtraAccountMeta, state::ExtraAccountMetaList};
+use spl_tlv_account_resolution::{account::ExtraAccountMeta};
 
 pub fn update_account_lamports_to_minimum_balance<'info>(
     account: AccountInfo<'info>,
@@ -66,6 +66,6 @@ pub fn get_meta_list(approve_account: Pubkey) -> Vec<ExtraAccountMeta> {
     }]
 }
 
-pub fn get_meta_list_size(approve_account: Pubkey) -> usize {
-    ExtraAccountMetaList::size_of(get_meta_list(approve_account).len()).unwrap()
-}
+// pub fn get_meta_list_size(approve_account: Pubkey) -> usize {
+//     ExtraAccountMetaList::size_of(get_meta_list(approve_account).len()).unwrap()
+// }

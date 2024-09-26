@@ -9,7 +9,7 @@ use spl_transfer_hook_interface::instruction::ExecuteInstruction;
 
 use crate::{EditionsDeployment, UpdateRoyaltiesArgs, META_LIST_ACCOUNT_SEED, ROYALTY_BASIS_POINTS_FIELD};
 use crate::errors::MetadataErrors;
-use crate::utils::{get_approve_account_pda, get_meta_list, update_account_lamports_to_minimum_balance, get_meta_list_size};
+use crate::utils::{get_meta_list, update_account_lamports_to_minimum_balance};
 
 #[derive(Accounts)]
 #[instruction(args: UpdateRoyaltiesArgs)]

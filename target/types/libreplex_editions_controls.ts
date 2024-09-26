@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/libreplex_editions_controls.json`.
  */
 export type LibreplexEditionsControls = {
-  "address": "Ey4RSJfxsKrRfKdnetiFrhZuQU9XkQASjkjdFSxep1yL",
+  "address": "3c6wKJRj2BGWyS6pSyncncZvgG6h3Gtydindak1x1LVM",
   "metadata": {
     "name": "libreplexEditionsControls",
     "version": "0.2.1",
@@ -51,7 +51,7 @@ export type LibreplexEditionsControls = {
         },
         {
           "name": "libreplexEditionsProgram",
-          "address": "7EReqCaHtmsHVajsoUioVVK7AJKZpdWN4Pszh5DbWooS"
+          "address": "2fuBwsFLwynWTzVo3NUFodAC97NkQ2toRBZ8JwvHWFQe"
         }
       ],
       "args": [
@@ -152,7 +152,7 @@ export type LibreplexEditionsControls = {
         },
         {
           "name": "libreplexEditionsProgram",
-          "address": "7EReqCaHtmsHVajsoUioVVK7AJKZpdWN4Pszh5DbWooS"
+          "address": "2fuBwsFLwynWTzVo3NUFodAC97NkQ2toRBZ8JwvHWFQe"
         }
       ],
       "args": [
@@ -357,7 +357,7 @@ export type LibreplexEditionsControls = {
         },
         {
           "name": "libreplexEditionsProgram",
-          "address": "7EReqCaHtmsHVajsoUioVVK7AJKZpdWN4Pszh5DbWooS"
+          "address": "2fuBwsFLwynWTzVo3NUFodAC97NkQ2toRBZ8JwvHWFQe"
         }
       ],
       "args": [
@@ -366,6 +366,94 @@ export type LibreplexEditionsControls = {
           "type": {
             "defined": {
               "name": "mintInput"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "modifyRoyalties",
+      "discriminator": [
+        199,
+        95,
+        20,
+        107,
+        136,
+        161,
+        93,
+        137
+      ],
+      "accounts": [
+        {
+          "name": "editionsDeployment",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  100,
+                  105,
+                  116,
+                  105,
+                  111,
+                  110,
+                  115,
+                  95,
+                  100,
+                  101,
+                  112,
+                  108,
+                  111,
+                  121,
+                  109,
+                  101,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "editions_deployment.symbol",
+                "account": "editionsDeployment"
+              }
+            ]
+          }
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "creator",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "mint",
+          "writable": true
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "tokenProgram",
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+        },
+        {
+          "name": "libreplexEditionsProgram",
+          "address": "2fuBwsFLwynWTzVo3NUFodAC97NkQ2toRBZ8JwvHWFQe"
+        }
+      ],
+      "args": [
+        {
+          "name": "input",
+          "type": {
+            "defined": {
+              "name": "updateRoyaltiesArgs"
             }
           }
         }

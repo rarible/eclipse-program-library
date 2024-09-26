@@ -9,7 +9,10 @@ pub use initialise::*;
 pub mod add_phase;
 pub use add_phase::*;
 
+pub mod update_royalties;
+pub use update_royalties::*;
 
 pub mod mint_with_controls;
+
 pub use mint_with_controls::*;
 

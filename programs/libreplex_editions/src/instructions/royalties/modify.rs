@@ -1,4 +1,5 @@
 use std::str::FromStr;
+use anchor_lang::{system_program};
 
 use anchor_lang::{
     prelude::*,
@@ -16,10 +17,7 @@ use anchor_spl::token_interface::{
     token_metadata_update_field, Mint, Token2022, TokenMetadataUpdateField,
 };
 
-use crate::{
-    UpdateRoyaltiesArgs,
-    ROYALTY_BASIS_POINTS_FIELD,
-};
+use crate::{EditionsDeployment, UpdateRoyaltiesArgs, ROYALTY_BASIS_POINTS_FIELD};
 use crate::errors::MetadataErrors;
 use crate::utils::update_account_lamports_to_minimum_balance;
 
@@ -28,8 +26,12 @@ use crate::utils::update_account_lamports_to_minimum_balance;
 pub struct ModifyRoyalties<'info> {
     #[account(mut)]
     pub payer: Signer<'info>,
-    #[account()]
-    pub authority: Signer<'info>,
+    #[account(mut,
+        seeds = ["editions_deployment".as_ref(), editions_deployment.symbol.as_ref()], bump)]
+    pub editions_deployment: Account<'info, EditionsDeployment>,
+    #[account(mut,
+        constraint = editions_deployment.cosigner_program_id == system_program::ID || signer.key() == editions_deployment.creator)]
+    pub signer: Signer<'info>,
     #[account(
         mut,
         mint::token_program = token_program,
@@ -44,7 +46,7 @@ impl<'info> ModifyRoyalties<'info> {
         let cpi_accounts = TokenMetadataUpdateField {
             token_program_id: self.token_program.to_account_info(),
             metadata: self.mint.to_account_info().clone(),
-            update_authority: self.authority.to_account_info(),
+            update_authority: self.editions_deployment.to_account_info(),
         };
         let cpi_ctx = CpiContext::new(self.token_program.to_account_info(), cpi_accounts);
         token_metadata_update_field(cpi_ctx, field, value)?;
@@ -57,13 +59,13 @@ impl<'info> ModifyRoyalties<'info> {
             &remove_key(
                 &self.token_program.key(),
                 &self.mint.key(),
-                &self.authority.key(),
+                &self.editions_deployment.key(),
                 field.to_string(),
                 false,
             ),
             &[
                 self.mint.to_account_info(),
-                self.authority.to_account_info(),
+                self.editions_deployment.to_account_info(),
             ],
         )?;
 
