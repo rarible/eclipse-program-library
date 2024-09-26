@@ -52,4 +52,8 @@ pub enum MetadataErrors {
     CreatorAddressInvalid,
     #[msg("Royalty basis points must be less than or equal to 10000.")]
     RoyaltyBasisPointsInvalid,
+    #[msg("Platform fee basis points must be less than or equal to 10000.")]
+    PlatformFeeBasisPointsInvalid,
+    #[msg("Recipient shares must add up to 100.")]
+    RecipientShareInvalid,
 }
