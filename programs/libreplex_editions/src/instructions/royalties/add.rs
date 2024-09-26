@@ -23,7 +23,7 @@ pub struct AddRoyalties<'info> {
     // when deployment.require_creator_cosign is true, this must be equal to the creator
     // of the deployment otherwise, can be any signer account
     #[account(mut,
-        constraint = editions_deployment.cosigner_program_id == system_program::ID || signer.key() == editions_deployment.creator)]
+        constraint = signer.key() == editions_deployment.creator)]
     pub signer: Signer<'info>,
     #[account(mut)]
     pub mint: Signer<'info>,

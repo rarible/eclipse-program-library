@@ -6,8 +6,8 @@ use anchor_spl::{
     token_interface::spl_token_metadata_interface::instruction::remove_key,
     token_interface::{Mint, Token2022},
 };
-
-use crate::{errors::MetadataErrors};
+use solana_program::program::invoke_signed;
+use crate::{errors::MetadataErrors, EditionsDeployment, ROYALTY_BASIS_POINTS_FIELD};
 use crate::utils::update_account_lamports_to_minimum_balance;
 
 #[derive(AnchorDeserialize, AnchorSerialize)]
@@ -18,14 +18,18 @@ pub struct RemoveMetadataArgs {
 
 #[derive(Accounts)]
 pub struct RemoveMetadata<'info> {
+    #[account(mut,
+        seeds = ["editions_deployment".as_ref(), editions_deployment.symbol.as_ref()], bump)]
+    pub editions_deployment: Account<'info, EditionsDeployment>,
     #[account(mut)]
     pub payer: Signer<'info>,
-    #[account()]
-    pub authority: Signer<'info>,
-    #[account(
-        mut,
-        mint::token_program = token_program,
+
+    // when deployment.require_creator_cosign is true, this must be equal to the creator
+    // of the deployment otherwise, can be any signer account
+    #[account(mut,
+        constraint = signer.key() == editions_deployment.creator
     )]
+    pub signer: Signer<'info>,
     pub mint: Box<InterfaceAccount<'info, Mint>>,
     pub system_program: Program<'info, System>,
     pub token_program: Program<'info, Token2022>,
@@ -33,19 +37,27 @@ pub struct RemoveMetadata<'info> {
 
 impl<'info> RemoveMetadata<'info> {
     // ToDo: Create a macro for it
-    fn remove_token_metadata_field(&self, field: String) -> Result<()> {
-        invoke(
+    fn remove_token_metadata_field(&self, field: String, bump_edition: u8) -> Result<()> {
+        let deployment_seeds: &[&[u8]] = &[
+            "editions_deployment".as_bytes(),
+            self.editions_deployment.symbol.as_ref(),
+            &[bump_edition],
+        ];
+        let signer_seeds: &[&[&[u8]]] = &[deployment_seeds];
+
+        invoke_signed(
             &remove_key(
                 &self.token_program.key(),
                 &self.mint.key(),
-                &self.authority.key(),
+                &self.editions_deployment.key(),
                 field,
                 false,
             ),
             &[
                 self.mint.to_account_info(),
-                self.authority.to_account_info(),
+                self.editions_deployment.to_account_info(),
             ],
+            signer_seeds
         )?;
 
         Ok(())
@@ -54,6 +66,9 @@ impl<'info> RemoveMetadata<'info> {
 
 pub fn handler(ctx: Context<RemoveMetadata>, args: Vec<RemoveMetadataArgs>) -> Result<()> {
     for metadata_arg in args {
+        if metadata_arg.field.to_string() == ROYALTY_BASIS_POINTS_FIELD {
+            continue;
+        }
         // validate that the field is not a publickey
         match Pubkey::from_str(&metadata_arg.field) {
             Ok(_) => {
@@ -61,7 +76,7 @@ pub fn handler(ctx: Context<RemoveMetadata>, args: Vec<RemoveMetadataArgs>) -> R
             }
             Err(_) => {
                 ctx.accounts
-                    .remove_token_metadata_field(metadata_arg.field)?;
+                    .remove_token_metadata_field(metadata_arg.field, ctx.bumps.editions_deployment)?;
             }
         }
     }

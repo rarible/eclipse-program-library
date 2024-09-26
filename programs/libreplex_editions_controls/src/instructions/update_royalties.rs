@@ -3,20 +3,26 @@ use libreplex_editions::{EditionsDeployment, UpdateRoyaltiesArgs};
 use libreplex_editions::program::LibreplexEditions;
 use anchor_spl::token_interface::{Mint};
 use libreplex_editions::cpi::accounts::ModifyRoyalties;
+use crate::EditionsControls;
 
 #[derive(Accounts)]
 #[instruction(input: UpdateRoyaltiesArgs)]
 pub struct UpdateRoyaltiesCtx<'info> {
+    #[account(mut)]
+    pub editions_deployment: Box<Account<'info, EditionsDeployment>>,
+
     #[account(mut,
-        seeds = ["editions_deployment".as_ref(), editions_deployment.symbol.as_ref()], bump)]
-    pub editions_deployment: Account<'info, EditionsDeployment>,
+        seeds = [b"editions_controls", editions_deployment.key().as_ref()],
+        bump
+    )]
+    pub editions_controls: Box<Account<'info, EditionsControls>>,
 
     #[account(mut)]
     pub payer: Signer<'info>,
 
     // can be different from payer for PDA integration
     #[account(mut,
-        constraint = editions_deployment.creator == creator.key())]
+        constraint = editions_controls.creator == creator.key())]
     pub creator: Signer<'info>,
 
     #[account(
@@ -38,6 +44,7 @@ pub struct UpdateRoyaltiesCtx<'info> {
 
 pub fn update_royalties(ctx: Context<UpdateRoyaltiesCtx>, royalties_input: UpdateRoyaltiesArgs) -> Result<()> {
 
+    let editions_controls = &mut ctx.accounts.editions_controls;
     let libreplex_editions_program = &ctx.accounts.libreplex_editions_program;
     let editions_deployment = &ctx.accounts.editions_deployment;
     let payer = &ctx.accounts.payer;
@@ -49,22 +56,22 @@ pub fn update_royalties(ctx: Context<UpdateRoyaltiesCtx>, royalties_input: Updat
     let seeds = &[
         b"editions_controls",
         editions_deployment_key.as_ref(),
-        &[ctx.bumps.editions_deployment],
+        &[ctx.bumps.editions_controls],
     ];
-
+    msg!("libreplex_editions::cpi::modify_royalties start");
     libreplex_editions::cpi::modify_royalties(
         CpiContext::new_with_signer(
             libreplex_editions_program.to_account_info(),
             ModifyRoyalties {
                 editions_deployment: editions_deployment.to_account_info(),
                 payer: payer.to_account_info(),
-                signer: editions_deployment.to_account_info(),
+                signer: editions_controls.to_account_info(),
                 mint: mint.to_account_info(),
                 token_program: token_program.to_account_info(),
                 system_program: system_program.to_account_info(),
             },
             &[seeds]
         ), royalties_input)?;
-
+    msg!("libreplex_editions::cpi::modify_royalties done");
     Ok(())
 }
