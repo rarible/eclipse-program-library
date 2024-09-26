@@ -1,10 +1,7 @@
-
-
 use anchor_lang::{prelude::*, system_program};
 use anchor_spl::{
     associated_token::AssociatedToken, token_2022
 };
-
 
 use libreplex_editions::group_extension_program;
 use libreplex_editions::{program::LibreplexEditions, EditionsDeployment};
@@ -12,16 +9,13 @@ use libreplex_editions::cpi::accounts::MintCtx;
 
 use crate::{EditionsControls, MinterStats};
 
-
 use crate::check_phase_constraints;
-
-
 
 #[derive(AnchorDeserialize, AnchorSerialize, Clone)]
 pub struct MintInput {
-    pub phase_index: u32
+    pub phase_index: u32,
+    pub merkle_proof: Option<Vec<[u8; 32]>>,
 }
-
 
 #[derive(Accounts)]
 #[instruction(mint_input: MintInput)]
@@ -36,7 +30,6 @@ pub struct MintWithControlsCtx<'info> {
         bump
     )]
     pub editions_controls: Box<Account<'info, EditionsControls>>,
-
 
      /// CHECK: Checked via CPI
      #[account(mut)]
@@ -75,8 +68,6 @@ pub struct MintWithControlsCtx<'info> {
         space=MinterStats::SIZE)]
     pub minter_stats_phase: Box<Account<'info, MinterStats>>,
 
-
-
     #[account(mut)]
     pub mint: Signer<'info>,
 
@@ -102,7 +93,6 @@ pub struct MintWithControlsCtx<'info> {
         constraint = editions_controls.treasury == treasury.key())]
     pub treasury: UncheckedAccount<'info>,
 
-
     /* BOILERPLATE PROGRAM ACCOUNTS */
     /// CHECK: Checked in constraint
     #[account(
@@ -124,14 +114,12 @@ pub struct MintWithControlsCtx<'info> {
 
 }
 
-
-
 pub fn mint_with_controls(ctx: Context<MintWithControlsCtx>, mint_input: MintInput) -> Result<()> {
     
     let libreplex_editions_program = &ctx.accounts.libreplex_editions_program;
     let editions_deployment = &ctx.accounts.editions_deployment;
     let editions_controls = &mut ctx.accounts.editions_controls;
-   
+
     let hashlist = &ctx.accounts.hashlist;
     let hashlist_marker = &ctx.accounts.hashlist_marker;
     let payer = &ctx.accounts.payer;
@@ -163,7 +151,10 @@ pub fn mint_with_controls(ctx: Context<MintWithControlsCtx>, mint_input: MintInp
         &editions_controls.phases[phase_index],
         minter_stats,
         minter_stats_phase,
-        editions_controls);
+        editions_controls,
+        mint_input.merkle_proof,
+        &minter.key()
+    );
 
     msg!("[mint_count] total:{} phase: {}", minter_stats.mint_count, minter_stats_phase.mint_count);
      // update this in case it has been initialised

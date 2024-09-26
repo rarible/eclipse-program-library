@@ -13,15 +13,16 @@ pub struct InitialisePhaseInput {
     pub start_time: i64, 
     pub max_mints_per_wallet: u64,
     pub max_mints_total: u64,
-    pub end_time: i64 // set to i64::MAX if not supplied
+    pub end_time: i64, // set to i64::MAX if not supplied
+    pub is_private: bool,
+    pub merkle_root: Option<[u8; 32]>,
 }
 
 
 #[derive(Accounts)]
 #[instruction(input: InitialisePhaseInput)]
 pub struct AddPhaseCtx<'info> {
-   
-   
+
     #[account(mut,
         realloc = EditionsControls::get_size(editions_controls.phases.len()+1),
         realloc::zero = false,
@@ -63,10 +64,10 @@ pub fn add_phase(ctx: Context<AddPhaseCtx>, input: InitialisePhaseInput) -> Resu
         end_time: input.end_time,
         padding: [0; 200],
         max_mints_total: input.max_mints_total,
-        current_mints: 0
+        current_mints: 0,
+        is_private: input.is_private,
+        merkle_root: input.merkle_root,
     });
-
-
 
     Ok(())
 }

@@ -9,6 +9,8 @@ pub fn check_phase_constraints(
     minter_stats: &mut Account<MinterStats>,
     minter_stats_phase: &mut Account<MinterStats>,
     editions_controls: &Account<EditionsControls>,
+    merkle_proof: Option<Vec<[u8; 32]>>,
+    minter: &Pubkey,
 ) {
     // check
     let clock = Clock::get().unwrap();
@@ -38,6 +40,27 @@ pub fn check_phase_constraints(
     if editions_controls.max_mints_per_wallet > 0 && minter_stats.mint_count >= editions_controls.max_mints_per_wallet {
         panic!("This wallet has exceeded max mints for the deployment")
     }
-
     
+    // check private phase constraints @dev on-going development
+    if phase.is_private {
+        if let Some(merkle_root) = phase.merkle_root {
+            if let Some(proof) = merkle_proof {
+
+                // construct leaf, check PhaseTreeNode.
+                let leaf = hashv(&[
+                    // minter
+                    // price
+                    // max_claims
+                ]);
+
+                if !verify(proof, merkle_root, leaf.to_bytes()) {
+                    panic!("Invalid merkle proof");
+                }
+            } else {
+                panic!("Merkle proof required for private phase");
+            }
+        } else {
+            panic!("Merkle root not set for private phase");
+        }
+    }
 }

@@ -12,6 +12,8 @@ pub struct Phase {
     pub max_mints_total: u64, // set to 0 for unlimited (applied across all the phases)
     pub end_time: i64, // set to i64::MAX for unlimited
     pub current_mints: u64,
+    pub is_private: bool,
+    pub merkle_root: Option<[u8; 32]>,
     pub padding: [u8; 200]
 }
 
@@ -24,6 +26,8 @@ impl Phase {
     + 8
     + 8
     + 8
+    + 1  // is_private
+    + 33 // Option<[u8; 32]>
     + 200;
 }
 
