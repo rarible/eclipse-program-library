@@ -8,6 +8,9 @@ pub const META_LIST_ACCOUNT_SEED: &[u8] = b"extra-account-metas";
 pub const APPROVE_ACCOUNT_SEED: &[u8] = b"approve-account";
 pub const ROYALTY_BASIS_POINTS_FIELD: &str = "royalty_basis_points";
 pub const PLATFORM_FEE_VALUE: &str = "platform_fee_value";
+// Define constants for metadata keys
+pub const PLATFORM_FEE_PREFIX_KEY: &str = "platform_fee__";
+pub const PLATFORM_FEE_VALUE_KEY: &str = "platform_fee_value";
 
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub enum DeploymentStatus {
@@ -71,3 +74,5 @@ pub struct Hashlist {
     pub deployment: Pubkey,
     pub issues: Vec<MintAndOrder>,
 }
+
+

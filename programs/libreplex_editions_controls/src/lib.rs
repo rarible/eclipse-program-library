@@ -5,7 +5,7 @@ pub use logic::*;
 
 pub mod instructions;
 pub use instructions::*;
-declare_id!("6nmj6UVQgjZseRruceU1ZJG2dhfCDrcxKG2qhB2x9QSG");
+declare_id!("J87ZtbZvSYaBhwwDb4LqCHAh7rAUjkVWiab5AZ7R3TY5");
 
 pub mod errors;
 pub mod state;
@@ -14,7 +14,7 @@ pub use state::*;
 
 #[program]
 pub mod libreplex_editions_controls {
-
+    use libreplex_editions::{ModifyPlatformFee, UpdatePlatformFeeArgs};
     use super::*;
 
     // v2 endpoints. Prefer these over the original ones.
@@ -43,5 +43,11 @@ pub mod libreplex_editions_controls {
         ctx: Context<UpdateRoyaltiesCtx>,
         input: libreplex_editions::UpdateRoyaltiesArgs) -> Result<()> {
         instructions::update_royalties(ctx, input)
+    }
+
+    pub fn modify_platform_fee(
+        ctx: Context<UpdatePlatformFeeCtx>,
+        input: libreplex_editions::UpdatePlatformFeeArgs) -> Result<()> {
+        instructions::update_platform_fee(ctx, input)
     }
 }

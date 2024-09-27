@@ -1,3 +1,4 @@
+use crate::{PlatformFeeRecipient, UpdatePlatformFeeArgs, PLATFORM_FEE_PREFIX_KEY, PLATFORM_FEE_VALUE_KEY};
 use anchor_lang::prelude::*;
 use anchor_spl::token_interface::spl_token_2022::{
     extension::{BaseStateWithExtensions, StateWithExtensions},
@@ -5,7 +6,6 @@ use anchor_spl::token_interface::spl_token_2022::{
 };
 use anchor_spl::token_interface::spl_token_metadata_interface::state::TokenMetadata;
 use std::str::FromStr;
-use crate::{PlatformFeeRecipient, UpdatePlatformFeeArgs, PLATFORM_FEE_PREFIX_KEY, PLATFORM_FEE_VALUE_KEY};
 
 pub fn get_platform_fee(account: &AccountInfo) -> Result<UpdatePlatformFeeArgs> {
     // Get the TokenMetadata from the mint account

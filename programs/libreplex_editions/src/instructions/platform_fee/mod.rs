@@ -13,10 +13,6 @@ pub struct UpdatePlatformFeeArgs {
     pub is_fee_flat: bool, // Flag to indicate if the fee is flat
 }
 
-// Define constants for metadata keys
-pub const PLATFORM_FEE_PREFIX_KEY: &str = "platform_fee__";
-pub const PLATFORM_FEE_VALUE_KEY: &str = "platform_fee_value";
-
 pub mod add;
 pub mod modify;
 mod get;

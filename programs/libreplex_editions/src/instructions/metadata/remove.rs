@@ -7,7 +7,7 @@ use anchor_spl::{
     token_interface::{Mint, Token2022},
 };
 use solana_program::program::invoke_signed;
-use crate::{errors::MetadataErrors, EditionsDeployment, ROYALTY_BASIS_POINTS_FIELD};
+use crate::{errors::MetadataErrors, EditionsDeployment, PLATFORM_FEE_PREFIX_KEY, ROYALTY_BASIS_POINTS_FIELD};
 use crate::utils::update_account_lamports_to_minimum_balance;
 
 #[derive(AnchorDeserialize, AnchorSerialize)]
@@ -66,6 +66,18 @@ impl<'info> RemoveMetadata<'info> {
 
 pub fn handler(ctx: Context<RemoveMetadata>, args: Vec<RemoveMetadataArgs>) -> Result<()> {
     for metadata_arg in args {
+        // Validate that the field is not a public key
+        if Pubkey::from_str(&metadata_arg.field).is_ok() {
+            return Err(MetadataErrors::InvalidField.into());
+        }
+
+        // Validate that the field does not start with reserved prefixes
+        if metadata_arg.field.starts_with(PLATFORM_FEE_PREFIX_KEY)
+            || metadata_arg.field.starts_with(ROYALTY_BASIS_POINTS_FIELD)
+        {
+            return Err(MetadataErrors::InvalidField.into());
+        }
+
         if metadata_arg.field.to_string() == ROYALTY_BASIS_POINTS_FIELD {
             continue;
         }

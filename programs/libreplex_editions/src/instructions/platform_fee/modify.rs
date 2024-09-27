@@ -1,5 +1,5 @@
-use std::str::FromStr;
 use anchor_lang::system_program;
+use std::str::FromStr;
 
 use anchor_lang::{
     prelude::*,
@@ -17,12 +17,12 @@ use anchor_spl::token_interface::{
     token_metadata_update_field, Mint, Token2022, TokenMetadataUpdateField,
 };
 
+use crate::errors::MetadataErrors;
+use crate::utils::update_account_lamports_to_minimum_balance;
 use crate::{
     EditionsDeployment, UpdatePlatformFeeArgs,
     PLATFORM_FEE_PREFIX_KEY, PLATFORM_FEE_VALUE_KEY,
 };
-use crate::errors::MetadataErrors;
-use crate::utils::update_account_lamports_to_minimum_balance;
 
 #[derive(Accounts)]
 #[instruction(args: UpdatePlatformFeeArgs)]

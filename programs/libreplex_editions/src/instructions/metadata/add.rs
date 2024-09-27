@@ -1,6 +1,7 @@
 use anchor_lang::system_program;
 use anchor_lang::{prelude::*, solana_program::entrypoint::ProgramResult};
 use std::str::FromStr;
+use crate::{PLATFORM_FEE_PREFIX_KEY, PLATFORM_FEE_VALUE_KEY, ROYALTY_BASIS_POINTS_FIELD};
 
 use anchor_spl::token_interface::{
     spl_token_metadata_interface::state::Field, token_metadata_update_field, Token2022,
@@ -58,6 +59,18 @@ impl<'info> AddMetadata<'info> {
 
 pub fn handler(ctx: Context<AddMetadata>, args: Vec<AddMetadataArgs>) -> Result<()> {
     for metadata_arg in args {
+        // Validate that the field is not a public key
+        if Pubkey::from_str(&metadata_arg.field).is_ok() {
+            return Err(MetadataErrors::InvalidField.into());
+        }
+
+        // Validate that the field does not start with reserved prefixes
+        if metadata_arg.field.starts_with(PLATFORM_FEE_PREFIX_KEY)
+            || metadata_arg.field.starts_with(ROYALTY_BASIS_POINTS_FIELD)
+        {
+            return Err(MetadataErrors::InvalidField.into());
+        }
+
         // validate that the field is not a publickey
         match Pubkey::from_str(&metadata_arg.field) {
             Ok(_) => {

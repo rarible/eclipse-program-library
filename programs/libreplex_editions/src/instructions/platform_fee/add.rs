@@ -1,5 +1,8 @@
-use anchor_lang::{prelude::*, solana_program::entrypoint::ProgramResult};
+use crate::errors::MetadataErrors;
+use crate::utils::update_account_lamports_to_minimum_balance;
+use crate::{EditionsDeployment, UpdatePlatformFeeArgs, PLATFORM_FEE_PREFIX_KEY, PLATFORM_FEE_VALUE_KEY};
 use anchor_lang::system_program;
+use anchor_lang::{prelude::*, solana_program::entrypoint::ProgramResult};
 use anchor_spl::token_interface::{
     spl_token_metadata_interface::state::Field,
     token_metadata_update_field,
@@ -7,9 +10,6 @@ use anchor_spl::token_interface::{
     Token2022,
     TokenMetadataUpdateField,
 };
-use crate::{EditionsDeployment, UpdatePlatformFeeArgs, PLATFORM_FEE_PREFIX_KEY, PLATFORM_FEE_VALUE_KEY};
-use crate::errors::MetadataErrors;
-use crate::utils::update_account_lamports_to_minimum_balance;
 
 #[derive(Accounts)]
 #[instruction(args: UpdatePlatformFeeArgs)]

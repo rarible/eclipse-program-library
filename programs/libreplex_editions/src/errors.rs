@@ -56,4 +56,6 @@ pub enum MetadataErrors {
     PlatformFeeBasisPointsInvalid,
     #[msg("Recipient shares must add up to 100.")]
     RecipientShareInvalid,
+    #[msg("The provided field is invalid or reserved.")]
+    ReservedField,
 }
