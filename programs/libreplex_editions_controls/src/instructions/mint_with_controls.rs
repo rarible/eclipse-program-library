@@ -161,7 +161,7 @@ pub fn mint_with_controls(ctx: Context<MintWithControlsCtx>, mint_input: MintInp
     );
 
     msg!("[mint_count] total:{} phase: {}", minter_stats.mint_count, minter_stats_phase.mint_count);
-     // update this in case it has been initialised
+    // update this in case it has been initialised
     // idempotent because the account is determined by the PDA
     minter_stats.wallet = minter.key();
     minter_stats.mint_count += 1; 
@@ -171,7 +171,12 @@ pub fn mint_with_controls(ctx: Context<MintWithControlsCtx>, mint_input: MintInp
 
     editions_controls.phases[phase_index].current_mints += 1;
 
-    
+    let isPrivatePhase = editions_controls.phases[phase_index].is_private;
+    let final_mint_price = if isPrivatePhase {
+        mint_input.allow_list_price.unwrap_or(0)
+    } else {
+        price_amount
+    };
     // ok, we are gucci. transfer funds to treasury if applicable
 
     system_program::transfer(
@@ -182,7 +187,7 @@ pub fn mint_with_controls(ctx: Context<MintWithControlsCtx>, mint_input: MintInp
                 to: treasury.to_account_info(),
             },
         ),
-        price_amount
+        final_mint_price
     )?;
 
     // take all the data for platform fee and transfer
