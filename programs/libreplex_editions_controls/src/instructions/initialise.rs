@@ -1,7 +1,8 @@
 use anchor_lang::{prelude::*, system_program};
-use libreplex_editions::{cpi::accounts::InitialiseCtx, group_extension_program, program::LibreplexEditions, AddMetadataArgs, CreatorWithShare, InitialiseInput, UpdateRoyaltiesArgs};
+use libreplex_editions::{cpi::accounts::InitialiseCtx, group_extension_program, program::LibreplexEditions, AddMetadataArgs, CreatorWithShare, InitialiseInput, UpdatePlatformFeeArgs, UpdateRoyaltiesArgs};
 use libreplex_editions::cpi::accounts::AddMetadata;
 use libreplex_editions::cpi::accounts::AddRoyalties;
+use libreplex_editions::cpi::accounts::AddPlatformFee;
 use crate::EditionsControls;
 
 #[derive(AnchorDeserialize, AnchorSerialize, Clone)]
@@ -17,6 +18,7 @@ pub struct InitialiseControlInput {
     pub extra_meta: Vec<AddMetadataArgs>,
     pub item_base_uri: String,
     pub item_name: String,
+    pub platform_fee: UpdatePlatformFeeArgs
 }
 
 #[derive(Accounts)]
@@ -83,8 +85,6 @@ pub fn initialise_editions_controls(
     let system_program = &ctx.accounts.system_program;
     let token_program = &ctx.accounts.token_program;
     let group_extension_program = &ctx.accounts.group_extension_program;
-    let item_name = input.item_name.clone();
-    let item_base_uri = input.item_base_uri.clone();
 
     let core_input = InitialiseInput {
         max_number_of_tokens: input.max_number_of_tokens,
@@ -168,6 +168,21 @@ pub fn initialise_editions_controls(
     )?;
 
     // Add platform fee
+    libreplex_editions::cpi::add_platform_fee(
+        CpiContext::new_with_signer(
+            libreplex_editions_program.to_account_info(),
+            AddPlatformFee {
+                editions_deployment: editions_deployment.to_account_info(),
+                payer: payer.to_account_info(),
+                system_program: system_program.to_account_info(),
+                token_program: token_program.to_account_info(),
+                group_mint: group_mint.to_account_info(),
+                signer: editions_controls.to_account_info(),
+            },
+            &[seeds]
+        ),
+        input.platform_fee,
+    )?;
 
     Ok(())
 }

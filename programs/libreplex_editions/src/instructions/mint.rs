@@ -189,30 +189,51 @@ pub fn mint<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> Result<()
         &mint.key(),
         editions_deployment.number_of_tokens_issued,
     )?;
+
+    // Retrieve metadata from the group mint
     msg!("Mint: get meta start");
-    let meta = get_mint_metadata(&mut group_mint.to_account_info());
-    let additional_meta = meta?.additional_metadata;
+    let meta = get_mint_metadata(&mut group_mint.to_account_info())?;
+    let additional_meta = meta.additional_metadata;
     msg!("Mint: get meta end: meta len {}", additional_meta.len());
 
+    // Process each additional metadata key-value pair, excluding platform fee metadata
     for additional_metadatum in additional_meta {
-        msg!("Mint: meta key {}", additional_metadatum.0);
-        msg!("Mint: meta value {}", additional_metadatum.1);
+        let key = additional_metadatum.0.as_str();
+        let value = additional_metadatum.1.as_str();
+
+        // Skip metadata related to platform fees
+        if key.starts_with("platform_fee__") {
+            msg!("Mint: Skipping platform fee metadata: {}", key);
+            continue;
+        }
+
+        msg!("Mint: meta key {}", key);
+        msg!("Mint: meta value {}", value);
+
         let deployment_seeds: &[&[u8]] = &[
             "editions_deployment".as_bytes(),
             editions_deployment.symbol.as_ref(),
             &[ctx.bumps.editions_deployment],
         ];
         let signer_seeds: &[&[&[u8]]] = &[deployment_seeds];
+
         let cpi_accounts = TokenMetadataUpdateField {
             token_program_id: token_program.to_account_info(),
             metadata: mint.to_account_info(),
             update_authority: editions_deployment.to_account_info(),
         };
-        let cpi_ctx = CpiContext::new_with_signer(token_program.to_account_info(), cpi_accounts, signer_seeds);
+
+        let cpi_ctx = CpiContext::new_with_signer(
+            token_program.to_account_info(),
+            cpi_accounts,
+            signer_seeds,
+        );
+
         token_metadata_update_field(cpi_ctx, Field::Key(additional_metadatum.0), additional_metadatum.1)?;
     }
+
+    // Transfer minimum rent to the mint account
     msg!("Mint: transfer minimum rent to mint account");
-    // transfer minimum rent to mint account
     update_account_lamports_to_minimum_balance(
         ctx.accounts.mint.to_account_info(),
         ctx.accounts.payer.to_account_info(),

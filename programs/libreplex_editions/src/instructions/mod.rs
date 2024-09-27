@@ -4,13 +4,16 @@
     on-chain accounts, mints, token accounts etc 
 */
 pub mod initialise;
-pub mod royalties;
-pub mod metadata;
 pub use initialise::*;
+
+pub mod royalties;
 pub use royalties::*;
+
+pub mod metadata;
 pub use metadata::*;
 
 pub mod mint;
-
 pub use mint::*;
 
+pub mod platform_fee;
+pub use platform_fee::*;

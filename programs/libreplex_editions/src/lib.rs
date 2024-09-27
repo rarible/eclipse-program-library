@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 
 pub mod instructions;
 pub use instructions::*;
-declare_id!("Fb9o5V3ZrvSVAfoAZ3P2cRyUCmSPzHdKCf7FzGv42AGD");
+declare_id!("GBh9v74hwXm4pqMYVUndiUDdyA71et7EfqXfcbQTNhnf");
 
 pub mod errors;
 pub mod state;
@@ -46,7 +46,7 @@ pub mod libreplex_editions {
         ctx: Context<ModifyRoyalties>,
         args: UpdateRoyaltiesArgs,
     ) -> Result<()> {
-        modify::handler(ctx, args)
+        royalties::modify::handler(ctx, args)
     }
 
     /// add additional metadata to mint
@@ -60,5 +60,18 @@ pub mod libreplex_editions {
         args: Vec<RemoveMetadataArgs>,
     ) -> Result<()> {
         metadata::remove::handler(ctx, args)
+    }
+
+    /// add royalties to mint
+    pub fn add_platform_fee(ctx: Context<AddPlatformFee>, args: UpdatePlatformFeeArgs) -> Result<()> {
+        platform_fee::add::handler(ctx, args)
+    }
+
+    /// modify royalties of mint
+    pub fn modify_platform_fee(
+        ctx: Context<ModifyPlatformFee>,
+        args: UpdatePlatformFeeArgs,
+    ) -> Result<()> {
+        platform_fee::modify::handler(ctx, args)
     }
 }
