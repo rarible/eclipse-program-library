@@ -1,8 +1,17 @@
-use anchor_lang::accounts::account::Account;
+use anchor_lang::{
+    accounts::account::Account,
+    prelude::*,
+    solana_program::hash::hashv,
+};
 
-use anchor_lang::prelude::*;
+use rarible_merkle_verify::verify;
 
 use crate::{EditionsControls, MinterStats, Phase};
+
+// We need to discern between leaf and intermediate nodes to prevent trivial second
+// pre-image attacks.
+// https://flawed.net.nz/2018/02/21/attacking-merkle-trees-with-a-second-preimage-attack
+const LEAF_PREFIX: &[u8] = &[0];
 
 pub fn check_phase_constraints(
     phase: &Phase,
@@ -11,6 +20,8 @@ pub fn check_phase_constraints(
     editions_controls: &Account<EditionsControls>,
     merkle_proof: Option<Vec<[u8; 32]>>,
     minter: &Pubkey,
+    allow_list_price: Option<u64>,
+    allow_list_max_claims: Option<u64>,
 ) {
     // check
     let clock = Clock::get().unwrap();
@@ -45,16 +56,21 @@ pub fn check_phase_constraints(
     if phase.is_private {
         if let Some(merkle_root) = phase.merkle_root {
             if let Some(proof) = merkle_proof {
+                if let (Some(price), Some(max_claims)) = (allow_list_price, allow_list_max_claims) {
+                    // construct leaf
+                    let leaf = hashv(&[
+                        &minter.to_bytes(),
+                        &price.to_le_bytes(),
+                        &max_claims.to_le_bytes(),
+                    ]);
 
-                // construct leaf, check PhaseTreeNode.
-                let leaf = hashv(&[
-                    // minter
-                    // price
-                    // max_claims
-                ]);
+                    let node = hashv(&[LEAF_PREFIX, &leaf.to_bytes()]);
 
-                if !verify(proof, merkle_root, leaf.to_bytes()) {
-                    panic!("Invalid merkle proof");
+                    if !verify(proof, merkle_root, node.to_bytes()) {
+                        panic!("Invalid merkle proof");
+                    }
+                } else {
+                    panic!("Merkle proof required for private phase");
                 }
             } else {
                 panic!("Merkle proof required for private phase");

@@ -2,12 +2,12 @@
  * Program IDL in camelCase format in order to be used in JS/TS.
  *
  * Note that this is only a type helper and is not the actual IDL. The original
- * IDL can be found at `target/idl/libreplex_editions.json`.
+ * IDL can be found at `target/idl/libreplex_editions_controls.json`.
  */
-export type LibreplexEditions = {
-  "address": "GBh9v74hwXm4pqMYVUndiUDdyA71et7EfqXfcbQTNhnf",
+export type LibreplexEditionsControls = {
+  "address": "J87ZtbZvSYaBhwwDb4LqCHAh7rAUjkVWiab5AZ7R3TY5",
   "metadata": {
-    "name": "libreplexEditions",
+    "name": "libreplexEditionsControls",
     "version": "0.2.1",
     "spec": "0.1.0",
     "description": "Created with Anchor",
@@ -15,57 +15,21 @@ export type LibreplexEditions = {
   },
   "instructions": [
     {
-      "name": "addMetadata",
-      "docs": [
-        "add additional metadata to mint"
-      ],
+      "name": "addPhase",
       "discriminator": [
-        231,
-        195,
+        245,
+        220,
+        147,
         40,
-        240,
-        67,
-        231,
-        53,
-        136
+        30,
+        207,
+        36,
+        127
       ],
       "accounts": [
         {
-          "name": "editionsDeployment",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  101,
-                  100,
-                  105,
-                  116,
-                  105,
-                  111,
-                  110,
-                  115,
-                  95,
-                  100,
-                  101,
-                  112,
-                  108,
-                  111,
-                  121,
-                  109,
-                  101,
-                  110,
-                  116
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "editions_deployment.symbol",
-                "account": "editionsDeployment"
-              }
-            ]
-          }
+          "name": "editionsControls",
+          "writable": true
         },
         {
           "name": "payer",
@@ -73,12 +37,7 @@ export type LibreplexEditions = {
           "signer": true
         },
         {
-          "name": "signer",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "mint",
+          "name": "creator",
           "writable": true,
           "signer": true
         },
@@ -89,39 +48,38 @@ export type LibreplexEditions = {
         {
           "name": "tokenProgram",
           "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+        },
+        {
+          "name": "libreplexEditionsProgram",
+          "address": "GBh9v74hwXm4pqMYVUndiUDdyA71et7EfqXfcbQTNhnf"
         }
       ],
       "args": [
         {
-          "name": "args",
+          "name": "input",
           "type": {
-            "vec": {
-              "defined": {
-                "name": "addMetadataArgs"
-              }
+            "defined": {
+              "name": "initialisePhaseInput"
             }
           }
         }
       ]
     },
     {
-      "name": "addPlatformFee",
-      "docs": [
-        "add royalties to mint"
-      ],
+      "name": "initialiseEditionsControls",
       "discriminator": [
-        62,
-        94,
+        69,
+        176,
+        133,
         29,
-        95,
-        254,
-        228,
-        21,
-        18
+        20,
+        49,
+        120,
+        202
       ],
       "accounts": [
         {
-          "name": "editionsDeployment",
+          "name": "editionsControls",
           "writable": true,
           "pda": {
             "seeds": [
@@ -137,214 +95,14 @@ export type LibreplexEditions = {
                   110,
                   115,
                   95,
-                  100,
-                  101,
-                  112,
-                  108,
+                  99,
                   111,
-                  121,
-                  109,
-                  101,
                   110,
-                  116
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "editions_deployment.symbol",
-                "account": "editionsDeployment"
-              }
-            ]
-          }
-        },
-        {
-          "name": "payer",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "signer",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "groupMint",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "systemProgram",
-          "address": "11111111111111111111111111111111"
-        },
-        {
-          "name": "tokenProgram",
-          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
-        }
-      ],
-      "args": [
-        {
-          "name": "args",
-          "type": {
-            "defined": {
-              "name": "updatePlatformFeeArgs"
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "addRoyalties",
-      "docs": [
-        "add royalties to mint"
-      ],
-      "discriminator": [
-        195,
-        251,
-        126,
-        230,
-        187,
-        134,
-        168,
-        210
-      ],
-      "accounts": [
-        {
-          "name": "editionsDeployment",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  101,
-                  100,
-                  105,
                   116,
-                  105,
+                  114,
                   111,
-                  110,
-                  115,
-                  95,
-                  100,
-                  101,
-                  112,
                   108,
-                  111,
-                  121,
-                  109,
-                  101,
-                  110,
-                  116
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "editions_deployment.symbol",
-                "account": "editionsDeployment"
-              }
-            ]
-          }
-        },
-        {
-          "name": "payer",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "signer",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "mint",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "systemProgram",
-          "address": "11111111111111111111111111111111"
-        },
-        {
-          "name": "tokenProgram",
-          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
-        }
-      ],
-      "args": [
-        {
-          "name": "args",
-          "type": {
-            "defined": {
-              "name": "updateRoyaltiesArgs"
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "initialise",
-      "discriminator": [
-        162,
-        198,
-        118,
-        235,
-        215,
-        247,
-        25,
-        118
-      ],
-      "accounts": [
-        {
-          "name": "editionsDeployment",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  101,
-                  100,
-                  105,
-                  116,
-                  105,
-                  111,
-                  110,
-                  115,
-                  95,
-                  100,
-                  101,
-                  112,
-                  108,
-                  111,
-                  121,
-                  109,
-                  101,
-                  110,
-                  116
-                ]
-              },
-              {
-                "kind": "arg",
-                "path": "input.symbol"
-              }
-            ]
-          }
-        },
-        {
-          "name": "hashlist",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  104,
-                  97,
-                  115,
-                  104,
-                  108,
-                  105,
-                  115,
-                  116
+                  115
                 ]
               },
               {
@@ -355,13 +113,20 @@ export type LibreplexEditions = {
           }
         },
         {
+          "name": "editionsDeployment",
+          "writable": true
+        },
+        {
+          "name": "hashlist",
+          "writable": true
+        },
+        {
           "name": "payer",
           "writable": true,
           "signer": true
         },
         {
-          "name": "creator",
-          "writable": true
+          "name": "creator"
         },
         {
           "name": "groupMint",
@@ -384,6 +149,10 @@ export type LibreplexEditions = {
         {
           "name": "groupExtensionProgram",
           "address": "5hx15GaPPqsYA61v6QpcGPpo125v7rfvEfZQ4dJErG5V"
+        },
+        {
+          "name": "libreplexEditionsProgram",
+          "address": "GBh9v74hwXm4pqMYVUndiUDdyA71et7EfqXfcbQTNhnf"
         }
       ],
       "args": [
@@ -391,27 +160,31 @@ export type LibreplexEditions = {
           "name": "input",
           "type": {
             "defined": {
-              "name": "initialiseInput"
+              "name": "initialiseControlInput"
             }
           }
         }
       ]
     },
     {
-      "name": "mint",
+      "name": "mintWithControls",
       "discriminator": [
-        51,
+        167,
         57,
-        225,
-        47,
-        182,
-        146,
-        137,
-        166
+        252,
+        220,
+        69,
+        92,
+        231,
+        61
       ],
       "accounts": [
         {
           "name": "editionsDeployment",
+          "writable": true
+        },
+        {
+          "name": "editionsControls",
           "writable": true,
           "pda": {
             "seeds": [
@@ -427,86 +200,30 @@ export type LibreplexEditions = {
                   110,
                   115,
                   95,
-                  100,
-                  101,
-                  112,
-                  108,
+                  99,
                   111,
-                  121,
-                  109,
-                  101,
                   110,
-                  116
+                  116,
+                  114,
+                  111,
+                  108,
+                  115
                 ]
               },
               {
                 "kind": "account",
-                "path": "editions_deployment.symbol",
-                "account": "editionsDeployment"
+                "path": "editionsDeployment"
               }
             ]
           }
         },
         {
           "name": "hashlist",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  104,
-                  97,
-                  115,
-                  104,
-                  108,
-                  105,
-                  115,
-                  116
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "editionsDeployment"
-              }
-            ]
-          }
+          "writable": true
         },
         {
           "name": "hashlistMarker",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  104,
-                  97,
-                  115,
-                  104,
-                  108,
-                  105,
-                  115,
-                  116,
-                  95,
-                  109,
-                  97,
-                  114,
-                  107,
-                  101,
-                  114
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "editionsDeployment"
-              },
-              {
-                "kind": "account",
-                "path": "mint"
-              }
-            ]
-          }
+          "writable": true
         },
         {
           "name": "payer",
@@ -515,12 +232,87 @@ export type LibreplexEditions = {
         },
         {
           "name": "signer",
-          "writable": true,
           "signer": true
         },
         {
           "name": "minter",
           "writable": true
+        },
+        {
+          "name": "minterStats",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  105,
+                  110,
+                  116,
+                  101,
+                  114,
+                  95,
+                  115,
+                  116,
+                  97,
+                  116,
+                  115
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "editionsDeployment"
+              },
+              {
+                "kind": "account",
+                "path": "minter"
+              }
+            ]
+          }
+        },
+        {
+          "name": "minterStatsPhase",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  105,
+                  110,
+                  116,
+                  101,
+                  114,
+                  95,
+                  115,
+                  116,
+                  97,
+                  116,
+                  115,
+                  95,
+                  112,
+                  104,
+                  97,
+                  115,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "editionsDeployment"
+              },
+              {
+                "kind": "account",
+                "path": "minter"
+              },
+              {
+                "kind": "arg",
+                "path": "mint_input.phase_index"
+              }
+            ]
+          }
         },
         {
           "name": "mint",
@@ -545,6 +337,10 @@ export type LibreplexEditions = {
           "writable": true
         },
         {
+          "name": "treasury",
+          "writable": true
+        },
+        {
           "name": "tokenProgram"
         },
         {
@@ -558,15 +354,25 @@ export type LibreplexEditions = {
         {
           "name": "systemProgram",
           "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "libreplexEditionsProgram",
+          "address": "GBh9v74hwXm4pqMYVUndiUDdyA71et7EfqXfcbQTNhnf"
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "mintInput",
+          "type": {
+            "defined": {
+              "name": "mintInput"
+            }
+          }
+        }
+      ]
     },
     {
       "name": "modifyPlatformFee",
-      "docs": [
-        "modify royalties of mint"
-      ],
       "discriminator": [
         186,
         73,
@@ -579,12 +385,11 @@ export type LibreplexEditions = {
       ],
       "accounts": [
         {
-          "name": "payer",
-          "writable": true,
-          "signer": true
+          "name": "editionsDeployment",
+          "writable": true
         },
         {
-          "name": "editionsDeployment",
+          "name": "editionsControls",
           "writable": true,
           "pda": {
             "seeds": [
@@ -600,28 +405,30 @@ export type LibreplexEditions = {
                   110,
                   115,
                   95,
-                  100,
-                  101,
-                  112,
-                  108,
+                  99,
                   111,
-                  121,
-                  109,
-                  101,
                   110,
-                  116
+                  116,
+                  114,
+                  111,
+                  108,
+                  115
                 ]
               },
               {
                 "kind": "account",
-                "path": "editions_deployment.symbol",
-                "account": "editionsDeployment"
+                "path": "editionsDeployment"
               }
             ]
           }
         },
         {
-          "name": "signer",
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "creator",
           "writable": true,
           "signer": true
         },
@@ -636,11 +443,15 @@ export type LibreplexEditions = {
         {
           "name": "tokenProgram",
           "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+        },
+        {
+          "name": "libreplexEditionsProgram",
+          "address": "GBh9v74hwXm4pqMYVUndiUDdyA71et7EfqXfcbQTNhnf"
         }
       ],
       "args": [
         {
-          "name": "args",
+          "name": "input",
           "type": {
             "defined": {
               "name": "updatePlatformFeeArgs"
@@ -651,9 +462,6 @@ export type LibreplexEditions = {
     },
     {
       "name": "modifyRoyalties",
-      "docs": [
-        "modify royalties of mint"
-      ],
       "discriminator": [
         199,
         95,
@@ -666,12 +474,11 @@ export type LibreplexEditions = {
       ],
       "accounts": [
         {
-          "name": "payer",
-          "writable": true,
-          "signer": true
+          "name": "editionsDeployment",
+          "writable": true
         },
         {
-          "name": "editionsDeployment",
+          "name": "editionsControls",
           "writable": true,
           "pda": {
             "seeds": [
@@ -687,28 +494,30 @@ export type LibreplexEditions = {
                   110,
                   115,
                   95,
-                  100,
-                  101,
-                  112,
-                  108,
+                  99,
                   111,
-                  121,
-                  109,
-                  101,
                   110,
-                  116
+                  116,
+                  114,
+                  111,
+                  108,
+                  115
                 ]
               },
               {
                 "kind": "account",
-                "path": "editions_deployment.symbol",
-                "account": "editionsDeployment"
+                "path": "editionsDeployment"
               }
             ]
           }
         },
         {
-          "name": "signer",
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "creator",
           "writable": true,
           "signer": true
         },
@@ -723,11 +532,15 @@ export type LibreplexEditions = {
         {
           "name": "tokenProgram",
           "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+        },
+        {
+          "name": "libreplexEditionsProgram",
+          "address": "GBh9v74hwXm4pqMYVUndiUDdyA71et7EfqXfcbQTNhnf"
         }
       ],
       "args": [
         {
-          "name": "args",
+          "name": "input",
           "type": {
             "defined": {
               "name": "updateRoyaltiesArgs"
@@ -735,97 +548,22 @@ export type LibreplexEditions = {
           }
         }
       ]
-    },
-    {
-      "name": "removeMetadata",
-      "docs": [
-        "remove additional metadata to mint"
-      ],
-      "discriminator": [
-        81,
-        68,
-        231,
-        49,
-        91,
-        8,
-        111,
-        160
-      ],
-      "accounts": [
-        {
-          "name": "editionsDeployment",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  101,
-                  100,
-                  105,
-                  116,
-                  105,
-                  111,
-                  110,
-                  115,
-                  95,
-                  100,
-                  101,
-                  112,
-                  108,
-                  111,
-                  121,
-                  109,
-                  101,
-                  110,
-                  116
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "editions_deployment.symbol",
-                "account": "editionsDeployment"
-              }
-            ]
-          }
-        },
-        {
-          "name": "payer",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "signer",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "mint"
-        },
-        {
-          "name": "systemProgram",
-          "address": "11111111111111111111111111111111"
-        },
-        {
-          "name": "tokenProgram",
-          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
-        }
-      ],
-      "args": [
-        {
-          "name": "args",
-          "type": {
-            "vec": {
-              "defined": {
-                "name": "removeMetadataArgs"
-              }
-            }
-          }
-        }
-      ]
     }
   ],
   "accounts": [
+    {
+      "name": "editionsControls",
+      "discriminator": [
+        124,
+        32,
+        239,
+        85,
+        118,
+        231,
+        152,
+        156
+      ]
+    },
     {
       "name": "editionsDeployment",
       "discriminator": [
@@ -840,29 +578,16 @@ export type LibreplexEditions = {
       ]
     },
     {
-      "name": "hashlist",
+      "name": "minterStats",
       "discriminator": [
-        187,
-        203,
-        134,
-        6,
-        43,
-        198,
-        120,
-        186
-      ]
-    },
-    {
-      "name": "hashlistMarker",
-      "discriminator": [
-        55,
-        46,
-        160,
-        53,
+        138,
         239,
-        41,
-        223,
-        50
+        240,
+        226,
+        199,
+        53,
+        170,
+        179
       ]
     }
   ],
@@ -952,6 +677,53 @@ export type LibreplexEditions = {
       }
     },
     {
+      "name": "editionsControls",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "editionsDeployment",
+            "type": "pubkey"
+          },
+          {
+            "name": "creator",
+            "type": "pubkey"
+          },
+          {
+            "name": "treasury",
+            "type": "pubkey"
+          },
+          {
+            "name": "maxMintsPerWallet",
+            "type": "u64"
+          },
+          {
+            "name": "cosignerProgramId",
+            "type": "pubkey"
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": [
+                "u8",
+                200
+              ]
+            }
+          },
+          {
+            "name": "phases",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "phase"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
       "name": "editionsDeployment",
       "type": {
         "kind": "struct",
@@ -1013,48 +785,18 @@ export type LibreplexEditions = {
       }
     },
     {
-      "name": "hashlist",
+      "name": "initialiseControlInput",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "deployment",
-            "type": "pubkey"
+            "name": "maxMintsPerWallet",
+            "type": "u64"
           },
           {
-            "name": "issues",
-            "type": {
-              "vec": {
-                "defined": {
-                  "name": "mintAndOrder"
-                }
-              }
-            }
-          }
-        ]
-      }
-    },
-    {
-      "name": "hashlistMarker",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "editionsDeployment",
+            "name": "treasury",
             "type": "pubkey"
           },
-          {
-            "name": "mint",
-            "type": "pubkey"
-          }
-        ]
-      }
-    },
-    {
-      "name": "initialiseInput",
-      "type": {
-        "kind": "struct",
-        "fields": [
           {
             "name": "maxNumberOfTokens",
             "type": "u64"
@@ -1072,9 +814,27 @@ export type LibreplexEditions = {
             "type": "string"
           },
           {
-            "name": "creatorCosignProgramId",
+            "name": "cosignerProgramId",
             "type": {
               "option": "pubkey"
+            }
+          },
+          {
+            "name": "royalties",
+            "type": {
+              "defined": {
+                "name": "updateRoyaltiesArgs"
+              }
+            }
+          },
+          {
+            "name": "extraMeta",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "addMetadataArgs"
+                }
+              }
             }
           },
           {
@@ -1084,22 +844,187 @@ export type LibreplexEditions = {
           {
             "name": "itemName",
             "type": "string"
+          },
+          {
+            "name": "platformFee",
+            "type": {
+              "defined": {
+                "name": "updatePlatformFeeArgs"
+              }
+            }
           }
         ]
       }
     },
     {
-      "name": "mintAndOrder",
+      "name": "initialisePhaseInput",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "mint",
+            "name": "priceAmount",
+            "type": "u64"
+          },
+          {
+            "name": "priceToken",
             "type": "pubkey"
           },
           {
-            "name": "order",
+            "name": "startTime",
+            "type": "i64"
+          },
+          {
+            "name": "maxMintsPerWallet",
             "type": "u64"
+          },
+          {
+            "name": "maxMintsTotal",
+            "type": "u64"
+          },
+          {
+            "name": "endTime",
+            "type": "i64"
+          },
+          {
+            "name": "isPrivate",
+            "type": "bool"
+          },
+          {
+            "name": "merkleRoot",
+            "type": {
+              "option": {
+                "array": [
+                  "u8",
+                  32
+                ]
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "mintInput",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "phaseIndex",
+            "type": "u32"
+          },
+          {
+            "name": "merkleProof",
+            "type": {
+              "option": {
+                "vec": {
+                  "array": [
+                    "u8",
+                    32
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "name": "allowListPrice",
+            "type": {
+              "option": "u64"
+            }
+          },
+          {
+            "name": "allowListMaxClaims",
+            "type": {
+              "option": "u64"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "minterStats",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "wallet",
+            "type": "pubkey"
+          },
+          {
+            "name": "mintCount",
+            "type": "u64"
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": [
+                "u8",
+                50
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "phase",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "priceAmount",
+            "type": "u64"
+          },
+          {
+            "name": "priceToken",
+            "type": "pubkey"
+          },
+          {
+            "name": "startTime",
+            "type": "i64"
+          },
+          {
+            "name": "active",
+            "type": "bool"
+          },
+          {
+            "name": "maxMintsPerWallet",
+            "type": "u64"
+          },
+          {
+            "name": "maxMintsTotal",
+            "type": "u64"
+          },
+          {
+            "name": "endTime",
+            "type": "i64"
+          },
+          {
+            "name": "currentMints",
+            "type": "u64"
+          },
+          {
+            "name": "isPrivate",
+            "type": "bool"
+          },
+          {
+            "name": "merkleRoot",
+            "type": {
+              "option": {
+                "array": [
+                  "u8",
+                  32
+                ]
+              }
+            }
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": [
+                "u8",
+                200
+              ]
+            }
           }
         ]
       }
@@ -1116,22 +1041,6 @@ export type LibreplexEditions = {
           {
             "name": "share",
             "type": "u8"
-          }
-        ]
-      }
-    },
-    {
-      "name": "removeMetadataArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "field",
-            "type": "string"
-          },
-          {
-            "name": "value",
-            "type": "string"
           }
         ]
       }

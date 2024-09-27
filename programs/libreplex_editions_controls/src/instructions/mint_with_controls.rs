@@ -15,6 +15,8 @@ use crate::check_phase_constraints;
 pub struct MintInput {
     pub phase_index: u32,
     pub merkle_proof: Option<Vec<[u8; 32]>>,
+    pub allow_list_price: Option<u64>,
+    pub allow_list_max_claims: Option<u64>,
 }
 
 #[derive(Accounts)]
@@ -153,7 +155,9 @@ pub fn mint_with_controls(ctx: Context<MintWithControlsCtx>, mint_input: MintInp
         minter_stats_phase,
         editions_controls,
         mint_input.merkle_proof,
-        &minter.key()
+        &minter.key,
+        mint_input.allow_list_price,
+        mint_input.allow_list_max_claims
     );
 
     msg!("[mint_count] total:{} phase: {}", minter_stats.mint_count, minter_stats_phase.mint_count);
