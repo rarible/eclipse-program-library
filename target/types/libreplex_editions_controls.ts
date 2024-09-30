@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/libreplex_editions_controls.json`.
  */
 export type LibreplexEditionsControls = {
-  "address": "J87ZtbZvSYaBhwwDb4LqCHAh7rAUjkVWiab5AZ7R3TY5",
+  "address": "JBoH2n87fFvyJgsty8UN3KBTEWbkv1pH7yfT8kGKSs6y",
   "metadata": {
     "name": "libreplexEditionsControls",
     "version": "0.2.1",
@@ -51,7 +51,7 @@ export type LibreplexEditionsControls = {
         },
         {
           "name": "libreplexEditionsProgram",
-          "address": "GBh9v74hwXm4pqMYVUndiUDdyA71et7EfqXfcbQTNhnf"
+          "address": "CeGRFA9sFRbfhaUVWj4hi3oDezCD8o56abbdMoeAkYBU"
         }
       ],
       "args": [
@@ -152,7 +152,7 @@ export type LibreplexEditionsControls = {
         },
         {
           "name": "libreplexEditionsProgram",
-          "address": "GBh9v74hwXm4pqMYVUndiUDdyA71et7EfqXfcbQTNhnf"
+          "address": "CeGRFA9sFRbfhaUVWj4hi3oDezCD8o56abbdMoeAkYBU"
         }
       ],
       "args": [
@@ -357,7 +357,7 @@ export type LibreplexEditionsControls = {
         },
         {
           "name": "libreplexEditionsProgram",
-          "address": "GBh9v74hwXm4pqMYVUndiUDdyA71et7EfqXfcbQTNhnf"
+          "address": "CeGRFA9sFRbfhaUVWj4hi3oDezCD8o56abbdMoeAkYBU"
         }
       ],
       "args": [
@@ -446,7 +446,7 @@ export type LibreplexEditionsControls = {
         },
         {
           "name": "libreplexEditionsProgram",
-          "address": "GBh9v74hwXm4pqMYVUndiUDdyA71et7EfqXfcbQTNhnf"
+          "address": "CeGRFA9sFRbfhaUVWj4hi3oDezCD8o56abbdMoeAkYBU"
         }
       ],
       "args": [
@@ -535,7 +535,7 @@ export type LibreplexEditionsControls = {
         },
         {
           "name": "libreplexEditionsProgram",
-          "address": "GBh9v74hwXm4pqMYVUndiUDdyA71et7EfqXfcbQTNhnf"
+          "address": "CeGRFA9sFRbfhaUVWj4hi3oDezCD8o56abbdMoeAkYBU"
         }
       ],
       "args": [
@@ -884,21 +884,6 @@ export type LibreplexEditionsControls = {
           {
             "name": "endTime",
             "type": "i64"
-          },
-          {
-            "name": "isPrivate",
-            "type": "bool"
-          },
-          {
-            "name": "merkleRoot",
-            "type": {
-              "option": {
-                "array": [
-                  "u8",
-                  32
-                ]
-              }
-            }
           }
         ]
       }
@@ -911,31 +896,6 @@ export type LibreplexEditionsControls = {
           {
             "name": "phaseIndex",
             "type": "u32"
-          },
-          {
-            "name": "merkleProof",
-            "type": {
-              "option": {
-                "vec": {
-                  "array": [
-                    "u8",
-                    32
-                  ]
-                }
-              }
-            }
-          },
-          {
-            "name": "allowListPrice",
-            "type": {
-              "option": "u64"
-            }
-          },
-          {
-            "name": "allowListMaxClaims",
-            "type": {
-              "option": "u64"
-            }
           }
         ]
       }
@@ -1001,21 +961,6 @@ export type LibreplexEditionsControls = {
           {
             "name": "currentMints",
             "type": "u64"
-          },
-          {
-            "name": "isPrivate",
-            "type": "bool"
-          },
-          {
-            "name": "merkleRoot",
-            "type": {
-              "option": {
-                "array": [
-                  "u8",
-                  32
-                ]
-              }
-            }
           },
           {
             "name": "padding",
