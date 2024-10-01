@@ -702,15 +702,6 @@ export type LibreplexEditionsControls = {
             "type": "pubkey"
           },
           {
-            "name": "padding",
-            "type": {
-              "array": [
-                "u8",
-                200
-              ]
-            }
-          },
-          {
             "name": "phases",
             "type": {
               "vec": {
@@ -718,6 +709,15 @@ export type LibreplexEditionsControls = {
                   "name": "phase"
                 }
               }
+            }
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": [
+                "u8",
+                200
+              ]
             }
           }
         ]
@@ -884,6 +884,17 @@ export type LibreplexEditionsControls = {
           {
             "name": "endTime",
             "type": "i64"
+          },
+          {
+            "name": "merkleRoot",
+            "type": {
+              "option": {
+                "array": [
+                  "u8",
+                  32
+                ]
+              }
+            }
           }
         ]
       }
@@ -896,6 +907,31 @@ export type LibreplexEditionsControls = {
           {
             "name": "phaseIndex",
             "type": "u32"
+          },
+          {
+            "name": "merkleProof",
+            "type": {
+              "option": {
+                "vec": {
+                  "array": [
+                    "u8",
+                    32
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "name": "allowListPrice",
+            "type": {
+              "option": "u64"
+            }
+          },
+          {
+            "name": "allowListMaxClaims",
+            "type": {
+              "option": "u64"
+            }
           }
         ]
       }
@@ -961,6 +997,17 @@ export type LibreplexEditionsControls = {
           {
             "name": "currentMints",
             "type": "u64"
+          },
+          {
+            "name": "merkleRoot",
+            "type": {
+              "option": {
+                "array": [
+                  "u8",
+                  32
+                ]
+              }
+            }
           },
           {
             "name": "padding",

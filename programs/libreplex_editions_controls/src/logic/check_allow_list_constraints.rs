@@ -13,7 +13,7 @@ use crate::{MinterStats, Phase};
 /// https://flawed.net.nz/2018/02/21/attacking-merkle-trees-with-a-second-preimage-attack
 const LEAF_PREFIX: &[u8] = &[0];
 
-pub fn check_phase_constraints(
+pub fn check_allow_list_constraints(
     phase: &Phase,
     minter: &Pubkey,
     minter_stats_phase: &mut Account<MinterStats>,

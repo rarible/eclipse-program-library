@@ -12,7 +12,7 @@ use libreplex_editions::{
 
 use crate::{EditionsControls, MinterStats};
 
-use crate::check_phase_constraints;
+use crate::{check_phase_constraints, check_allow_list_constraints};
 
 #[derive(AnchorDeserialize, AnchorSerialize, Clone)]
 pub struct MintInput {
@@ -34,11 +34,11 @@ pub struct MintWithControlsCtx<'info> {
     )]
     pub editions_controls: Box<Account<'info, EditionsControls>>,
 
-    /// CHECK: Checked via CPI
+    // CHECK: Checked via CPI
     #[account(mut)]
     pub hashlist: UncheckedAccount<'info>,
 
-    /// CHECK: Checked via CPI
+    // CHECK: Checked via CPI
     #[account(mut)]
     pub hashlist_marker: UncheckedAccount<'info>,
 
@@ -50,11 +50,11 @@ pub struct MintWithControlsCtx<'info> {
     #[account(constraint = editions_controls.cosigner_program_id == system_program::ID || signer.key() == editions_deployment.creator)]
     pub signer: Signer<'info>,
 
-    /// CHECK: Anybody can sign, anybody can receive the inscription
+    // CHECK: Anybody can sign, anybody can receive the inscription
     #[account(mut)]
     pub minter: UncheckedAccount<'info>,
 
-    /// CHECK: Anybody can sign, anybody can receive the inscription
+    // CHECK: Anybody can sign, anybody can receive the inscription
     #[account(init_if_needed,
         payer = payer,
         seeds=[b"minter_stats", editions_deployment.key().as_ref(), minter.key().as_ref()],
@@ -62,7 +62,7 @@ pub struct MintWithControlsCtx<'info> {
         space=MinterStats::SIZE)]
     pub minter_stats: Box<Account<'info, MinterStats>>,
 
-    /// CHECK: Anybody can sign, anybody can receive the inscription
+    // CHECK: Anybody can sign, anybody can receive the inscription
     #[account(init_if_needed,
         payer = payer,
         seeds=["minter_stats_phase".as_bytes(), editions_deployment.key().as_ref(), minter.key().as_ref()
@@ -77,27 +77,27 @@ pub struct MintWithControlsCtx<'info> {
     #[account(mut)]
     pub member: Signer<'info>,
 
-    /// CHECK: checked in constraint
+    // CHECK: checked in constraint
     #[account(mut,
     constraint = editions_deployment.group == group.key())]
     pub group: UncheckedAccount<'info>,
 
-    /// CHECK: Checked in constraint
+    // CHECK: Checked in constraint
     #[account(mut,
         constraint = editions_deployment.group_mint == group_mint.key())]
     pub group_mint: UncheckedAccount<'info>,
 
-    /// CHECK: passed in via CPI to mpl_token_metadata program
+    // CHECK: passed in via CPI to mpl_token_metadata program
     #[account(mut)]
     pub token_account: UncheckedAccount<'info>,
     
-    /// CHECK: Checked in constraint
+    // CHECK: Checked in constraint
     #[account(mut,
         constraint = editions_controls.treasury == treasury.key())]
     pub treasury: UncheckedAccount<'info>,
 
     /* BOILERPLATE PROGRAM ACCOUNTS */
-    /// CHECK: Checked in constraint
+    // CHECK: Checked in constraint
     #[account(
         constraint = token_program.key() == token_2022::ID
     )]
@@ -106,7 +106,7 @@ pub struct MintWithControlsCtx<'info> {
     #[account()]
     pub associated_token_program: Program<'info, AssociatedToken>,
 
-    /// CHECK: address checked
+    // CHECK: address checked
     #[account(address = group_extension_program::ID)]
     pub group_extension_program: AccountInfo<'info>,
 
@@ -147,25 +147,25 @@ pub fn mint_with_controls(ctx: Context<MintWithControlsCtx>, mint_input: MintInp
     }
 
     let phase_index = mint_input.phase_index as usize;
-    let current_phase = editions_controls.phases[phase_index];
+    let current_phase = &editions_controls.phases[phase_index];
 
-    /// check phase constraints
+    // check phase constraints
     check_phase_constraints(
-        &editions_controls.phases[phase_index],
+        current_phase,
         minter_stats,
         minter_stats_phase,
         editions_controls,
     );
 
-    /// Determine if is a normal mint or an allow list mint
+    // Determine if is a normal mint or an allow list mint
     let is_allow_list_mint = mint_input.merkle_proof.is_some();
 
-    /// If allow list mint, check allow list constraints
-    /// This check generates the leaf based on (minter, price, max_claims), verifies the proof, and ensures the minter has not exceeded max_claims
+    // If allow list mint, check allow list constraints
+    // This check generates the leaf based on (minter, price, max_claims), verifies the proof, and ensures the minter has not exceeded max_claims
     if is_allow_list_mint {
         check_allow_list_constraints(
-            &editions_controls.phases[phase_index],
-            minter,
+            current_phase,
+            &minter.key(),
             minter_stats_phase,
             mint_input.merkle_proof,
             mint_input.allow_list_price,
@@ -173,7 +173,7 @@ pub fn mint_with_controls(ctx: Context<MintWithControlsCtx>, mint_input: MintInp
         );
     }
 
-    /// determine mint price, which is either the allow list price or the phase price, depending on the mint type
+    // determine mint price, which is either the allow list price or the phase price, depending on the mint type
     let price_amount = if is_allow_list_mint {
         mint_input.allow_list_price.unwrap_or(0)
     } else {
@@ -185,18 +185,18 @@ pub fn mint_with_controls(ctx: Context<MintWithControlsCtx>, mint_input: MintInp
         minter_stats.mint_count, minter_stats_phase.mint_count
     );
 
-    /// Increment the minter stats across the collection
+    // Increment the minter stats across the collection
     minter_stats.wallet = minter.key();
     minter_stats.mint_count += 1; 
 
-    /// Increment the minter stats for the current phase
+    // Increment the minter stats for the current phase
     minter_stats_phase.wallet = minter.key();
     minter_stats_phase.mint_count += 1; 
 
-    /// Increment the current mints for the phase
-    current_phase.current_mints += 1;
+    // Increment the current mints for the phase
+    editions_controls.phases[phase_index].current_mints += 1;
 
-    /// Checks completed, transfer funds to treasury if applicable
+    // Checks completed, transfer funds to treasury if applicable
 
     system_program::transfer(
         CpiContext::new(

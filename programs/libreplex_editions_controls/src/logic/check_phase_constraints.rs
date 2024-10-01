@@ -1,7 +1,6 @@
 use anchor_lang::{
     accounts::account::Account,
     prelude::*,
-    solana_program::hash::hashv,
 };
 
 use crate::{EditionsControls, MinterStats, Phase};
