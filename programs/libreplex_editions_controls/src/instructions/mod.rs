@@ -17,3 +17,6 @@ pub use mint_with_controls::*;
 
 pub mod update_platform_fee;
 pub use update_platform_fee::*;
+
+pub mod update_platform_fee_secondary_admin;
+pub use update_platform_fee_secondary_admin::*;

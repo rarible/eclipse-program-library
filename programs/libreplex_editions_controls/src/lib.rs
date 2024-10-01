@@ -49,4 +49,10 @@ pub mod libreplex_editions_controls {
         input: libreplex_editions::UpdatePlatformFeeArgs) -> Result<()> {
         instructions::update_platform_fee(ctx, input)
     }
+
+    pub fn modify_platform_secondary_admin(
+        ctx: Context<UpdatePlatformFeeSecondaryAdminCtx>,
+        input: UpdatePlatformFeeSecondaryAdminInput) -> Result<()> {
+        instructions::update_platform_fee_secondary_admin(ctx, input)
+    }
 }
