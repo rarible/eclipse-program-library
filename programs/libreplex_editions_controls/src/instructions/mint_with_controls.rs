@@ -3,9 +3,12 @@ use anchor_spl::{
     associated_token::AssociatedToken, token_2022
 };
 
-use libreplex_editions::group_extension_program;
-use libreplex_editions::{program::LibreplexEditions, EditionsDeployment};
-use libreplex_editions::cpi::accounts::MintCtx;
+use libreplex_editions::{
+    group_extension_program,
+    program::LibreplexEditions, 
+    EditionsDeployment,
+    cpi::accounts::MintCtx
+};
 
 use crate::{EditionsControls, MinterStats};
 
@@ -21,9 +24,7 @@ pub struct MintInput {
 
 #[derive(Accounts)]
 #[instruction(mint_input: MintInput)]
-
 pub struct MintWithControlsCtx<'info> {
-
     #[account(mut)]
     pub editions_deployment: Box<Account<'info, EditionsDeployment>>,
 
@@ -33,8 +34,8 @@ pub struct MintWithControlsCtx<'info> {
     )]
     pub editions_controls: Box<Account<'info, EditionsControls>>,
 
-     /// CHECK: Checked via CPI
-     #[account(mut)]
+    /// CHECK: Checked via CPI
+    #[account(mut)]
     pub hashlist: UncheckedAccount<'info>,
 
     /// CHECK: Checked via CPI
@@ -113,11 +114,9 @@ pub struct MintWithControlsCtx<'info> {
     pub system_program: Program<'info, System>,
 
     pub libreplex_editions_program: Program<'info, LibreplexEditions>
-
 }
 
 pub fn mint_with_controls(ctx: Context<MintWithControlsCtx>, mint_input: MintInput) -> Result<()> {
-    
     let libreplex_editions_program = &ctx.accounts.libreplex_editions_program;
     let editions_deployment = &ctx.accounts.editions_deployment;
     let editions_controls = &mut ctx.accounts.editions_controls;
@@ -138,6 +137,7 @@ pub fn mint_with_controls(ctx: Context<MintWithControlsCtx>, mint_input: MintInp
     let minter_stats_phase = &mut ctx.accounts.minter_stats_phase;
     let group_extension_program = &ctx.accounts.group_extension_program;
     let member = &ctx.accounts.member;
+
     if mint_input.phase_index >= editions_controls.phases.len() as u32 {
         if editions_controls.phases.is_empty() {
             panic!("No phases added. Cannot mint");
@@ -147,37 +147,56 @@ pub fn mint_with_controls(ctx: Context<MintWithControlsCtx>, mint_input: MintInp
     }
 
     let phase_index = mint_input.phase_index as usize;
-    let price_amount = editions_controls.phases[phase_index].price_amount;
+    let current_phase = editions_controls.phases[phase_index];
 
+    /// check phase constraints
     check_phase_constraints(
         &editions_controls.phases[phase_index],
         minter_stats,
         minter_stats_phase,
         editions_controls,
-        mint_input.merkle_proof,
-        &minter.key,
-        mint_input.allow_list_price,
-        mint_input.allow_list_max_claims
     );
 
-    msg!("[mint_count] total:{} phase: {}", minter_stats.mint_count, minter_stats_phase.mint_count);
-    // update this in case it has been initialised
-    // idempotent because the account is determined by the PDA
+    /// Determine if is a normal mint or an allow list mint
+    let is_allow_list_mint = mint_input.merkle_proof.is_some();
+
+    /// If allow list mint, check allow list constraints
+    /// This check generates the leaf based on (minter, price, max_claims), verifies the proof, and ensures the minter has not exceeded max_claims
+    if is_allow_list_mint {
+        check_allow_list_constraints(
+            &editions_controls.phases[phase_index],
+            minter,
+            minter_stats_phase,
+            mint_input.merkle_proof,
+            mint_input.allow_list_price,
+            mint_input.allow_list_max_claims,
+        );
+    }
+
+    /// determine mint price, which is either the allow list price or the phase price, depending on the mint type
+    let price_amount = if is_allow_list_mint {
+        mint_input.allow_list_price.unwrap_or(0)
+    } else {
+        current_phase.price_amount
+    };
+
+    msg!(
+        "[mint_count] user mints on collection:{}, user mints on phase: {}",
+        minter_stats.mint_count, minter_stats_phase.mint_count
+    );
+
+    /// Increment the minter stats across the collection
     minter_stats.wallet = minter.key();
     minter_stats.mint_count += 1; 
 
+    /// Increment the minter stats for the current phase
     minter_stats_phase.wallet = minter.key();
     minter_stats_phase.mint_count += 1; 
 
-    editions_controls.phases[phase_index].current_mints += 1;
+    /// Increment the current mints for the phase
+    current_phase.current_mints += 1;
 
-    let isPrivatePhase = editions_controls.phases[phase_index].is_private;
-    let final_mint_price = if isPrivatePhase {
-        mint_input.allow_list_price.unwrap_or(0)
-    } else {
-        price_amount
-    };
-    // ok, we are gucci. transfer funds to treasury if applicable
+    /// Checks completed, transfer funds to treasury if applicable
 
     system_program::transfer(
         CpiContext::new(
@@ -187,7 +206,7 @@ pub fn mint_with_controls(ctx: Context<MintWithControlsCtx>, mint_input: MintInp
                 to: treasury.to_account_info(),
             },
         ),
-        final_mint_price
+        price_amount
     )?;
 
     // take all the data for platform fee and transfer
