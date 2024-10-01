@@ -120,7 +120,7 @@ pub fn initialise_editions_controls(
         editions_deployment: editions_deployment.key(),
         creator: creator.key(),
         max_mints_per_wallet: input.max_mints_per_wallet,
-        padding: [0; 136],
+        padding: [0; 200],
         cosigner_program_id: input.cosigner_program_id.unwrap_or(system_program::ID),
         phases: vec![],
         treasury: input.treasury,

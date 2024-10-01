@@ -778,15 +778,6 @@ export type LibreplexEditionsControls = {
             "type": "pubkey"
           },
           {
-            "name": "padding",
-            "type": {
-              "array": [
-                "u8",
-                136
-              ]
-            }
-          },
-          {
             "name": "phases",
             "type": {
               "vec": {

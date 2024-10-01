@@ -52,7 +52,6 @@ pub struct EditionsControls {
     pub cosigner_program_id: Pubkey,
     pub platform_fee_primary_admin: Pubkey,
     pub platform_fee_secondary_admin: Pubkey,
-    pub padding: [u8; 136],    // in case we need some more stuff in the future
     pub phases: Vec<Phase>,
     pub padding: [u8; 200], 
 }
