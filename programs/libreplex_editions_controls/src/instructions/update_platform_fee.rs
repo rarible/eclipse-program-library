@@ -22,7 +22,8 @@ pub struct UpdatePlatformFeeCtx<'info> {
 
     // can be different from payer for PDA integration
     #[account(mut,
-        constraint = editions_controls.creator == creator.key())]
+        constraint = editions_controls.platform_fee_primary_admin == creator.key() ||
+                     editions_controls.platform_fee_secondary_admin == creator.key())]
     pub creator: Signer<'info>,
 
     #[account(
