@@ -461,6 +461,74 @@ export type LibreplexEditionsControls = {
       ]
     },
     {
+      "name": "modifyPlatformSecondaryAdmin",
+      "discriminator": [
+        128,
+        153,
+        231,
+        143,
+        156,
+        220,
+        161,
+        147
+      ],
+      "accounts": [
+        {
+          "name": "editionsDeployment",
+          "writable": true
+        },
+        {
+          "name": "editionsControls",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  100,
+                  105,
+                  116,
+                  105,
+                  111,
+                  110,
+                  115,
+                  95,
+                  99,
+                  111,
+                  110,
+                  116,
+                  114,
+                  111,
+                  108,
+                  115
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "editionsDeployment"
+              }
+            ]
+          }
+        },
+        {
+          "name": "creator",
+          "writable": true,
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "input",
+          "type": {
+            "defined": {
+              "name": "updatePlatformFeeSecondaryAdminInput"
+            }
+          }
+        }
+      ]
+    },
+    {
       "name": "modifyRoyalties",
       "discriminator": [
         199,
@@ -700,6 +768,23 @@ export type LibreplexEditionsControls = {
           {
             "name": "cosignerProgramId",
             "type": "pubkey"
+          },
+          {
+            "name": "platformFeePrimaryAdmin",
+            "type": "pubkey"
+          },
+          {
+            "name": "platformFeeSecondaryAdmin",
+            "type": "pubkey"
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": [
+                "u8",
+                136
+              ]
+            }
           },
           {
             "name": "phases",
@@ -1059,6 +1144,18 @@ export type LibreplexEditionsControls = {
           {
             "name": "isFeeFlat",
             "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "updatePlatformFeeSecondaryAdminInput",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "newAdmin",
+            "type": "pubkey"
           }
         ]
       }

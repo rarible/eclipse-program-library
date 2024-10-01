@@ -14,7 +14,6 @@ pub use state::*;
 
 #[program]
 pub mod libreplex_editions_controls {
-    use libreplex_editions::{ModifyPlatformFee, UpdatePlatformFeeArgs};
     use super::*;
 
     // v2 endpoints. Prefer these over the original ones.
@@ -49,5 +48,11 @@ pub mod libreplex_editions_controls {
         ctx: Context<UpdatePlatformFeeCtx>,
         input: libreplex_editions::UpdatePlatformFeeArgs) -> Result<()> {
         instructions::update_platform_fee(ctx, input)
+    }
+
+    pub fn modify_platform_secondary_admin(
+        ctx: Context<UpdatePlatformFeeSecondaryAdminCtx>,
+        input: UpdatePlatformFeeSecondaryAdminInput) -> Result<()> {
+        instructions::update_platform_fee_secondary_admin(ctx, input)
     }
 }

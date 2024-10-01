@@ -1,4 +1,4 @@
-use crate::{PlatformFeeRecipient, UpdatePlatformFeeArgs, PLATFORM_FEE_PREFIX_KEY, PLATFORM_FEE_VALUE_KEY};
+use crate::{EditionsDeployment, ModifyPlatformFee, PlatformFeeRecipient, UpdatePlatformFeeArgs, PLATFORM_FEE_PREFIX_KEY, PLATFORM_FEE_VALUE_KEY};
 use anchor_lang::prelude::*;
 use anchor_spl::token_interface::spl_token_2022::{
     extension::{BaseStateWithExtensions, StateWithExtensions},
@@ -6,6 +6,35 @@ use anchor_spl::token_interface::spl_token_2022::{
 };
 use anchor_spl::token_interface::spl_token_metadata_interface::state::TokenMetadata;
 use std::str::FromStr;
+use anchor_spl::token_2022::Token2022;
+use anchor_spl::token_2022_extensions::{token_metadata_update_field, TokenMetadataUpdateField};
+use solana_program::entrypoint::ProgramResult;
+use solana_program::program::invoke_signed;
+use spl_token_metadata_interface::instruction::remove_key;
+use spl_token_metadata_interface::state::Field;
+
+#[derive(Accounts)]
+#[instruction(args: UpdatePlatformFeeArgs)]
+pub struct GetPlatformFee<'info> {
+    #[account(mut,
+        seeds = ["editions_deployment".as_ref(), editions_deployment.symbol.as_ref()], bump)]
+    pub editions_deployment: Account<'info, EditionsDeployment>,
+
+    #[account(mut,
+        constraint = editions_deployment.group_mint == group_mint.key())]
+    pub group_mint: UncheckedAccount<'info>,
+}
+
+impl<'info> GetPlatformFee<'info> {
+    fn get_platform_fee(&self, account: &AccountInfo) -> Result<UpdatePlatformFeeArgs> {
+        get_platform_fee(account)
+    }
+}
+
+pub fn get_handler(ctx: Context<GetPlatformFee>) -> Result<UpdatePlatformFeeArgs> {
+    let group_mint = &ctx.accounts.group_mint;
+    get_platform_fee(group_mint)
+}
 
 pub fn get_platform_fee(account: &AccountInfo) -> Result<UpdatePlatformFeeArgs> {
     // Get the TokenMetadata from the mint account

@@ -1,4 +1,3 @@
-use anchor_lang::system_program;
 use anchor_lang::{prelude::*, solana_program::entrypoint::ProgramResult};
 use std::str::FromStr;
 use crate::{PLATFORM_FEE_PREFIX_KEY, PLATFORM_FEE_VALUE_KEY, ROYALTY_BASIS_POINTS_FIELD};
@@ -67,6 +66,7 @@ pub fn handler(ctx: Context<AddMetadata>, args: Vec<AddMetadataArgs>) -> Result<
         // Validate that the field does not start with reserved prefixes
         if metadata_arg.field.starts_with(PLATFORM_FEE_PREFIX_KEY)
             || metadata_arg.field.starts_with(ROYALTY_BASIS_POINTS_FIELD)
+            || metadata_arg.field.starts_with(PLATFORM_FEE_VALUE_KEY)
         {
             return Err(MetadataErrors::InvalidField.into());
         }

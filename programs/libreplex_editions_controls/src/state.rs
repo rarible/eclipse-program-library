@@ -29,6 +29,9 @@ impl Phase {
     + 200;
 }
 
+pub const DEFAULT_PLATFORM_FEE_PRIMARY_ADMIN: &str = "674s1Sap3KVnr8WGrY5KGQ69oTYjjgr1disKJo6GpTYw";
+pub const DEFAULT_PLATFORM_FEE_SECONDARY_ADMIN: &str = "QjzRL6VwKGnpco8wx3cPjtq8ZPhewy7ohq7F5mv2eeR";
+
 #[account]
 pub struct MinterStats {
     pub wallet: Pubkey,
@@ -47,6 +50,9 @@ pub struct EditionsControls {
     pub treasury: Pubkey, // mint proceeds go here
     pub max_mints_per_wallet: u64, // set to 0 for unlimited (applied across all the phases)
     pub cosigner_program_id: Pubkey,
+    pub platform_fee_primary_admin: Pubkey,
+    pub platform_fee_secondary_admin: Pubkey,
+    pub padding: [u8; 136],    // in case we need some more stuff in the future
     pub phases: Vec<Phase>,
     pub padding: [u8; 200], 
 }
