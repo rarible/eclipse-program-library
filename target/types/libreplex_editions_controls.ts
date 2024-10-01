@@ -792,7 +792,7 @@ export type LibreplexEditionsControls = {
             "type": {
               "array": [
                 "u8",
-                200
+                136
               ]
             }
           }
@@ -1090,7 +1090,7 @@ export type LibreplexEditionsControls = {
             "type": {
               "array": [
                 "u8",
-                200
+                136
               ]
             }
           }
