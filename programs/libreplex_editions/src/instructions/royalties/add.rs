@@ -1,15 +1,12 @@
 use anchor_lang::{prelude::*, solana_program::entrypoint::ProgramResult};
-use spl_tlv_account_resolution::state::ExtraAccountMetaList;
-use anchor_lang::{system_program};
 use anchor_spl::token_interface::{
     spl_token_metadata_interface::state::Field, token_metadata_update_field, transfer_hook_update,
     Mint, Token2022, TokenMetadataUpdateField, TransferHookUpdate,
 };
-use spl_transfer_hook_interface::instruction::ExecuteInstruction;
 
-use crate::{EditionsDeployment, UpdateRoyaltiesArgs, META_LIST_ACCOUNT_SEED, ROYALTY_BASIS_POINTS_FIELD};
+use crate::{EditionsDeployment, UpdateRoyaltiesArgs, ROYALTY_BASIS_POINTS_FIELD};
 use crate::errors::MetadataErrors;
-use crate::utils::{get_meta_list, update_account_lamports_to_minimum_balance};
+use crate::utils::{update_account_lamports_to_minimum_balance};
 
 #[derive(Accounts)]
 #[instruction(args: UpdateRoyaltiesArgs)]

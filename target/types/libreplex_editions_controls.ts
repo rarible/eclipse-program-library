@@ -702,11 +702,19 @@ export type LibreplexEditionsControls = {
             "type": "pubkey"
           },
           {
+            "name": "platformFeePrimaryAdmin",
+            "type": "pubkey"
+          },
+          {
+            "name": "platformFeeSecondaryAdmin",
+            "type": "pubkey"
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                200
+                136
               ]
             }
           },

@@ -1,6 +1,3 @@
-use anchor_lang::system_program;
-use std::str::FromStr;
-
 use anchor_lang::{
     prelude::*,
     solana_program::{entrypoint::ProgramResult, program::invoke_signed},

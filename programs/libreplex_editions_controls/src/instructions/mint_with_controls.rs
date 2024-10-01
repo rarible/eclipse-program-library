@@ -192,7 +192,7 @@ pub fn mint_with_controls(ctx: Context<MintWithControlsCtx>, mint_input: MintInp
 
     // take all the data for platform fee and transfer
     // editions_deployment.group_mint.
-
+    // libreplex_editions::platform_fee::handler()
 
     let editions_deployment_key = editions_deployment.key();
     let seeds = &[

@@ -14,7 +14,6 @@ pub use state::*;
 
 #[program]
 pub mod libreplex_editions_controls {
-    use libreplex_editions::{ModifyPlatformFee, UpdatePlatformFeeArgs};
     use super::*;
 
     // v2 endpoints. Prefer these over the original ones.

@@ -15,7 +15,8 @@ pub struct UpdatePlatformFeeArgs {
 
 pub mod add;
 pub mod modify;
-mod get;
+pub mod get;
 
 pub use add::*;
+pub use get::*;
 pub use modify::*;

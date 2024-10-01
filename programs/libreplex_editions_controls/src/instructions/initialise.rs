@@ -3,7 +3,7 @@ use libreplex_editions::{cpi::accounts::InitialiseCtx, group_extension_program, 
 use libreplex_editions::cpi::accounts::AddMetadata;
 use libreplex_editions::cpi::accounts::AddRoyalties;
 use libreplex_editions::cpi::accounts::AddPlatformFee;
-use crate::EditionsControls;
+use crate::{EditionsControls, DEFAULT_PLATFORM_FEE_PRIMARY_ADMIN, DEFAULT_PLATFORM_FEE_SECONDARY_ADMIN};
 
 #[derive(AnchorDeserialize, AnchorSerialize, Clone)]
 pub struct InitialiseControlInput {
@@ -120,10 +120,12 @@ pub fn initialise_editions_controls(
         editions_deployment: editions_deployment.key(),
         creator: creator.key(),
         max_mints_per_wallet: input.max_mints_per_wallet,
-        padding: [0; 200],
+        padding: [0; 136],
         cosigner_program_id: input.cosigner_program_id.unwrap_or(system_program::ID),
         phases: vec![],
         treasury: input.treasury,
+        platform_fee_primary_admin: DEFAULT_PLATFORM_FEE_PRIMARY_ADMIN.parse().unwrap(),
+        platform_fee_secondary_admin: DEFAULT_PLATFORM_FEE_SECONDARY_ADMIN.parse().unwrap(),
     });
 
     let editions_deployment_key = editions_deployment.key();
