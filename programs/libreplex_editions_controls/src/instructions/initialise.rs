@@ -120,12 +120,12 @@ pub fn initialise_editions_controls(
         editions_deployment: editions_deployment.key(),
         creator: creator.key(),
         max_mints_per_wallet: input.max_mints_per_wallet,
-        padding: [0; 200],
         cosigner_program_id: input.cosigner_program_id.unwrap_or(system_program::ID),
         phases: vec![],
         treasury: input.treasury,
         platform_fee_primary_admin: DEFAULT_PLATFORM_FEE_PRIMARY_ADMIN.parse().unwrap(),
         platform_fee_secondary_admin: DEFAULT_PLATFORM_FEE_SECONDARY_ADMIN.parse().unwrap(),
+        padding: [0; 136],
     });
 
     let editions_deployment_key = editions_deployment.key();

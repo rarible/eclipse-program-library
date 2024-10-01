@@ -1,7 +1,6 @@
 use anchor_lang::prelude::*;
 use solana_program::pubkey::Pubkey;
 
-// max length: 8 + 8 + 8 + 1 + 8 = 33
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub struct Phase {
     pub price_amount: u64,
@@ -13,20 +12,22 @@ pub struct Phase {
     pub end_time: i64, // set to i64::MAX for unlimited
     pub current_mints: u64,
     pub merkle_root: Option<[u8; 32]>,
-    pub padding: [u8; 200]
+    pub padding: [u8; 136]
 }
 
 impl Phase {
-    pub const SIZE: usize = 8 
-    + 32 
+    pub const SIZE: usize = 
+    8
+    + 8
+    + 32
     + 8
     + 1
     + 8
     + 8
     + 8
     + 8
-    + 33 // Option<[u8; 32]>
-    + 200;
+    + 33 
+    + 136;
 }
 
 pub const DEFAULT_PLATFORM_FEE_PRIMARY_ADMIN: &str = "674s1Sap3KVnr8WGrY5KGQ69oTYjjgr1disKJo6GpTYw";
@@ -40,7 +41,7 @@ pub struct MinterStats {
 }
 
 impl MinterStats {
-    pub const SIZE: usize = 8 + 32 + 8 + 8 + 50;
+    pub const SIZE: usize = 8 + 32 + 8 + 50;
 }
 
 #[account]
@@ -53,11 +54,11 @@ pub struct EditionsControls {
     pub platform_fee_primary_admin: Pubkey,
     pub platform_fee_secondary_admin: Pubkey,
     pub phases: Vec<Phase>,
-    pub padding: [u8; 200], 
+    pub padding: [u8; 136], 
 }
 
 impl EditionsControls {
-    pub const INITIAL_SIZE: usize = 8 + 32 + 32 + 32 + 8 + 32 + 200 + 4;
+    pub const INITIAL_SIZE: usize = 8 + 32 + 32 + 32 + 8 + 32 + 32 + 32 + 4 + 136;
     pub fn get_size(number_of_phases: usize) -> usize {
         EditionsControls::INITIAL_SIZE + Phase::SIZE * number_of_phases
     }

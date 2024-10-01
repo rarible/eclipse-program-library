@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 
 pub mod instructions;
 pub use instructions::*;
-declare_id!("CeGRFA9sFRbfhaUVWj4hi3oDezCD8o56abbdMoeAkYBU");
+declare_id!("AffMEwvVXZgKcSD5aBDeB6H9PByiupYLryt4nw7LUbYA");
 
 pub mod errors;
 pub mod state;

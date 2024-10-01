@@ -197,7 +197,6 @@ pub fn mint_with_controls(ctx: Context<MintWithControlsCtx>, mint_input: MintInp
     editions_controls.phases[phase_index].current_mints += 1;
 
     // Checks completed, transfer funds to treasury if applicable
-
     system_program::transfer(
         CpiContext::new(
             system_program.to_account_info(),
