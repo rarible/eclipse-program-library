@@ -224,14 +224,7 @@ fn process_platform_fees(
 
     if editions_controls.is_fee_flat {
         total_fee = editions_controls.platform_fee_value;
-
-        // Ensure total_fee does not exceed price_amount
-        if total_fee > price_amount {
-            return Err(EditionsError::FeeExceedsPrice.into());
-        }
-
-        remaining_amount = price_amount.checked_sub(total_fee)
-            .ok_or(EditionsError::FeeCalculationError)?;
+        remaining_amount = price_amount;
     } else {
         // Calculate fee as (price_amount * platform_fee_value) / 10,000 (assuming basis points)
         total_fee = price_amount
@@ -244,19 +237,15 @@ fn process_platform_fees(
             .ok_or(EditionsError::FeeCalculationError)?;
     }
 
-    // Collect platform fee recipients into an array
-    //let mut recipient_accounts = vec![ctx.accounts.platform_fee_recipient_main.to_account_info()];
-    //recipient_accounts.extend(ctx.remaining_accounts.iter().cloned());
-
-    // Ensure the number of accounts matches the number of recipients
-    // if recipient_accounts.len() != recipients.len() {
-    //     return Err(EditionsError::InvalidNumberOfRecipients.into());
-    // }
-
     // Distribute fees to recipients
     for (i, recipient_struct) in recipients.iter().enumerate() {
+        if recipient_struct.share == 0 {
+            continue;
+        }
+
         let recipient_account = &ctx.accounts.platform_fee_recipient_main;
 
+        msg!("check recipients {}: {} vs {}", i, recipient_account.key(), recipient_struct.address.key());
         // Ensure that the account matches the expected recipient
         if recipient_account.key() != recipient_struct.address.key() {
             return Err(EditionsError::RecipientMismatch.into());
@@ -279,6 +268,8 @@ fn process_platform_fees(
             ),
             recipient_fee,
         )?;
+
+        break;
     }
 
     // Transfer remaining amount to treasury
