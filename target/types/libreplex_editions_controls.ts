@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/libreplex_editions_controls.json`.
  */
 export type LibreplexEditionsControls = {
-  "address": "JBoH2n87fFvyJgsty8UN3KBTEWbkv1pH7yfT8kGKSs6y",
+  "address": "6NWqCAnyTGLhL2Qu5qYW4h9aPAgUn3333TPhRSMgYR32",
   "metadata": {
     "name": "libreplexEditionsControls",
     "version": "0.2.1",
@@ -51,7 +51,7 @@ export type LibreplexEditionsControls = {
         },
         {
           "name": "libreplexEditionsProgram",
-          "address": "CeGRFA9sFRbfhaUVWj4hi3oDezCD8o56abbdMoeAkYBU"
+          "address": "AZzr7M9VAQNw5kHi5Di4vdK2hb5gdM9AhVXhh81Woe1y"
         }
       ],
       "args": [
@@ -152,7 +152,7 @@ export type LibreplexEditionsControls = {
         },
         {
           "name": "libreplexEditionsProgram",
-          "address": "CeGRFA9sFRbfhaUVWj4hi3oDezCD8o56abbdMoeAkYBU"
+          "address": "AZzr7M9VAQNw5kHi5Di4vdK2hb5gdM9AhVXhh81Woe1y"
         }
       ],
       "args": [
@@ -357,7 +357,7 @@ export type LibreplexEditionsControls = {
         },
         {
           "name": "libreplexEditionsProgram",
-          "address": "CeGRFA9sFRbfhaUVWj4hi3oDezCD8o56abbdMoeAkYBU"
+          "address": "AZzr7M9VAQNw5kHi5Di4vdK2hb5gdM9AhVXhh81Woe1y"
         },
         {
           "name": "platformFeeRecipient1",
@@ -451,22 +451,6 @@ export type LibreplexEditionsControls = {
           "name": "creator",
           "writable": true,
           "signer": true
-        },
-        {
-          "name": "groupMint",
-          "writable": true
-        },
-        {
-          "name": "systemProgram",
-          "address": "11111111111111111111111111111111"
-        },
-        {
-          "name": "tokenProgram",
-          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
-        },
-        {
-          "name": "libreplexEditionsProgram",
-          "address": "CeGRFA9sFRbfhaUVWj4hi3oDezCD8o56abbdMoeAkYBU"
         }
       ],
       "args": [
@@ -623,7 +607,7 @@ export type LibreplexEditionsControls = {
         },
         {
           "name": "libreplexEditionsProgram",
-          "address": "CeGRFA9sFRbfhaUVWj4hi3oDezCD8o56abbdMoeAkYBU"
+          "address": "AZzr7M9VAQNw5kHi5Di4vdK2hb5gdM9AhVXhh81Woe1y"
         }
       ],
       "args": [

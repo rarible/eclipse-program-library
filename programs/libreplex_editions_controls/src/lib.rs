@@ -5,7 +5,7 @@ pub use logic::*;
 
 pub mod instructions;
 pub use instructions::*;
-declare_id!("JBoH2n87fFvyJgsty8UN3KBTEWbkv1pH7yfT8kGKSs6y");
+declare_id!("6NWqCAnyTGLhL2Qu5qYW4h9aPAgUn3333TPhRSMgYR32");
 
 pub mod errors;
 pub mod state;
@@ -46,7 +46,7 @@ pub mod libreplex_editions_controls {
 
     pub fn modify_platform_fee(
         ctx: Context<UpdatePlatformFeeCtx>,
-        input: libreplex_editions::UpdatePlatformFeeArgs) -> Result<()> {
+        input: UpdatePlatformFeeArgs) -> Result<()> {
         instructions::update_platform_fee(ctx, input)
     }
 

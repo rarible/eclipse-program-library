@@ -14,6 +14,3 @@ pub use metadata::*;
 
 pub mod mint;
 pub use mint::*;
-
-pub mod platform_fee;
-pub use platform_fee::*;

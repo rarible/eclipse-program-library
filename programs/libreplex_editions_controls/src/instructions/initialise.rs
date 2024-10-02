@@ -1,9 +1,8 @@
 use anchor_lang::{prelude::*, system_program};
-use libreplex_editions::{cpi::accounts::InitialiseCtx, group_extension_program, program::LibreplexEditions, AddMetadataArgs, CreatorWithShare, InitialiseInput, UpdatePlatformFeeArgs, UpdateRoyaltiesArgs};
+use libreplex_editions::{cpi::accounts::InitialiseCtx, group_extension_program, program::LibreplexEditions, AddMetadataArgs, CreatorWithShare, InitialiseInput, UpdateRoyaltiesArgs};
 use libreplex_editions::cpi::accounts::AddMetadata;
 use libreplex_editions::cpi::accounts::AddRoyalties;
-use libreplex_editions::cpi::accounts::AddPlatformFee;
-use crate::{EditionsControls, DEFAULT_PLATFORM_FEE_PRIMARY_ADMIN, DEFAULT_PLATFORM_FEE_SECONDARY_ADMIN};
+use crate::{EditionsControls, PlatformFeeRecipient, UpdatePlatformFeeArgs, DEFAULT_PLATFORM_FEE_PRIMARY_ADMIN, DEFAULT_PLATFORM_FEE_SECONDARY_ADMIN};
 use crate::errors::EditionsError;
 
 #[derive(AnchorDeserialize, AnchorSerialize, Clone)]
@@ -129,24 +128,24 @@ pub fn initialise_editions_controls(
     }
 
     // Initialize an array of 5 PlatformFeeRecipient with default values
-    let mut recipients_array: [libreplex_editions::PlatformFeeRecipient; 5] = [
-        libreplex_editions::PlatformFeeRecipient {
+    let mut recipients_array: [PlatformFeeRecipient; 5] = [
+        PlatformFeeRecipient {
             address: Pubkey::default(),
             share: 0,
         },
-        libreplex_editions::PlatformFeeRecipient {
+        PlatformFeeRecipient {
             address: Pubkey::default(),
             share: 0,
         },
-        libreplex_editions::PlatformFeeRecipient {
+        PlatformFeeRecipient {
             address: Pubkey::default(),
             share: 0,
         },
-        libreplex_editions::PlatformFeeRecipient {
+        PlatformFeeRecipient {
             address: Pubkey::default(),
             share: 0,
         },
-        libreplex_editions::PlatformFeeRecipient {
+        PlatformFeeRecipient {
             address: Pubkey::default(),
             share: 0,
         },
@@ -212,23 +211,6 @@ pub fn initialise_editions_controls(
             &[seeds]
         ),
         input.extra_meta,
-    )?;
-
-    // Add platform fee
-    libreplex_editions::cpi::add_platform_fee(
-        CpiContext::new_with_signer(
-            libreplex_editions_program.to_account_info(),
-            AddPlatformFee {
-                editions_deployment: editions_deployment.to_account_info(),
-                payer: payer.to_account_info(),
-                system_program: system_program.to_account_info(),
-                token_program: token_program.to_account_info(),
-                group_mint: group_mint.to_account_info(),
-                signer: editions_controls.to_account_info(),
-            },
-            &[seeds]
-        ),
-        input.platform_fee,
     )?;
 
     Ok(())

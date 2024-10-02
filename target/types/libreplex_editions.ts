@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/libreplex_editions.json`.
  */
 export type LibreplexEditions = {
-  "address": "CeGRFA9sFRbfhaUVWj4hi3oDezCD8o56abbdMoeAkYBU",
+  "address": "AZzr7M9VAQNw5kHi5Di4vdK2hb5gdM9AhVXhh81Woe1y",
   "metadata": {
     "name": "libreplexEditions",
     "version": "0.2.1",
@@ -105,94 +105,6 @@ export type LibreplexEditions = {
       ]
     },
     {
-      "name": "addPlatformFee",
-      "docs": [
-        "add royalties to mint"
-      ],
-      "discriminator": [
-        62,
-        94,
-        29,
-        95,
-        254,
-        228,
-        21,
-        18
-      ],
-      "accounts": [
-        {
-          "name": "editionsDeployment",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  101,
-                  100,
-                  105,
-                  116,
-                  105,
-                  111,
-                  110,
-                  115,
-                  95,
-                  100,
-                  101,
-                  112,
-                  108,
-                  111,
-                  121,
-                  109,
-                  101,
-                  110,
-                  116
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "editions_deployment.symbol",
-                "account": "editionsDeployment"
-              }
-            ]
-          }
-        },
-        {
-          "name": "payer",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "signer",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "groupMint",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "systemProgram",
-          "address": "11111111111111111111111111111111"
-        },
-        {
-          "name": "tokenProgram",
-          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
-        }
-      ],
-      "args": [
-        {
-          "name": "args",
-          "type": {
-            "defined": {
-              "name": "updatePlatformFeeArgs"
-            }
-          }
-        }
-      ]
-    },
-    {
       "name": "addRoyalties",
       "docs": [
         "add royalties to mint"
@@ -279,71 +191,6 @@ export type LibreplexEditions = {
           }
         }
       ]
-    },
-    {
-      "name": "getPlatformFee",
-      "docs": [
-        "modify royalties of mint"
-      ],
-      "discriminator": [
-        255,
-        104,
-        37,
-        27,
-        21,
-        39,
-        45,
-        174
-      ],
-      "accounts": [
-        {
-          "name": "editionsDeployment",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  101,
-                  100,
-                  105,
-                  116,
-                  105,
-                  111,
-                  110,
-                  115,
-                  95,
-                  100,
-                  101,
-                  112,
-                  108,
-                  111,
-                  121,
-                  109,
-                  101,
-                  110,
-                  116
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "editions_deployment.symbol",
-                "account": "editionsDeployment"
-              }
-            ]
-          }
-        },
-        {
-          "name": "groupMint",
-          "writable": true
-        }
-      ],
-      "args": [],
-      "returns": {
-        "defined": {
-          "name": "updatePlatformFeeArgs"
-        }
-      }
     },
     {
       "name": "initialise",
@@ -626,93 +473,6 @@ export type LibreplexEditions = {
         }
       ],
       "args": []
-    },
-    {
-      "name": "modifyPlatformFee",
-      "docs": [
-        "modify royalties of mint"
-      ],
-      "discriminator": [
-        186,
-        73,
-        229,
-        152,
-        183,
-        174,
-        250,
-        197
-      ],
-      "accounts": [
-        {
-          "name": "payer",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "editionsDeployment",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  101,
-                  100,
-                  105,
-                  116,
-                  105,
-                  111,
-                  110,
-                  115,
-                  95,
-                  100,
-                  101,
-                  112,
-                  108,
-                  111,
-                  121,
-                  109,
-                  101,
-                  110,
-                  116
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "editions_deployment.symbol",
-                "account": "editionsDeployment"
-              }
-            ]
-          }
-        },
-        {
-          "name": "signer",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "groupMint",
-          "writable": true
-        },
-        {
-          "name": "systemProgram",
-          "address": "11111111111111111111111111111111"
-        },
-        {
-          "name": "tokenProgram",
-          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
-        }
-      ],
-      "args": [
-        {
-          "name": "args",
-          "type": {
-            "defined": {
-              "name": "updatePlatformFeeArgs"
-            }
-          }
-        }
-      ]
     },
     {
       "name": "modifyRoyalties",
@@ -1180,22 +940,6 @@ export type LibreplexEditions = {
       }
     },
     {
-      "name": "platformFeeRecipient",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "address",
-            "type": "pubkey"
-          },
-          {
-            "name": "share",
-            "type": "u8"
-          }
-        ]
-      }
-    },
-    {
       "name": "removeMetadataArgs",
       "type": {
         "kind": "struct",
@@ -1207,32 +951,6 @@ export type LibreplexEditions = {
           {
             "name": "value",
             "type": "string"
-          }
-        ]
-      }
-    },
-    {
-      "name": "updatePlatformFeeArgs",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "platformFeeValue",
-            "type": "u64"
-          },
-          {
-            "name": "recipients",
-            "type": {
-              "vec": {
-                "defined": {
-                  "name": "platformFeeRecipient"
-                }
-              }
-            }
-          },
-          {
-            "name": "isFeeFlat",
-            "type": "bool"
           }
         ]
       }

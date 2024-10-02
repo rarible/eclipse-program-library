@@ -1,6 +1,23 @@
 use anchor_lang::prelude::*;
 use solana_program::pubkey::Pubkey;
 
+#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+pub struct PlatformFeeRecipient {
+    pub address: Pubkey,
+    pub share: u8, // Share percentage (0-100)
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+pub struct UpdatePlatformFeeArgs {
+    pub platform_fee_value: u64, // Always required
+    pub recipients: Vec<PlatformFeeRecipient>,
+    pub is_fee_flat: bool, // Flag to indicate if the fee is flat
+}
+
+impl PlatformFeeRecipient {
+    pub const SIZE: usize = 32 + 1; // Pubkey + u8
+}
+
 // max length: 8 + 8 + 8 + 1 + 8 = 33
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub struct Phase {
@@ -52,7 +69,7 @@ pub struct EditionsControls {
     pub platform_fee_secondary_admin: Pubkey,
     pub platform_fee_value: u64, // Fee amount or basis points
     pub is_fee_flat: bool, // True for flat fee, false for percentage-based fee
-    pub platform_fee_recipients: [libreplex_editions::PlatformFeeRecipient; 5], // Fixed-length array of 5 recipients and their shares
+    pub platform_fee_recipients: [PlatformFeeRecipient; 5], // Fixed-length array of 5 recipients and their shares
     pub padding: [u8; 200],    // in case we need some more stuff in the future
     pub phases: Vec<Phase>,
 }
@@ -68,7 +85,7 @@ impl EditionsControls {
         + 32                                   // platform_fee_secondary_admin
         + 8                                    // platform_fee_value
         + 1                                    // is_fee_flat
-        + (libreplex_editions::PlatformFeeRecipient::SIZE * 5)     // platform_fee_recipients (5 * 33 = 165)
+        + (PlatformFeeRecipient::SIZE * 5)     // platform_fee_recipients (5 * 33 = 165)
         + 200                                  // padding
         + 4;                                   // Vec length for phases
     pub fn get_size(number_of_phases: usize) -> usize {
