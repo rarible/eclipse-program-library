@@ -39,9 +39,9 @@ pub fn update_account_lamports_to_minimum_balance<'info>(
     Ok(())
 }
 
-pub fn get_approve_account_pda(mint: Pubkey) -> Pubkey {
-    Pubkey::find_program_address(&[APPROVE_ACCOUNT_SEED, mint.as_ref()], &crate::id()).0
-}
+// pub fn get_approve_account_pda(mint: Pubkey) -> Pubkey {
+//     Pubkey::find_program_address(&[APPROVE_ACCOUNT_SEED, mint.as_ref()], &crate::id()).0
+// }
 
 pub fn get_mint_metadata(account: &mut AccountInfo) -> Result<TokenMetadata> {
     let mint_data = account.data.borrow();
@@ -57,14 +57,14 @@ pub fn get_extension_data<T: Extension + Pod>(account: &mut AccountInfo) -> Resu
     Ok(extension_data)
 }
 
-pub fn get_meta_list(approve_account: Pubkey) -> Vec<ExtraAccountMeta> {
-    vec![ExtraAccountMeta {
-        discriminator: 0,
-        address_config: approve_account.to_bytes(),
-        is_signer: false.into(),
-        is_writable: true.into(),
-    }]
-}
+// pub fn get_meta_list(approve_account: Pubkey) -> Vec<ExtraAccountMeta> {
+//     vec![ExtraAccountMeta {
+//         discriminator: 0,
+//         address_config: approve_account.to_bytes(),
+//         is_signer: false.into(),
+//         is_writable: true.into(),
+//     }]
+// }
 
 // pub fn get_meta_list_size(approve_account: Pubkey) -> usize {
 //     ExtraAccountMetaList::size_of(get_meta_list(approve_account).len()).unwrap()
