@@ -75,5 +75,10 @@ pub mod libreplex_editions {
         platform_fee::modify::handler(ctx, args)
     }
 
-
+    /// modify royalties of mint
+    pub fn get_platform_fee(
+        ctx: Context<GetPlatformFee>,
+    ) -> Result<UpdatePlatformFeeArgs> {
+        platform_fee::get::get_handler(ctx)
+    }
 }

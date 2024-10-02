@@ -358,6 +358,26 @@ export type LibreplexEditionsControls = {
         {
           "name": "libreplexEditionsProgram",
           "address": "CeGRFA9sFRbfhaUVWj4hi3oDezCD8o56abbdMoeAkYBU"
+        },
+        {
+          "name": "platformFeeRecipient1",
+          "writable": true
+        },
+        {
+          "name": "platformFeeRecipient2",
+          "writable": true
+        },
+        {
+          "name": "platformFeeRecipient3",
+          "writable": true
+        },
+        {
+          "name": "platformFeeRecipient4",
+          "writable": true
+        },
+        {
+          "name": "platformFeeRecipient5",
+          "writable": true
         }
       ],
       "args": [
@@ -709,6 +729,31 @@ export type LibreplexEditionsControls = {
       "code": 6009,
       "name": "creatorFeeTooHigh",
       "msg": "Creator fee too high"
+    },
+    {
+      "code": 6010,
+      "name": "feeCalculationError",
+      "msg": "Platform fee calculation failed."
+    },
+    {
+      "code": 6011,
+      "name": "feeExceedsPrice",
+      "msg": "Total fee exceeds the price amount."
+    },
+    {
+      "code": 6012,
+      "name": "invalidFeeShares",
+      "msg": "Total fee shares must equal 100."
+    },
+    {
+      "code": 6013,
+      "name": "tooManyRecipients",
+      "msg": "Too many platform fee recipients. Maximum allowed is 5."
+    },
+    {
+      "code": 6014,
+      "name": "recipientMismatch",
+      "msg": "Recipient account does not match the expected address."
     }
   ],
   "types": [
@@ -778,11 +823,32 @@ export type LibreplexEditionsControls = {
             "type": "pubkey"
           },
           {
+            "name": "platformFeeValue",
+            "type": "u64"
+          },
+          {
+            "name": "isFeeFlat",
+            "type": "bool"
+          },
+          {
+            "name": "platformFeeRecipients",
+            "type": {
+              "array": [
+                {
+                  "defined": {
+                    "name": "platformFeeRecipient"
+                  }
+                },
+                5
+              ]
+            }
+          },
+          {
             "name": "padding",
             "type": {
               "array": [
                 "u8",
-                136
+                200
               ]
             }
           },

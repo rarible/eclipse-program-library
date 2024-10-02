@@ -53,6 +53,8 @@ pub fn update_platform_fee(ctx: Context<UpdatePlatformFeeCtx>, platform_fee_inpu
     let mint = &ctx.accounts.group_mint;
     let system_program = &ctx.accounts.system_program;
     let token_program = &ctx.accounts.token_program;
+    let platform_fee_value = platform_fee_input.platform_fee_value;
+    let is_fee_flat = platform_fee_input.is_fee_flat;
 
     let editions_deployment_key = editions_deployment.key();
     let seeds = &[
@@ -73,7 +75,44 @@ pub fn update_platform_fee(ctx: Context<UpdatePlatformFeeCtx>, platform_fee_inpu
                 system_program: system_program.to_account_info(),
             },
             &[seeds]
-        ), platform_fee_input)?;
-    msg!("libreplex_editions::cpi::modify_platform_ffe done");
+        ), platform_fee_input.clone())?;
+    let editions_controls = &mut ctx.accounts.editions_controls;
+
+    // Initialize an array of 5 PlatformFeeRecipient with default values
+    let mut recipients_array: [libreplex_editions::PlatformFeeRecipient; 5] = [
+        libreplex_editions::PlatformFeeRecipient {
+            address: Pubkey::default(),
+            share: 0,
+        },
+        libreplex_editions::PlatformFeeRecipient {
+            address: Pubkey::default(),
+            share: 0,
+        },
+        libreplex_editions::PlatformFeeRecipient {
+            address: Pubkey::default(),
+            share: 0,
+        },
+        libreplex_editions::PlatformFeeRecipient {
+            address: Pubkey::default(),
+            share: 0,
+        },
+        libreplex_editions::PlatformFeeRecipient {
+            address: Pubkey::default(),
+            share: 0,
+        },
+    ];
+
+    msg!("libreplex_editions_controls:: update editions_controls");
+    // Populate the array with provided recipients
+    for (i, recipient) in platform_fee_input.recipients.iter().enumerate() {
+        recipients_array[i] = recipient.clone();
+    }
+    editions_controls.platform_fee_value = platform_fee_value;
+    editions_controls.is_fee_flat = is_fee_flat;
+    editions_controls.platform_fee_recipients = recipients_array;
+
+    msg!("libreplex_editions::cpi::modify_platform_fee done");
+
+
     Ok(())
 }

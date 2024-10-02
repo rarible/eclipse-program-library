@@ -6,6 +6,10 @@ pub struct PlatformFeeRecipient {
     pub share: u8,
 }
 
+impl PlatformFeeRecipient {
+    pub const SIZE: usize = 32 + 1; // Pubkey (32 bytes) + u8 (1 byte) = 33 bytes
+}
+
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub struct UpdatePlatformFeeArgs {
     pub platform_fee_value: u64, // Always required

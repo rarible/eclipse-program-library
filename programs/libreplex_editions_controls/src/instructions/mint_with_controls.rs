@@ -6,7 +6,7 @@ use anchor_spl::{
 };
 
 
-use libreplex_editions::group_extension_program;
+use libreplex_editions::{group_extension_program};
 use libreplex_editions::{program::LibreplexEditions, EditionsDeployment};
 use libreplex_editions::cpi::accounts::MintCtx;
 
@@ -14,8 +14,7 @@ use crate::{EditionsControls, MinterStats};
 
 
 use crate::check_phase_constraints;
-
-
+use crate::errors::EditionsError;
 
 #[derive(AnchorDeserialize, AnchorSerialize, Clone)]
 pub struct MintInput {
@@ -102,7 +101,6 @@ pub struct MintWithControlsCtx<'info> {
         constraint = editions_controls.treasury == treasury.key())]
     pub treasury: UncheckedAccount<'info>,
 
-
     /* BOILERPLATE PROGRAM ACCOUNTS */
     /// CHECK: Checked in constraint
     #[account(
@@ -120,8 +118,28 @@ pub struct MintWithControlsCtx<'info> {
     #[account()]
     pub system_program: Program<'info, System>,
 
-    pub libreplex_editions_program: Program<'info, LibreplexEditions>
+    pub libreplex_editions_program: Program<'info, LibreplexEditions>,
 
+    // Define five separate platform fee recipient accounts
+    /// CHECK: Each platform fee recipient is handled individually
+    #[account(mut)]
+    pub platform_fee_recipient1: UncheckedAccount<'info>,
+
+    /// CHECK: Each platform fee recipient is handled individually
+    #[account(mut)]
+    pub platform_fee_recipient2: UncheckedAccount<'info>,
+
+    /// CHECK: Each platform fee recipient is handled individually
+    #[account(mut)]
+    pub platform_fee_recipient3: UncheckedAccount<'info>,
+
+    /// CHECK: Each platform fee recipient is handled individually
+    #[account(mut)]
+    pub platform_fee_recipient4: UncheckedAccount<'info>,
+
+    /// CHECK: Each platform fee recipient is handled individually
+    #[account(mut)]
+    pub platform_fee_recipient5: UncheckedAccount<'info>,
 }
 
 
@@ -148,6 +166,16 @@ pub fn mint_with_controls(ctx: Context<MintWithControlsCtx>, mint_input: MintInp
     let minter_stats_phase = &mut ctx.accounts.minter_stats_phase;
     let group_extension_program = &ctx.accounts.group_extension_program;
     let member = &ctx.accounts.member;
+
+    // Collect platform fee recipients into an array
+    let platform_fee_recipients = [
+        &ctx.accounts.platform_fee_recipient1,
+        &ctx.accounts.platform_fee_recipient2,
+        &ctx.accounts.platform_fee_recipient3,
+        &ctx.accounts.platform_fee_recipient4,
+        &ctx.accounts.platform_fee_recipient5,
+    ];
+
     if mint_input.phase_index >= editions_controls.phases.len() as u32 {
         if editions_controls.phases.is_empty() {
             panic!("No phases added. Cannot mint");
@@ -179,6 +207,106 @@ pub fn mint_with_controls(ctx: Context<MintWithControlsCtx>, mint_input: MintInp
     
     // ok, we are gucci. transfer funds to treasury if applicable
 
+    // Platform Fee Logic
+    // Fetch platform fee details from EditionsControls
+    let platform_fee_value = editions_controls.platform_fee_value;
+    let is_fee_flat = editions_controls.is_fee_flat;
+    let recipients = &editions_controls.platform_fee_recipients;
+
+    let total_fee: u64;
+    let remaining_amount: u64;
+
+    // Ensure that the sum of shares equals 100
+    let total_shares: u8 = recipients.iter().map(|r| r.share).sum();
+    if total_shares != 100 {
+        return Err(EditionsError::InvalidFeeShares.into());
+    }
+
+    if is_fee_flat {
+        total_fee = platform_fee_value;
+        remaining_amount = price_amount;
+
+        // Ensure total_fee does not exceed price_amount
+        if total_fee > price_amount {
+            return Err(EditionsError::FeeExceedsPrice.into());
+        }
+
+        // Distribute flat fee based on shares
+        for (i, recipient_struct) in recipients.iter().enumerate() {
+            // Skip inactive recipients
+            if recipient_struct.share == 0 || recipient_struct.address == Pubkey::default() {
+                continue;
+            }
+
+            // Check that platform_fee_recipient{i} matches recipient_struct.address
+            if platform_fee_recipients[i].key() != recipient_struct.address {
+                return Err(EditionsError::RecipientMismatch.into());
+            }
+
+            let recipient_fee = total_fee
+                .checked_mul(recipient_struct.share as u64)
+                .ok_or(EditionsError::FeeCalculationError)?
+                .checked_div(100)
+                .ok_or(EditionsError::FeeCalculationError)?;
+
+            // Transfer platform fee to recipient
+            system_program::transfer(
+                CpiContext::new(
+                    system_program.to_account_info(),
+                    system_program::Transfer {
+                        from: payer.to_account_info(),
+                        to: platform_fee_recipients[i].to_account_info(),
+                    },
+                ),
+                recipient_fee,
+            )?;
+        }
+
+    } else {
+        // Calculate fee as (price_amount * platform_fee_value) / 10,000 (assuming basis points)
+        total_fee = price_amount
+            .checked_mul(platform_fee_value)
+            .ok_or(EditionsError::FeeCalculationError)?
+            .checked_div(10_000)
+            .ok_or(EditionsError::FeeCalculationError)?;
+
+        remaining_amount = price_amount
+            .checked_sub(total_fee)
+            .ok_or(EditionsError::FeeCalculationError)?;
+
+        // Distribute percentage-based fee based on shares
+        for (i, recipient_struct) in recipients.iter().enumerate() {
+            // Skip inactive recipients
+            if recipient_struct.share == 0 || recipient_struct.address == Pubkey::default() {
+                continue;
+            }
+
+            // Check that platform_fee_recipient{i} matches recipient_struct.address
+            if platform_fee_recipients[i].key() != recipient_struct.address {
+                return Err(EditionsError::RecipientMismatch.into());
+            }
+
+            let recipient_fee = total_fee
+                .checked_mul(recipient_struct.share as u64)
+                .ok_or(EditionsError::FeeCalculationError)?
+                .checked_div(100)
+                .ok_or(EditionsError::FeeCalculationError)?;
+
+            // Transfer platform fee to recipient
+            system_program::transfer(
+                CpiContext::new(
+                    system_program.to_account_info(),
+                    system_program::Transfer {
+                        from: payer.to_account_info(),
+                        to: platform_fee_recipients[i].to_account_info(),
+                    },
+                ),
+                recipient_fee,
+            )?;
+        }
+    }
+
+    // Transfer remaining_amount to treasury
     system_program::transfer(
         CpiContext::new(
             system_program.to_account_info(),
@@ -187,12 +315,9 @@ pub fn mint_with_controls(ctx: Context<MintWithControlsCtx>, mint_input: MintInp
                 to: treasury.to_account_info(),
             },
         ),
-        price_amount
+        remaining_amount,
     )?;
 
-    // take all the data for platform fee and transfer
-    // editions_deployment.group_mint.
-    // libreplex_editions::platform_fee::handler()
 
     let editions_deployment_key = editions_deployment.key();
     let seeds = &[

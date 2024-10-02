@@ -50,12 +50,27 @@ pub struct EditionsControls {
     pub cosigner_program_id: Pubkey,
     pub platform_fee_primary_admin: Pubkey,
     pub platform_fee_secondary_admin: Pubkey,
-    pub padding: [u8; 136],    // in case we need some more stuff in the future
+    pub platform_fee_value: u64, // Fee amount or basis points
+    pub is_fee_flat: bool, // True for flat fee, false for percentage-based fee
+    pub platform_fee_recipients: [libreplex_editions::PlatformFeeRecipient; 5], // Fixed-length array of 5 recipients and their shares
+    pub padding: [u8; 200],    // in case we need some more stuff in the future
     pub phases: Vec<Phase>,
 }
 
 impl EditionsControls {
-    pub const INITIAL_SIZE: usize = 8 + 32 + 32 + 32 + 8 + 32 + 200 + 4;
+    pub const INITIAL_SIZE: usize = 8          // Discriminator
+        + 32                                   // editions_deployment
+        + 32                                   // creator
+        + 32                                   // treasury
+        + 8                                    // max_mints_per_wallet
+        + 32                                   // cosigner_program_id
+        + 32                                   // platform_fee_primary_admin
+        + 32                                   // platform_fee_secondary_admin
+        + 8                                    // platform_fee_value
+        + 1                                    // is_fee_flat
+        + (libreplex_editions::PlatformFeeRecipient::SIZE * 5)     // platform_fee_recipients (5 * 33 = 165)
+        + 200                                  // padding
+        + 4;                                   // Vec length for phases
     pub fn get_size(number_of_phases: usize) -> usize {
         EditionsControls::INITIAL_SIZE + Phase::SIZE * number_of_phases
     }

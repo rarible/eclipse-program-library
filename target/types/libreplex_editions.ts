@@ -281,6 +281,71 @@ export type LibreplexEditions = {
       ]
     },
     {
+      "name": "getPlatformFee",
+      "docs": [
+        "modify royalties of mint"
+      ],
+      "discriminator": [
+        255,
+        104,
+        37,
+        27,
+        21,
+        39,
+        45,
+        174
+      ],
+      "accounts": [
+        {
+          "name": "editionsDeployment",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  100,
+                  105,
+                  116,
+                  105,
+                  111,
+                  110,
+                  115,
+                  95,
+                  100,
+                  101,
+                  112,
+                  108,
+                  111,
+                  121,
+                  109,
+                  101,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "editions_deployment.symbol",
+                "account": "editionsDeployment"
+              }
+            ]
+          }
+        },
+        {
+          "name": "groupMint",
+          "writable": true
+        }
+      ],
+      "args": [],
+      "returns": {
+        "defined": {
+          "name": "updatePlatformFeeArgs"
+        }
+      }
+    },
+    {
       "name": "initialise",
       "discriminator": [
         162,
@@ -921,6 +986,11 @@ export type LibreplexEditions = {
       "code": 6010,
       "name": "reservedField",
       "msg": "The provided field is invalid or reserved."
+    },
+    {
+      "code": 6011,
+      "name": "invalidNumberOfRecipients",
+      "msg": "Invalid number of platform fee recipients. Exactly 5 recipients are required."
     }
   ],
   "types": [
