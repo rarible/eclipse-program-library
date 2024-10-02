@@ -7,13 +7,13 @@ skip-lint = false
 [programs.localnet]
 libreplex_creator = "78deTr7qycJ6498vSd3pNMhdCKKWxMipniitVHQcM8RM"
 libreplex_creator_controls = "G9whLiLT9nSkxwWzWvbiKKrTL6yWxvzh2UXqNht5VXqV"
-libreplex_default_renderer = "HX1px98S4bYCKe5PTrgNpkFqJnaYwSmNeJy6xHe2PE7p"
-libreplex_editions = "AffMEwvVXZgKcSD5aBDeB6H9PByiupYLryt4nw7LUbYA"
-libreplex_editions_controls = "6L4TGey3VrSMfPHaRZuBB2WpDgVFDgLHJzja3KMSj9py"
+libreplex_default_renderer = "8MzCUXH5Y52jjorkSu9G6Y69AHBwFoW8GC7MFFhDJRaZ"
+libreplex_editions = "2wxjzcyejdC7jqgJPx3SVGhtroKoyB7ixERtRhKXTBxR"
+libreplex_editions_controls = "GoD9GkAZuP9Cc2DUbvv6CNXSz1cG4FMxzRxLoB37WEKy"
 libreplex_inscriptions = "GAc6iGWe4D8ZDT3xqJXysn3wfARrpz9eLUC1jquvd3Q1"
 libreplex_legacy_inscribers = "Leg1xVbrpq5gY6mprak3Ud4q4mBwcJi5C9ZruYjWv7n"
 libreplex_metadata = "LibrQsXf9V1DmTtJLkEghoaF1kjJcAzWiEGoJn8mz7p"
-libreplex_monoswap_deprecated = "HZAjnEyAN7Potf7cht2UArx6PAaa2pDHTRYnzLemetBp"
+libreplex_monoswap_deprecated = "3nY7oDsfv8UwRiE6rUE5abb3g3gLZKcmTHbQrsed6SrQ"
 libreplex_nft = "3oR36M1JQ9LHM1xykKTHDvhuYVM5mDAqRmq989zc1Pzi"
 libreplex_shop = "ListjawGEdhxuAErSyYwcTEGWQswFoi6FScnGG1RKSB"
 
