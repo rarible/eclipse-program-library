@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/libreplex_editions_controls.json`.
  */
 export type LibreplexEditionsControls = {
-  "address": "7VUZ2Jd6PkJm5BSQZGLmSfoY6ZXz7L9zgscqPZbpfYuT",
+  "address": "y6687qvJ1okaFX3eK5fWWAvmiGP49o251daXMtoi8vn",
   "metadata": {
     "name": "libreplexEditionsControls",
     "version": "0.2.1",
@@ -232,6 +232,10 @@ export type LibreplexEditionsControls = {
         },
         {
           "name": "signer",
+          "docs": [
+            "When deployment.require_creator_cosign is true, this must be equal to the creator",
+            "of the deployment; otherwise, can be any signer account"
+          ],
           "signer": true
         },
         {

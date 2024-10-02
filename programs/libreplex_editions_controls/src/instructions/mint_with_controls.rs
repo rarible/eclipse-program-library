@@ -1,15 +1,14 @@
-use anchor_lang::{prelude::*, system_program};
+use anchor_lang::prelude::*;
+use anchor_lang::system_program;
 use anchor_spl::{
-    associated_token::AssociatedToken, token_2022
+    associated_token::AssociatedToken,
+    token_2022::{self, ID as TOKEN_2022_ID},
 };
-use libreplex_editions::{group_extension_program};
-use libreplex_editions::{program::LibreplexEditions, EditionsDeployment};
-use libreplex_editions::cpi::accounts::MintCtx;
-use crate::{EditionsControls, MinterStats};
-use crate::check_phase_constraints;
-use crate::errors::EditionsError;
+use libreplex_editions::{cpi::accounts::MintCtx, program::LibreplexEditions, EditionsDeployment};
+use crate::{check_phase_constraints, errors::EditionsError, EditionsControls, MinterStats};
+use libreplex_editions::group_extension_program;
 
-#[derive(AnchorDeserialize, AnchorSerialize, Clone)]
+#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub struct MintInput {
     pub phase_index: u32,
 }
@@ -38,8 +37,8 @@ pub struct MintWithControlsCtx<'info> {
     #[account(mut)]
     pub payer: Signer<'info>,
 
-    // When deployment.require_creator_cosign is true, this must be equal to the creator
-    // of the deployment; otherwise, can be any signer account
+    /// When deployment.require_creator_cosign is true, this must be equal to the creator
+    /// of the deployment; otherwise, can be any signer account
     #[account(
         constraint = editions_controls.cosigner_program_id == system_program::ID
             || signer.key() == editions_deployment.creator
@@ -50,7 +49,6 @@ pub struct MintWithControlsCtx<'info> {
     #[account(mut)]
     pub minter: UncheckedAccount<'info>,
 
-    /// CHECK: Anybody can sign, anybody can receive the inscription
     #[account(
         init_if_needed,
         payer = payer,
@@ -60,12 +58,11 @@ pub struct MintWithControlsCtx<'info> {
     )]
     pub minter_stats: Box<Account<'info, MinterStats>>,
 
-    /// CHECK: Anybody can sign, anybody can receive the inscription
     #[account(
         init_if_needed,
         payer = payer,
         seeds = [
-            "minter_stats_phase".as_bytes(),
+            b"minter_stats_phase",
             editions_deployment.key().as_ref(),
             minter.key().as_ref(),
             &mint_input.phase_index.to_le_bytes()
@@ -110,21 +107,18 @@ pub struct MintWithControlsCtx<'info> {
     )]
     pub treasury: UncheckedAccount<'info>,
 
-    /* BOILERPLATE PROGRAM ACCOUNTS */
     /// CHECK: Checked in constraint
     #[account(
-        constraint = token_program.key() == token_2022::ID
+        constraint = token_program.key() == TOKEN_2022_ID
     )]
     pub token_program: UncheckedAccount<'info>,
 
-    #[account()]
     pub associated_token_program: Program<'info, AssociatedToken>,
 
     /// CHECK: Address checked
     #[account(address = group_extension_program::ID)]
-    pub group_extension_program: AccountInfo<'info>,
+    pub group_extension_program: UncheckedAccount<'info>,
 
-    #[account()]
     pub system_program: Program<'info, System>,
 
     pub libreplex_editions_program: Program<'info, LibreplexEditions>,
@@ -134,8 +128,6 @@ pub fn mint_with_controls(
     ctx: Context<MintWithControlsCtx>,
     mint_input: MintInput,
 ) -> Result<()> {
-    msg!("Starting mint_with_controls function");
-
     let editions_controls = &mut ctx.accounts.editions_controls;
     let minter_stats = &mut ctx.accounts.minter_stats;
     let minter_stats_phase = &mut ctx.accounts.minter_stats_phase;
@@ -202,12 +194,13 @@ fn update_minter_stats(
     phase_index: usize,
 ) {
     minter_stats.wallet = *minter_key;
-    minter_stats.mint_count += 1;
+    minter_stats.mint_count = minter_stats.mint_count.saturating_add(1);
 
     minter_stats_phase.wallet = *minter_key;
-    minter_stats_phase.mint_count += 1;
+    minter_stats_phase.mint_count = minter_stats_phase.mint_count.saturating_add(1);
 
-    editions_controls.phases[phase_index].current_mints += 1;
+    editions_controls.phases[phase_index].current_mints =
+        editions_controls.phases[phase_index].current_mints.saturating_add(1);
 }
 
 fn process_platform_fees(
@@ -237,37 +230,35 @@ fn process_platform_fees(
             return Err(EditionsError::FeeExceedsPrice.into());
         }
 
-        remaining_amount = price_amount
-            .checked_sub(total_fee)
+        remaining_amount = price_amount.checked_sub(total_fee)
             .ok_or(EditionsError::FeeCalculationError)?;
     } else {
         // Calculate fee as (price_amount * platform_fee_value) / 10,000 (assuming basis points)
         total_fee = price_amount
-            .checked_mul(editions_controls.platform_fee_value)
+            .checked_mul(editions_controls.platform_fee_value as u64)
             .ok_or(EditionsError::FeeCalculationError)?
             .checked_div(10_000)
             .ok_or(EditionsError::FeeCalculationError)?;
 
-        remaining_amount = price_amount
-            .checked_sub(total_fee)
+        remaining_amount = price_amount.checked_sub(total_fee)
             .ok_or(EditionsError::FeeCalculationError)?;
     }
 
     // Collect platform fee recipients into an array
-    let platform_fee_recipients = [
-        &ctx.accounts.platform_fee_recipient_main,
-        // Include more recipients if needed
-    ];
+    //let mut recipient_accounts = vec![ctx.accounts.platform_fee_recipient_main.to_account_info()];
+    //recipient_accounts.extend(ctx.remaining_accounts.iter().cloned());
+
+    // Ensure the number of accounts matches the number of recipients
+    // if recipient_accounts.len() != recipients.len() {
+    //     return Err(EditionsError::InvalidNumberOfRecipients.into());
+    // }
 
     // Distribute fees to recipients
     for (i, recipient_struct) in recipients.iter().enumerate() {
-        // Skip inactive recipients
-        if recipient_struct.share == 0 || recipient_struct.address == Pubkey::default() {
-            continue;
-        }
+        let recipient_account = &ctx.accounts.platform_fee_recipient_main;
 
         // Ensure that the account matches the expected recipient
-        if platform_fee_recipients[i].key() != recipient_struct.address {
+        if recipient_account.key() != recipient_struct.address.key() {
             return Err(EditionsError::RecipientMismatch.into());
         }
 
@@ -283,7 +274,7 @@ fn process_platform_fees(
                 system_program.to_account_info(),
                 system_program::Transfer {
                     from: payer.to_account_info(),
-                    to: platform_fee_recipients[i].to_account_info(),
+                    to: recipient_account.to_account_info(),
                 },
             ),
             recipient_fee,
