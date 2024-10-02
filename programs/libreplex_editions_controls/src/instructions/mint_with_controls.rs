@@ -94,7 +94,11 @@ pub struct MintWithControlsCtx<'info> {
 
     /// CHECK: Platform fee recipient
     #[account(mut)]
-    pub platform_fee_recipient_main: UncheckedAccount<'info>,
+    pub platform_fee_recipient_1: UncheckedAccount<'info>,
+
+    // TODO add optimization for stack
+    // #[account(mut)]
+    // pub platform_fee_recipient_2: UncheckedAccount<'info>,
 
     /// CHECK: Passed in via CPI to mpl_token_metadata program
     #[account(mut)]
@@ -243,7 +247,7 @@ fn process_platform_fees(
             continue;
         }
 
-        let recipient_account = &ctx.accounts.platform_fee_recipient_main;
+        let recipient_account = &ctx.accounts.platform_fee_recipient_1;
 
         msg!("check recipients {}: {} vs {}", i, recipient_account.key(), recipient_struct.address.key());
         // Ensure that the account matches the expected recipient
