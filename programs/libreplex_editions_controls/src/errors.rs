@@ -47,4 +47,10 @@ pub enum EditionsError {
 
     #[msg("Recipient account does not match the expected address.")]
     RecipientMismatch,
+
+    #[msg("No phases have been added. Cannot mint.")]
+    NoPhasesAdded,
+    #[msg("Invalid phase index.")]
+    InvalidPhaseIndex,
+
 }

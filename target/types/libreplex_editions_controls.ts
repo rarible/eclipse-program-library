@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/libreplex_editions_controls.json`.
  */
 export type LibreplexEditionsControls = {
-  "address": "CSEurJ75Yu8QkqoUnUBbyNmFtg5S3dJuuHcuQG6pFzja",
+  "address": "7VUZ2Jd6PkJm5BSQZGLmSfoY6ZXz7L9zgscqPZbpfYuT",
   "metadata": {
     "name": "libreplexEditionsControls",
     "version": "0.2.1",
@@ -333,6 +333,10 @@ export type LibreplexEditionsControls = {
           "writable": true
         },
         {
+          "name": "platformFeeRecipientMain",
+          "writable": true
+        },
+        {
           "name": "tokenAccount",
           "writable": true
         },
@@ -358,26 +362,6 @@ export type LibreplexEditionsControls = {
         {
           "name": "libreplexEditionsProgram",
           "address": "38bTcDm2U1tahksh82TPUYgqTdE8Wd5CJyW3hxyfvafS"
-        },
-        {
-          "name": "platformFeeRecipient1",
-          "writable": true
-        },
-        {
-          "name": "platformFeeRecipient2",
-          "writable": true
-        },
-        {
-          "name": "platformFeeRecipient3",
-          "writable": true
-        },
-        {
-          "name": "platformFeeRecipient4",
-          "writable": true
-        },
-        {
-          "name": "platformFeeRecipient5",
-          "writable": true
         }
       ],
       "args": [
@@ -738,6 +722,16 @@ export type LibreplexEditionsControls = {
       "code": 6014,
       "name": "recipientMismatch",
       "msg": "Recipient account does not match the expected address."
+    },
+    {
+      "code": 6015,
+      "name": "noPhasesAdded",
+      "msg": "No phases have been added. Cannot mint."
+    },
+    {
+      "code": 6016,
+      "name": "invalidPhaseIndex",
+      "msg": "Invalid phase index."
     }
   ],
   "types": [
