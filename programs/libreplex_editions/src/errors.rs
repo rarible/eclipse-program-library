@@ -58,4 +58,6 @@ pub enum MetadataErrors {
     RecipientShareInvalid,
     #[msg("The provided field is invalid or reserved.")]
     ReservedField,
+    #[msg("Invalid number of platform fee recipients. Exactly 5 recipients are required.")]
+    InvalidNumberOfRecipients,
 }

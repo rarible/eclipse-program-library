@@ -1,6 +1,6 @@
 use anchor_lang::{prelude::*, solana_program::entrypoint::ProgramResult};
 use std::str::FromStr;
-use crate::{PLATFORM_FEE_PREFIX_KEY, PLATFORM_FEE_VALUE_KEY, ROYALTY_BASIS_POINTS_FIELD};
+use crate::{ROYALTY_BASIS_POINTS_FIELD};
 
 use anchor_spl::token_interface::{
     spl_token_metadata_interface::state::Field, token_metadata_update_field, Token2022,
@@ -64,9 +64,7 @@ pub fn handler(ctx: Context<AddMetadata>, args: Vec<AddMetadataArgs>) -> Result<
         }
 
         // Validate that the field does not start with reserved prefixes
-        if metadata_arg.field.starts_with(PLATFORM_FEE_PREFIX_KEY)
-            || metadata_arg.field.starts_with(ROYALTY_BASIS_POINTS_FIELD)
-            || metadata_arg.field.starts_with(PLATFORM_FEE_VALUE_KEY)
+        if metadata_arg.field.starts_with(ROYALTY_BASIS_POINTS_FIELD)
         {
             return Err(MetadataErrors::InvalidField.into());
         }

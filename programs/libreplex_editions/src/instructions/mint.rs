@@ -198,17 +198,6 @@ pub fn mint<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> Result<()
 
     // Process each additional metadata key-value pair, excluding platform fee metadata
     for additional_metadatum in additional_meta {
-        let key = additional_metadatum.0.as_str();
-        let value = additional_metadatum.1.as_str();
-
-        // Skip metadata related to platform fees
-        if key.starts_with("platform_fee__") {
-            msg!("Mint: Skipping platform fee metadata: {}", key);
-            continue;
-        }
-
-        msg!("Mint: meta key {}", key);
-        msg!("Mint: meta value {}", value);
 
         let deployment_seeds: &[&[u8]] = &[
             "editions_deployment".as_bytes(),

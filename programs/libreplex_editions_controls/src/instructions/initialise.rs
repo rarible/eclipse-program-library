@@ -1,9 +1,9 @@
 use anchor_lang::{prelude::*, system_program};
-use libreplex_editions::{cpi::accounts::InitialiseCtx, group_extension_program, program::LibreplexEditions, AddMetadataArgs, CreatorWithShare, InitialiseInput, UpdatePlatformFeeArgs, UpdateRoyaltiesArgs};
+use libreplex_editions::{cpi::accounts::InitialiseCtx, group_extension_program, program::LibreplexEditions, AddMetadataArgs, CreatorWithShare, InitialiseInput, UpdateRoyaltiesArgs};
 use libreplex_editions::cpi::accounts::AddMetadata;
 use libreplex_editions::cpi::accounts::AddRoyalties;
-use libreplex_editions::cpi::accounts::AddPlatformFee;
-use crate::{EditionsControls, DEFAULT_PLATFORM_FEE_PRIMARY_ADMIN, DEFAULT_PLATFORM_FEE_SECONDARY_ADMIN};
+use crate::{EditionsControls, PlatformFeeRecipient, UpdatePlatformFeeArgs, DEFAULT_PLATFORM_FEE_PRIMARY_ADMIN, DEFAULT_PLATFORM_FEE_SECONDARY_ADMIN};
+use crate::errors::EditionsError;
 
 #[derive(AnchorDeserialize, AnchorSerialize, Clone)]
 pub struct InitialiseControlInput {
@@ -115,17 +115,61 @@ pub fn initialise_editions_controls(
         core_input,
     )?;
 
+    // Validate that platform_fee has up to 5 recipients
+    let provided_recipients = input.platform_fee.recipients.len();
+    if provided_recipients > 5 {
+        return Err(EditionsError::TooManyRecipients.into());
+    }
+
+    // Ensure that the sum of shares equals 100
+    let total_shares: u8 = input.platform_fee.recipients.iter().map(|r| r.share).sum();
+    if total_shares != 100 {
+        return Err(EditionsError::InvalidFeeShares.into());
+    }
+
+    // Initialize an array of 5 PlatformFeeRecipient with default values
+    let mut recipients_array: [PlatformFeeRecipient; 5] = [
+        PlatformFeeRecipient {
+            address: Pubkey::default(),
+            share: 0,
+        },
+        PlatformFeeRecipient {
+            address: Pubkey::default(),
+            share: 0,
+        },
+        PlatformFeeRecipient {
+            address: Pubkey::default(),
+            share: 0,
+        },
+        PlatformFeeRecipient {
+            address: Pubkey::default(),
+            share: 0,
+        },
+        PlatformFeeRecipient {
+            address: Pubkey::default(),
+            share: 0,
+        },
+    ];
+
+    // Populate the array with provided recipients
+    for (i, recipient) in input.platform_fee.recipients.iter().enumerate() {
+        recipients_array[i] = recipient.clone();
+    }
+
     // Set the editions control state
     editions_controls.set_inner(EditionsControls {
         editions_deployment: editions_deployment.key(),
         creator: creator.key(),
         max_mints_per_wallet: input.max_mints_per_wallet,
         cosigner_program_id: input.cosigner_program_id.unwrap_or(system_program::ID),
-        phases: vec![],
         treasury: input.treasury,
+        platform_fee_value: input.platform_fee.platform_fee_value,
+        is_fee_flat: input.platform_fee.is_fee_flat,
+        platform_fee_recipients: recipients_array.clone(),
         platform_fee_primary_admin: DEFAULT_PLATFORM_FEE_PRIMARY_ADMIN.parse().unwrap(),
         platform_fee_secondary_admin: DEFAULT_PLATFORM_FEE_SECONDARY_ADMIN.parse().unwrap(),
-        padding: [0; 136],
+        phases: vec![],
+        padding: [0; 200],
     });
 
     let editions_deployment_key = editions_deployment.key();
@@ -167,23 +211,6 @@ pub fn initialise_editions_controls(
             &[seeds]
         ),
         input.extra_meta,
-    )?;
-
-    // Add platform fee
-    libreplex_editions::cpi::add_platform_fee(
-        CpiContext::new_with_signer(
-            libreplex_editions_program.to_account_info(),
-            AddPlatformFee {
-                editions_deployment: editions_deployment.to_account_info(),
-                payer: payer.to_account_info(),
-                system_program: system_program.to_account_info(),
-                token_program: token_program.to_account_info(),
-                group_mint: group_mint.to_account_info(),
-                signer: editions_controls.to_account_info(),
-            },
-            &[seeds]
-        ),
-        input.platform_fee,
     )?;
 
     Ok(())

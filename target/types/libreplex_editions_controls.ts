@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/libreplex_editions_controls.json`.
  */
 export type LibreplexEditionsControls = {
-  "address": "GoD9GkAZuP9Cc2DUbvv6CNXSz1cG4FMxzRxLoB37WEKy",
+  "address": "3WDMk9suQtT1J9dRkEPRMyCp9VLwPaXngw5ronhn5d7R",
   "metadata": {
     "name": "libreplexEditionsControls",
     "version": "0.2.1",
@@ -51,7 +51,7 @@ export type LibreplexEditionsControls = {
         },
         {
           "name": "libreplexEditionsProgram",
-          "address": "2wxjzcyejdC7jqgJPx3SVGhtroKoyB7ixERtRhKXTBxR"
+          "address": "38bTcDm2U1tahksh82TPUYgqTdE8Wd5CJyW3hxyfvafS"
         }
       ],
       "args": [
@@ -152,7 +152,7 @@ export type LibreplexEditionsControls = {
         },
         {
           "name": "libreplexEditionsProgram",
-          "address": "2wxjzcyejdC7jqgJPx3SVGhtroKoyB7ixERtRhKXTBxR"
+          "address": "38bTcDm2U1tahksh82TPUYgqTdE8Wd5CJyW3hxyfvafS"
         }
       ],
       "args": [
@@ -232,6 +232,10 @@ export type LibreplexEditionsControls = {
         },
         {
           "name": "signer",
+          "docs": [
+            "When deployment.require_creator_cosign is true, this must be equal to the creator",
+            "of the deployment; otherwise, can be any signer account"
+          ],
           "signer": true
         },
         {
@@ -333,6 +337,10 @@ export type LibreplexEditionsControls = {
           "writable": true
         },
         {
+          "name": "platformFeeRecipient1",
+          "writable": true
+        },
+        {
           "name": "tokenAccount",
           "writable": true
         },
@@ -357,7 +365,7 @@ export type LibreplexEditionsControls = {
         },
         {
           "name": "libreplexEditionsProgram",
-          "address": "2wxjzcyejdC7jqgJPx3SVGhtroKoyB7ixERtRhKXTBxR"
+          "address": "38bTcDm2U1tahksh82TPUYgqTdE8Wd5CJyW3hxyfvafS"
         }
       ],
       "args": [
@@ -431,22 +439,6 @@ export type LibreplexEditionsControls = {
           "name": "creator",
           "writable": true,
           "signer": true
-        },
-        {
-          "name": "groupMint",
-          "writable": true
-        },
-        {
-          "name": "systemProgram",
-          "address": "11111111111111111111111111111111"
-        },
-        {
-          "name": "tokenProgram",
-          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
-        },
-        {
-          "name": "libreplexEditionsProgram",
-          "address": "2wxjzcyejdC7jqgJPx3SVGhtroKoyB7ixERtRhKXTBxR"
         }
       ],
       "args": [
@@ -603,7 +595,7 @@ export type LibreplexEditionsControls = {
         },
         {
           "name": "libreplexEditionsProgram",
-          "address": "2wxjzcyejdC7jqgJPx3SVGhtroKoyB7ixERtRhKXTBxR"
+          "address": "38bTcDm2U1tahksh82TPUYgqTdE8Wd5CJyW3hxyfvafS"
         }
       ],
       "args": [
@@ -709,6 +701,41 @@ export type LibreplexEditionsControls = {
       "code": 6009,
       "name": "creatorFeeTooHigh",
       "msg": "Creator fee too high"
+    },
+    {
+      "code": 6010,
+      "name": "feeCalculationError",
+      "msg": "Platform fee calculation failed."
+    },
+    {
+      "code": 6011,
+      "name": "feeExceedsPrice",
+      "msg": "Total fee exceeds the price amount."
+    },
+    {
+      "code": 6012,
+      "name": "invalidFeeShares",
+      "msg": "Total fee shares must equal 100."
+    },
+    {
+      "code": 6013,
+      "name": "tooManyRecipients",
+      "msg": "Too many platform fee recipients. Maximum allowed is 5."
+    },
+    {
+      "code": 6014,
+      "name": "recipientMismatch",
+      "msg": "Recipient account does not match the expected address."
+    },
+    {
+      "code": 6015,
+      "name": "noPhasesAdded",
+      "msg": "No phases have been added. Cannot mint."
+    },
+    {
+      "code": 6016,
+      "name": "invalidPhaseIndex",
+      "msg": "Invalid phase index."
     }
   ],
   "types": [
@@ -778,6 +805,27 @@ export type LibreplexEditionsControls = {
             "type": "pubkey"
           },
           {
+            "name": "platformFeeValue",
+            "type": "u64"
+          },
+          {
+            "name": "isFeeFlat",
+            "type": "bool"
+          },
+          {
+            "name": "platformFeeRecipients",
+            "type": {
+              "array": [
+                {
+                  "defined": {
+                    "name": "platformFeeRecipient"
+                  }
+                },
+                5
+              ]
+            }
+          },
+          {
             "name": "phases",
             "type": {
               "vec": {
@@ -792,7 +840,7 @@ export type LibreplexEditionsControls = {
             "type": {
               "array": [
                 "u8",
-                136
+                200
               ]
             }
           }
