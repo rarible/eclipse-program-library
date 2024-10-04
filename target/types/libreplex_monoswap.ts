@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/libreplex_monoswap.json`.
  */
 export type LibreplexMonoswap = {
-  "address": "HPhPBUi8eSYkQb5CUUxXdeaVVwbC7xQz3a6jmkLhy9a3",
+  "address": "6taGmaEfZx27c25Pk5BwJbDCNNsirVranzWYAeNEhvHi",
   "metadata": {
     "name": "libreplexMonoswap",
     "version": "0.0.0",
