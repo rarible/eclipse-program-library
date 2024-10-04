@@ -31,5 +31,26 @@ pub enum EditionsError {
     InvalidMetadata,
 
     #[msg("Creator fee too high")]
-    CreatorFeeTooHigh
+    CreatorFeeTooHigh,
+
+    #[msg("Platform fee calculation failed.")]
+    FeeCalculationError,
+
+    #[msg("Total fee exceeds the price amount.")]
+    FeeExceedsPrice,
+
+    #[msg("Total fee shares must equal 100.")]
+    InvalidFeeShares,
+
+    #[msg("Too many platform fee recipients. Maximum allowed is 5.")]
+    TooManyRecipients,
+
+    #[msg("Recipient account does not match the expected address.")]
+    RecipientMismatch,
+
+    #[msg("No phases have been added. Cannot mint.")]
+    NoPhasesAdded,
+    #[msg("Invalid phase index.")]
+    InvalidPhaseIndex,
+
 }

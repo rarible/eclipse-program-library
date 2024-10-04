@@ -4,6 +4,11 @@ use solana_program::pubkey::Pubkey;
 pub const NAME_LIMIT: usize = 400;
 pub const SYMBOL_LIMIT: usize = 100;
 pub const OFFCHAIN_URL_LIMIT: usize = 1200;
+pub const META_LIST_ACCOUNT_SEED: &[u8] = b"extra-account-metas";
+pub const APPROVE_ACCOUNT_SEED: &[u8] = b"approve-account";
+pub const ROYALTY_BASIS_POINTS_FIELD: &str = "royalty_basis_points";
+pub const PLATFORM_FEE_VALUE: &str = "platform_fee_value";
+// Define constants for metadata keys
 
 #[derive(Clone, AnchorDeserialize, AnchorSerialize)]
 pub enum DeploymentStatus {
@@ -67,3 +72,5 @@ pub struct Hashlist {
     pub deployment: Pubkey,
     pub issues: Vec<MintAndOrder>,
 }
+
+

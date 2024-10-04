@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/libreplex_editions_controls.json`.
  */
 export type LibreplexEditionsControls = {
-  "address": "2o4X8xqU74TSfFKadTnALpUKgSuX3K819ibnB8m6M3hH",
+  "address": "Ady6poZ59kW6rvbad3hiQpf8vun58RzHtNQ5Zvh7aJk3",
   "metadata": {
     "name": "libreplexEditionsControls",
     "version": "0.2.1",
@@ -51,7 +51,7 @@ export type LibreplexEditionsControls = {
         },
         {
           "name": "libreplexEditionsProgram",
-          "address": "6EhZc3zugRpHnQXzvBWQyLJz11JoQKpmUSGk4dHiLwPU"
+          "address": "6hRLBM1rexUvd64qaBHQJUz4ufRAFbXZXM12ExWd7kYX"
         }
       ],
       "args": [
@@ -152,7 +152,7 @@ export type LibreplexEditionsControls = {
         },
         {
           "name": "libreplexEditionsProgram",
-          "address": "6EhZc3zugRpHnQXzvBWQyLJz11JoQKpmUSGk4dHiLwPU"
+          "address": "6hRLBM1rexUvd64qaBHQJUz4ufRAFbXZXM12ExWd7kYX"
         }
       ],
       "args": [
@@ -232,6 +232,10 @@ export type LibreplexEditionsControls = {
         },
         {
           "name": "signer",
+          "docs": [
+            "When deployment.require_creator_cosign is true, this must be equal to the creator",
+            "of the deployment; otherwise, can be any signer account"
+          ],
           "signer": true
         },
         {
@@ -329,6 +333,14 @@ export type LibreplexEditionsControls = {
           "writable": true
         },
         {
+          "name": "groupMint",
+          "writable": true
+        },
+        {
+          "name": "platformFeeRecipient1",
+          "writable": true
+        },
+        {
           "name": "tokenAccount",
           "writable": true
         },
@@ -353,7 +365,7 @@ export type LibreplexEditionsControls = {
         },
         {
           "name": "libreplexEditionsProgram",
-          "address": "6EhZc3zugRpHnQXzvBWQyLJz11JoQKpmUSGk4dHiLwPU"
+          "address": "6hRLBM1rexUvd64qaBHQJUz4ufRAFbXZXM12ExWd7kYX"
         }
       ],
       "args": [
@@ -362,6 +374,236 @@ export type LibreplexEditionsControls = {
           "type": {
             "defined": {
               "name": "mintInput"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "modifyPlatformFee",
+      "discriminator": [
+        186,
+        73,
+        229,
+        152,
+        183,
+        174,
+        250,
+        197
+      ],
+      "accounts": [
+        {
+          "name": "editionsDeployment",
+          "writable": true
+        },
+        {
+          "name": "editionsControls",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  100,
+                  105,
+                  116,
+                  105,
+                  111,
+                  110,
+                  115,
+                  95,
+                  99,
+                  111,
+                  110,
+                  116,
+                  114,
+                  111,
+                  108,
+                  115
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "editionsDeployment"
+              }
+            ]
+          }
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "creator",
+          "writable": true,
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "input",
+          "type": {
+            "defined": {
+              "name": "updatePlatformFeeArgs"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "modifyPlatformSecondaryAdmin",
+      "discriminator": [
+        128,
+        153,
+        231,
+        143,
+        156,
+        220,
+        161,
+        147
+      ],
+      "accounts": [
+        {
+          "name": "editionsDeployment",
+          "writable": true
+        },
+        {
+          "name": "editionsControls",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  100,
+                  105,
+                  116,
+                  105,
+                  111,
+                  110,
+                  115,
+                  95,
+                  99,
+                  111,
+                  110,
+                  116,
+                  114,
+                  111,
+                  108,
+                  115
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "editionsDeployment"
+              }
+            ]
+          }
+        },
+        {
+          "name": "creator",
+          "writable": true,
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "input",
+          "type": {
+            "defined": {
+              "name": "updatePlatformFeeSecondaryAdminInput"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "modifyRoyalties",
+      "discriminator": [
+        199,
+        95,
+        20,
+        107,
+        136,
+        161,
+        93,
+        137
+      ],
+      "accounts": [
+        {
+          "name": "editionsDeployment",
+          "writable": true
+        },
+        {
+          "name": "editionsControls",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  100,
+                  105,
+                  116,
+                  105,
+                  111,
+                  110,
+                  115,
+                  95,
+                  99,
+                  111,
+                  110,
+                  116,
+                  114,
+                  111,
+                  108,
+                  115
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "editionsDeployment"
+              }
+            ]
+          }
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "creator",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "mint",
+          "writable": true
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "tokenProgram",
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+        },
+        {
+          "name": "libreplexEditionsProgram",
+          "address": "6hRLBM1rexUvd64qaBHQJUz4ufRAFbXZXM12ExWd7kYX"
+        }
+      ],
+      "args": [
+        {
+          "name": "input",
+          "type": {
+            "defined": {
+              "name": "updateRoyaltiesArgs"
             }
           }
         }
@@ -459,9 +701,76 @@ export type LibreplexEditionsControls = {
       "code": 6009,
       "name": "creatorFeeTooHigh",
       "msg": "Creator fee too high"
+    },
+    {
+      "code": 6010,
+      "name": "feeCalculationError",
+      "msg": "Platform fee calculation failed."
+    },
+    {
+      "code": 6011,
+      "name": "feeExceedsPrice",
+      "msg": "Total fee exceeds the price amount."
+    },
+    {
+      "code": 6012,
+      "name": "invalidFeeShares",
+      "msg": "Total fee shares must equal 100."
+    },
+    {
+      "code": 6013,
+      "name": "tooManyRecipients",
+      "msg": "Too many platform fee recipients. Maximum allowed is 5."
+    },
+    {
+      "code": 6014,
+      "name": "recipientMismatch",
+      "msg": "Recipient account does not match the expected address."
+    },
+    {
+      "code": 6015,
+      "name": "noPhasesAdded",
+      "msg": "No phases have been added. Cannot mint."
+    },
+    {
+      "code": 6016,
+      "name": "invalidPhaseIndex",
+      "msg": "Invalid phase index."
     }
   ],
   "types": [
+    {
+      "name": "addMetadataArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "field",
+            "type": "string"
+          },
+          {
+            "name": "value",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "creatorWithShare",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "address",
+            "type": "pubkey"
+          },
+          {
+            "name": "share",
+            "type": "u8"
+          }
+        ]
+      }
+    },
     {
       "name": "editionsControls",
       "type": {
@@ -486,6 +795,35 @@ export type LibreplexEditionsControls = {
           {
             "name": "cosignerProgramId",
             "type": "pubkey"
+          },
+          {
+            "name": "platformFeePrimaryAdmin",
+            "type": "pubkey"
+          },
+          {
+            "name": "platformFeeSecondaryAdmin",
+            "type": "pubkey"
+          },
+          {
+            "name": "platformFeeValue",
+            "type": "u64"
+          },
+          {
+            "name": "isFeeFlat",
+            "type": "bool"
+          },
+          {
+            "name": "platformFeeRecipients",
+            "type": {
+              "array": [
+                {
+                  "defined": {
+                    "name": "platformFeeRecipient"
+                  }
+                },
+                5
+              ]
+            }
           },
           {
             "name": "padding",
@@ -604,6 +942,40 @@ export type LibreplexEditionsControls = {
             "type": {
               "option": "pubkey"
             }
+          },
+          {
+            "name": "royalties",
+            "type": {
+              "defined": {
+                "name": "updateRoyaltiesArgs"
+              }
+            }
+          },
+          {
+            "name": "extraMeta",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "addMetadataArgs"
+                }
+              }
+            }
+          },
+          {
+            "name": "itemBaseUri",
+            "type": "string"
+          },
+          {
+            "name": "itemName",
+            "type": "string"
+          },
+          {
+            "name": "platformFee",
+            "type": {
+              "defined": {
+                "name": "updatePlatformFeeArgs"
+              }
+            }
           }
         ]
       }
@@ -721,6 +1093,82 @@ export type LibreplexEditionsControls = {
                 "u8",
                 200
               ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "platformFeeRecipient",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "address",
+            "type": "pubkey"
+          },
+          {
+            "name": "share",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "updatePlatformFeeArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "platformFeeValue",
+            "type": "u64"
+          },
+          {
+            "name": "recipients",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "platformFeeRecipient"
+                }
+              }
+            }
+          },
+          {
+            "name": "isFeeFlat",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "updatePlatformFeeSecondaryAdminInput",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "newAdmin",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "updateRoyaltiesArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "royaltyBasisPoints",
+            "type": "u16"
+          },
+          {
+            "name": "creators",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "creatorWithShare"
+                }
+              }
             }
           }
         ]

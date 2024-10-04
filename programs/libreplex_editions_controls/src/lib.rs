@@ -1,12 +1,11 @@
 use anchor_lang::prelude::*;
 
-
 pub mod logic;
 pub use logic::*;
 
 pub mod instructions;
 pub use instructions::*;
-declare_id!("2o4X8xqU74TSfFKadTnALpUKgSuX3K819ibnB8m6M3hH");
+declare_id!("Ady6poZ59kW6rvbad3hiQpf8vun58RzHtNQ5Zvh7aJk3");
 
 pub mod errors;
 pub mod state;
@@ -15,7 +14,6 @@ pub use state::*;
 
 #[program]
 pub mod libreplex_editions_controls {
-
     use super::*;
 
     // v2 endpoints. Prefer these over the original ones.
@@ -38,5 +36,23 @@ pub mod libreplex_editions_controls {
 
     pub fn mint_with_controls<'info>(ctx: Context<'_, '_, '_, 'info, MintWithControlsCtx<'info>>, mint_input: MintInput) -> Result<()> {
         instructions::mint_with_controls(ctx, mint_input)
+    }
+
+    pub fn modify_royalties(
+        ctx: Context<UpdateRoyaltiesCtx>,
+        input: libreplex_editions::UpdateRoyaltiesArgs) -> Result<()> {
+        instructions::update_royalties(ctx, input)
+    }
+
+    pub fn modify_platform_fee(
+        ctx: Context<UpdatePlatformFeeCtx>,
+        input: UpdatePlatformFeeArgs) -> Result<()> {
+        instructions::update_platform_fee(ctx, input)
+    }
+
+    pub fn modify_platform_secondary_admin(
+        ctx: Context<UpdatePlatformFeeSecondaryAdminCtx>,
+        input: UpdatePlatformFeeSecondaryAdminInput) -> Result<()> {
+        instructions::update_platform_fee_secondary_admin(ctx, input)
     }
 }

@@ -6,7 +6,11 @@
 pub mod initialise;
 pub use initialise::*;
 
+pub mod royalties;
+pub use royalties::*;
+
+pub mod metadata;
+pub use metadata::*;
 
 pub mod mint;
 pub use mint::*;
-

@@ -1,17 +1,15 @@
-use anchor_lang::{prelude::*, system_program};
+use crate::{group_extension_program, utils::update_account_lamports_to_minimum_balance, EditionsDeployment, Hashlist, NAME_LIMIT, OFFCHAIN_URL_LIMIT, SYMBOL_LIMIT};
+use anchor_lang::prelude::*;
 use libreplex_shared::{create_token_2022_and_metadata, MintAccounts2022, TokenGroupInput};
+use solana_program::system_program;
 use spl_pod::optional_keys::OptionalNonZeroPubkey;
 use spl_token_metadata_interface::state::TokenMetadata;
-
-use crate::{group_extension_program, EditionsDeployment, Hashlist, NAME_LIMIT, OFFCHAIN_URL_LIMIT, SYMBOL_LIMIT};
-
-
 
 #[derive(AnchorDeserialize, AnchorSerialize, Clone)]
 pub struct InitialiseInput {
     pub max_number_of_tokens: u64, // this is the max *number* of tokens
     pub symbol: String,
-     // add curlies if you want this to be created dynamically. For example
+    // add curlies if you want this to be created dynamically. For example
     // hippo #{} -> turns into hippo #0, hippo #1, etc
     // without curlies the url is the same for all mints 
     pub name: String,
@@ -20,17 +18,17 @@ pub struct InitialiseInput {
     // without curlies the url is the same for all mints 
     pub offchain_url: String,
     pub creator_cosign_program_id: Option<Pubkey>,
-
+    pub item_base_uri: String,
+    pub item_name: String,
 }
 
 
 #[derive(Accounts)]
 #[instruction(input: InitialiseInput)]
-pub struct InitialiseCtx<'info>  {
+pub struct InitialiseCtx<'info> {
     #[account(init, payer = payer, space = 8 + EditionsDeployment::INIT_SPACE, 
         seeds = ["editions_deployment".as_ref(), input.symbol.as_ref()], bump)]
     pub editions_deployment: Account<'info, EditionsDeployment>,
-
 
     /// CHECK: Checked in PDA. Not deserialized because it can be rather big
     #[account(init, seeds = ["hashlist".as_bytes(), 
@@ -44,7 +42,6 @@ pub struct InitialiseCtx<'info>  {
     /// CHECK: can be different from payer for PDA integration
     #[account(mut)]
     pub creator: UncheckedAccount<'info>,
-
 
     #[account(mut)]
     pub group_mint: Signer<'info>,
@@ -66,7 +63,6 @@ pub struct InitialiseCtx<'info>  {
 
 
 pub fn initialise(ctx: Context<InitialiseCtx>, input: InitialiseInput) -> Result<()> {
-   
     if input.offchain_url.len() > OFFCHAIN_URL_LIMIT {
         panic!("Offchain url too long");
     }
@@ -82,8 +78,7 @@ pub fn initialise(ctx: Context<InitialiseCtx>, input: InitialiseInput) -> Result
     let group = &ctx.accounts.group;
 
 
-
-    let url_is_template = match input.offchain_url.matches("{}").count() {
+    let url_is_template = match input.item_base_uri.matches("{}").count() {
         0 => false,
         1 => true,
         _ => {
@@ -92,14 +87,14 @@ pub fn initialise(ctx: Context<InitialiseCtx>, input: InitialiseInput) -> Result
     };
 
 
-    let name_is_template = match input.name.matches("{}").count() {
+    let name_is_template = match input.item_name.matches("{}").count() {
         0 => false,
         1 => true,
         _ => {
             panic!("Only one set of curlies ({{}}) can be specified. name had multiple");
         }
     };
-  
+
 
     ctx.accounts.editions_deployment.set_inner(EditionsDeployment {
         creator: ctx.accounts.creator.key(),
@@ -112,10 +107,10 @@ pub fn initialise(ctx: Context<InitialiseCtx>, input: InitialiseInput) -> Result
             _ => system_program::ID
         },
         symbol: input.symbol,
-        name: input.name,
+        name: input.item_name,
         url_is_template,
         name_is_template,
-        offchain_url: input.offchain_url,
+        offchain_url: input.item_base_uri,
         padding: [0; 98],
     });
 
@@ -126,16 +121,14 @@ pub fn initialise(ctx: Context<InitialiseCtx>, input: InitialiseInput) -> Result
     let token_program = &ctx.accounts.token_program;
     let group_extension_program = &ctx.accounts.group_extension_program;
 
-
     let update_authority =
         OptionalNonZeroPubkey::try_from(Some(editions_deployment.key())).expect("Bad update auth");
 
-        let deployment_seeds: &[&[u8]] = &[
-            "editions_deployment".as_bytes(),
-            editions_deployment.symbol.as_ref(),
-            &[ctx.bumps.editions_deployment],
-        ];
-
+    let deployment_seeds: &[&[u8]] = &[
+        "editions_deployment".as_bytes(),
+        editions_deployment.symbol.as_ref(),
+        &[ctx.bumps.editions_deployment],
+    ];
 
     // msg!("Create token 2022 w/ metadata");
     create_token_2022_and_metadata(
@@ -148,16 +141,16 @@ pub fn initialise(ctx: Context<InitialiseCtx>, input: InitialiseInput) -> Result
         },
         0,
         Some(TokenMetadata {
-            name: editions_deployment.name.clone(),
+            name: input.name.clone(),
             symbol: editions_deployment.symbol.clone(),
-            uri: editions_deployment.offchain_url.clone(),
+            uri: input.offchain_url.clone(),
             update_authority,
             mint: group_mint.key(),
-            additional_metadata: vec![],
+            additional_metadata: vec![], // Leave this empty for now,
         }),
         Some(TokenGroupInput {
             group: group.to_account_info(),
-            max_size: match editions_deployment.max_number_of_tokens  {
+            max_size: match editions_deployment.max_number_of_tokens {
                 0 => u32::MAX,
                 _ => editions_deployment.max_number_of_tokens as u32
             },
@@ -165,10 +158,8 @@ pub fn initialise(ctx: Context<InitialiseCtx>, input: InitialiseInput) -> Result
         None,
         Some(deployment_seeds),
         None,
-        Some(group_extension_program.key())
+        Some(group_extension_program.key()),
     )?;
-    
 
     Ok(())
-
 }

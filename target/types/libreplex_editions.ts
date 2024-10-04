@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/libreplex_editions.json`.
  */
 export type LibreplexEditions = {
-  "address": "6EhZc3zugRpHnQXzvBWQyLJz11JoQKpmUSGk4dHiLwPU",
+  "address": "5hx15GaPPqsYA61v6QpcGPpo125v7rfvEfZQ4dJErG5V",
   "metadata": {
     "name": "libreplexEditions",
     "version": "0.2.1",
@@ -14,6 +14,184 @@ export type LibreplexEditions = {
     "repository": "https://github.com/Libreplex/libreplex-program-library"
   },
   "instructions": [
+    {
+      "name": "addMetadata",
+      "docs": [
+        "add additional metadata to mint"
+      ],
+      "discriminator": [
+        231,
+        195,
+        40,
+        240,
+        67,
+        231,
+        53,
+        136
+      ],
+      "accounts": [
+        {
+          "name": "editionsDeployment",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  100,
+                  105,
+                  116,
+                  105,
+                  111,
+                  110,
+                  115,
+                  95,
+                  100,
+                  101,
+                  112,
+                  108,
+                  111,
+                  121,
+                  109,
+                  101,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "editions_deployment.symbol",
+                "account": "editionsDeployment"
+              }
+            ]
+          }
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "mint",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "tokenProgram",
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "vec": {
+              "defined": {
+                "name": "addMetadataArgs"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "addRoyalties",
+      "docs": [
+        "add royalties to mint"
+      ],
+      "discriminator": [
+        195,
+        251,
+        126,
+        230,
+        187,
+        134,
+        168,
+        210
+      ],
+      "accounts": [
+        {
+          "name": "editionsDeployment",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  100,
+                  105,
+                  116,
+                  105,
+                  111,
+                  110,
+                  115,
+                  95,
+                  100,
+                  101,
+                  112,
+                  108,
+                  111,
+                  121,
+                  109,
+                  101,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "editions_deployment.symbol",
+                "account": "editionsDeployment"
+              }
+            ]
+          }
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "mint",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "tokenProgram",
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": {
+              "name": "updateRoyaltiesArgs"
+            }
+          }
+        }
+      ]
+    },
     {
       "name": "initialise",
       "discriminator": [
@@ -271,6 +449,10 @@ export type LibreplexEditions = {
           "writable": true
         },
         {
+          "name": "groupMint",
+          "writable": true
+        },
+        {
           "name": "tokenAccount",
           "writable": true
         },
@@ -291,6 +473,181 @@ export type LibreplexEditions = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "modifyRoyalties",
+      "docs": [
+        "modify royalties of mint"
+      ],
+      "discriminator": [
+        199,
+        95,
+        20,
+        107,
+        136,
+        161,
+        93,
+        137
+      ],
+      "accounts": [
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "editionsDeployment",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  100,
+                  105,
+                  116,
+                  105,
+                  111,
+                  110,
+                  115,
+                  95,
+                  100,
+                  101,
+                  112,
+                  108,
+                  111,
+                  121,
+                  109,
+                  101,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "editions_deployment.symbol",
+                "account": "editionsDeployment"
+              }
+            ]
+          }
+        },
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "mint",
+          "writable": true
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "tokenProgram",
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": {
+              "name": "updateRoyaltiesArgs"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "removeMetadata",
+      "docs": [
+        "remove additional metadata to mint"
+      ],
+      "discriminator": [
+        81,
+        68,
+        231,
+        49,
+        91,
+        8,
+        111,
+        160
+      ],
+      "accounts": [
+        {
+          "name": "editionsDeployment",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  101,
+                  100,
+                  105,
+                  116,
+                  105,
+                  111,
+                  110,
+                  115,
+                  95,
+                  100,
+                  101,
+                  112,
+                  108,
+                  111,
+                  121,
+                  109,
+                  101,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "editions_deployment.symbol",
+                "account": "editionsDeployment"
+              }
+            ]
+          }
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "mint"
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "tokenProgram",
+          "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "vec": {
+              "defined": {
+                "name": "removeMetadataArgs"
+              }
+            }
+          }
+        }
+      ]
     }
   ],
   "accounts": [
@@ -337,56 +694,98 @@ export type LibreplexEditions = {
   "errors": [
     {
       "code": 6000,
-      "name": "tickerTooLong",
-      "msg": "Ticker too long"
+      "name": "sizeExceedsMaxSize",
+      "msg": "Collection size exceeds max size."
     },
     {
       "code": 6001,
-      "name": "mintTemplateTooLong",
-      "msg": "Mint template too long"
+      "name": "maxSizeBelowCurrentSize",
+      "msg": "Max size cannot be reduced below current size."
     },
     {
       "code": 6002,
-      "name": "deploymentTemplateTooLong",
-      "msg": "Deployment template too long"
+      "name": "creatorShareInvalid",
+      "msg": "Creators shares must add up to 100."
     },
     {
       "code": 6003,
-      "name": "rootTypeTooLong",
-      "msg": "Root type too long"
+      "name": "missingApproveAccount",
+      "msg": "Missing approve account."
     },
     {
       "code": 6004,
-      "name": "mintedOut",
-      "msg": "Minted out"
+      "name": "expiredApproveAccount",
+      "msg": "Approve account has expired."
     },
     {
       "code": 6005,
-      "name": "legacyMigrationsAreMintedOut",
-      "msg": "Legacy migrations are minted out"
+      "name": "invalidField",
+      "msg": "Invalid field. You cannot use a public key as a field."
     },
     {
       "code": 6006,
-      "name": "missingGlobalTreeDelegate",
-      "msg": "Global tree delegate is missing"
+      "name": "creatorAddressInvalid",
+      "msg": "The Address you provided is invalid. Please provide a valid address."
     },
     {
       "code": 6007,
-      "name": "incorrectMintType",
-      "msg": "Incorrect mint type"
+      "name": "royaltyBasisPointsInvalid",
+      "msg": "Royalty basis points must be less than or equal to 10000."
     },
     {
       "code": 6008,
-      "name": "invalidMetadata",
-      "msg": "Invalid Metadata"
+      "name": "platformFeeBasisPointsInvalid",
+      "msg": "Platform fee basis points must be less than or equal to 10000."
     },
     {
       "code": 6009,
-      "name": "creatorFeeTooHigh",
-      "msg": "Creator fee too high"
+      "name": "recipientShareInvalid",
+      "msg": "Recipient shares must add up to 100."
+    },
+    {
+      "code": 6010,
+      "name": "reservedField",
+      "msg": "The provided field is invalid or reserved."
+    },
+    {
+      "code": 6011,
+      "name": "invalidNumberOfRecipients",
+      "msg": "Invalid number of platform fee recipients. Exactly 5 recipients are required."
     }
   ],
   "types": [
+    {
+      "name": "addMetadataArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "field",
+            "type": "string"
+          },
+          {
+            "name": "value",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "creatorWithShare",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "address",
+            "type": "pubkey"
+          },
+          {
+            "name": "share",
+            "type": "u8"
+          }
+        ]
+      }
+    },
     {
       "name": "editionsDeployment",
       "type": {
@@ -512,6 +911,14 @@ export type LibreplexEditions = {
             "type": {
               "option": "pubkey"
             }
+          },
+          {
+            "name": "itemBaseUri",
+            "type": "string"
+          },
+          {
+            "name": "itemName",
+            "type": "string"
           }
         ]
       }
@@ -528,6 +935,44 @@ export type LibreplexEditions = {
           {
             "name": "order",
             "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "removeMetadataArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "field",
+            "type": "string"
+          },
+          {
+            "name": "value",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "updateRoyaltiesArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "royaltyBasisPoints",
+            "type": "u16"
+          },
+          {
+            "name": "creators",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "creatorWithShare"
+                }
+              }
+            }
           }
         ]
       }

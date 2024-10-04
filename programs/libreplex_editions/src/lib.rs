@@ -2,12 +2,14 @@ use anchor_lang::prelude::*;
 
 pub mod instructions;
 pub use instructions::*;
-declare_id!("6EhZc3zugRpHnQXzvBWQyLJz11JoQKpmUSGk4dHiLwPU");
+declare_id!("6hRLBM1rexUvd64qaBHQJUz4ufRAFbXZXM12ExWd7kYX");
 
 pub mod errors;
 pub mod state;
 
 pub mod logic;
+mod utils;
+
 pub use logic::*;
 
 pub use state::*;
@@ -19,7 +21,6 @@ pub mod group_extension_program {
 
 #[program]
 pub mod libreplex_editions {
-    
     use super::*;
 
     // v2 endpoints. Prefer these over the original ones. 
@@ -35,5 +36,29 @@ pub mod libreplex_editions {
         instructions::mint(ctx)
     }
 
-    
+    /// add royalties to mint
+    pub fn add_royalties(ctx: Context<AddRoyalties>, args: UpdateRoyaltiesArgs) -> Result<()> {
+        royalties::add::handler(ctx, args)
+    }
+
+    /// modify royalties of mint
+    pub fn modify_royalties(
+        ctx: Context<ModifyRoyalties>,
+        args: UpdateRoyaltiesArgs,
+    ) -> Result<()> {
+        royalties::modify::handler(ctx, args)
+    }
+
+    /// add additional metadata to mint
+    pub fn add_metadata(ctx: Context<AddMetadata>, args: Vec<AddMetadataArgs>) -> Result<()> {
+        metadata::add::handler(ctx, args)
+    }
+
+    /// remove additional metadata to mint
+    pub fn remove_metadata(
+        ctx: Context<RemoveMetadata>,
+        args: Vec<RemoveMetadataArgs>,
+    ) -> Result<()> {
+        metadata::remove::handler(ctx, args)
+    }
 }

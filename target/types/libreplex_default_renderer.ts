@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/libreplex_default_renderer.json`.
  */
 export type LibreplexDefaultRenderer = {
-  "address": "367qzSpbf5F8ouEJyNVJ1j7ikDxek4C25w5dqfL4eoCP",
+  "address": "EfC2horkE4hCaCruMvoDDWxUhcCgVaufHeG3Hkj69eR8",
   "metadata": {
     "name": "libreplexDefaultRenderer",
     "version": "0.1.2",
