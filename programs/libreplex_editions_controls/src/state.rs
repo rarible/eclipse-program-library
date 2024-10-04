@@ -15,7 +15,7 @@ pub struct UpdatePlatformFeeArgs {
 }
 
 impl PlatformFeeRecipient {
-    pub const SIZE: usize = 32 + 1; // Pubkey + u8
+    pub const SIZE: usize = 8 + 32 + 1; // Pubkey + u8
 }
 
 // max length: 8 + 8 + 8 + 1 + 8 = 33
