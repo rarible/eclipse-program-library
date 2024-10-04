@@ -59,7 +59,7 @@ pub fn add_phase(ctx: Context<AddPhaseCtx>, input: InitialisePhaseInput) -> Resu
         max_mints_total: input.max_mints_total,
         current_mints: 0,
         merkle_root: input.merkle_root,
-        padding: [0; 136],
+        padding: [0; 200],
     });
 
     Ok(())

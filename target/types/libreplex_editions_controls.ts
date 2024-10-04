@@ -736,6 +736,61 @@ export type LibreplexEditionsControls = {
       "code": 6016,
       "name": "invalidPhaseIndex",
       "msg": "Invalid phase index."
+    },
+    {
+      "code": 6017,
+      "name": "merkleRootNotSet",
+      "msg": "Merkle root not set for allow list mint"
+    },
+    {
+      "code": 6018,
+      "name": "merkleProofRequired",
+      "msg": "Merkle proof required for allow list mint"
+    },
+    {
+      "code": 6019,
+      "name": "allowListPriceAndMaxClaimsRequired",
+      "msg": "Allow list price and max claims are required for allow list mint"
+    },
+    {
+      "code": 6020,
+      "name": "invalidMerkleProof",
+      "msg": "Invalid merkle proof"
+    },
+    {
+      "code": 6021,
+      "name": "exceededAllowListMaxClaims",
+      "msg": "This wallet has exceeded allow list max_claims in the current phase"
+    },
+    {
+      "code": 6022,
+      "name": "phaseNotActive",
+      "msg": "Phase not active"
+    },
+    {
+      "code": 6023,
+      "name": "phaseNotStarted",
+      "msg": "Phase not yet started"
+    },
+    {
+      "code": 6024,
+      "name": "phaseAlreadyFinished",
+      "msg": "Phase already finished"
+    },
+    {
+      "code": 6025,
+      "name": "exceededMaxMintsForPhase",
+      "msg": "Exceeded max mints for this phase"
+    },
+    {
+      "code": 6026,
+      "name": "exceededWalletMaxMintsForPhase",
+      "msg": "Exceeded wallet max mints for this phase"
+    },
+    {
+      "code": 6027,
+      "name": "exceededWalletMaxMintsForCollection",
+      "msg": "Exceeded wallet max mints for the collection"
     }
   ],
   "types": [
@@ -1138,7 +1193,7 @@ export type LibreplexEditionsControls = {
             "type": {
               "array": [
                 "u8",
-                136
+                200
               ]
             }
           }

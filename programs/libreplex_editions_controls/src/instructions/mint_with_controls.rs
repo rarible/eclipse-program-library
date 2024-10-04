@@ -12,7 +12,7 @@ use libreplex_editions::{
 use crate::{
     EditionsControls,
     MinterStats,
-    errors::EditionsError,
+    errors::EditionsControlsError,
     check_phase_constraints,
     check_allow_list_constraints
 };
@@ -30,7 +30,7 @@ pub struct MintInput {
 pub struct MintWithControlsCtx<'info> {
     #[account(mut)]
     pub editions_deployment: Box<Account<'info, EditionsDeployment>>,
-c
+
     #[account(
         mut,
         seeds = [b"editions_controls", editions_deployment.key().as_ref()],
@@ -210,12 +210,12 @@ fn validate_phase(
 ) -> Result<()> {
     if phase_index >= editions_controls.phases.len() as u32 {
         if editions_controls.phases.is_empty() {
-            return Err(EditionsError::NoPhasesAdded.into());
+            return Err(EditionsControlsError::NoPhasesAdded.into());
         } else {
-            return Err(EditionsError::InvalidPhaseIndex.into());
+            return Err(EditionsControlsError::InvalidPhaseIndex.into());
         }
     }
-    
+
     Ok(())
 }
 
@@ -249,7 +249,7 @@ fn process_platform_fees(
     // Ensure that the sum of shares equals 100
     let total_shares: u8 = recipients.iter().map(|r| r.share).sum();
     if total_shares != 100 {
-        return Err(EditionsError::InvalidFeeShares.into());
+        return Err(EditionsControlsError::InvalidFeeShares.into());
     }
 
     let total_fee: u64;
@@ -262,12 +262,12 @@ fn process_platform_fees(
         // Calculate fee as (price_amount * platform_fee_value) / 10,000 (assuming basis points)
         total_fee = price_amount
             .checked_mul(editions_controls.platform_fee_value as u64)
-            .ok_or(EditionsError::FeeCalculationError)?
+            .ok_or(EditionsControlsError::FeeCalculationError)?
             .checked_div(10_000)
-            .ok_or(EditionsError::FeeCalculationError)?;
+            .ok_or(EditionsControlsError::FeeCalculationError)?;
 
         remaining_amount = price_amount.checked_sub(total_fee)
-            .ok_or(EditionsError::FeeCalculationError)?;
+            .ok_or(EditionsControlsError::FeeCalculationError)?;
     }
 
     // Distribute fees to recipients
@@ -281,14 +281,14 @@ fn process_platform_fees(
         msg!("check recipients {}: {} vs {}", i, recipient_account.key(), recipient_struct.address.key());
         // Ensure that the account matches the expected recipient
         if recipient_account.key() != recipient_struct.address.key() {
-            return Err(EditionsError::RecipientMismatch.into());
+            return Err(EditionsControlsError::RecipientMismatch.into());
         }
 
         let recipient_fee = total_fee
             .checked_mul(recipient_struct.share as u64)
-            .ok_or(EditionsError::FeeCalculationError)?
+            .ok_or(EditionsControlsError::FeeCalculationError)?
             .checked_div(100)
-            .ok_or(EditionsError::FeeCalculationError)?;
+            .ok_or(EditionsControlsError::FeeCalculationError)?;
 
         // Transfer platform fee to recipient
         system_program::transfer(

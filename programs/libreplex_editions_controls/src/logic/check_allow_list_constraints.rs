@@ -4,7 +4,11 @@ use anchor_lang::{
     solana_program::hash::hashv,
 };
 use rarible_merkle_verify::verify;
-use crate::{MinterStats, Phase};
+use crate::{
+    MinterStats, Phase,
+    errors::{EditionsControlsError},
+};
+
 
 /// We need to discern between leaf and intermediate nodes to prevent trivial second
 /// pre-image attacks.
@@ -18,14 +22,14 @@ pub fn check_allow_list_constraints(
     merkle_proof: Option<Vec<[u8; 32]>>,
     allow_list_price: Option<u64>,
     allow_list_max_claims: Option<u64>,
-) {
+) -> Result<()> {
     if let Some(merkle_root) = phase.merkle_root {
         if let Some(proof) = merkle_proof {
             if let (Some(phase_list_price), Some(phase_max_claims)) = (allow_list_price, allow_list_max_claims) {
                 /// 1. check constraints
                 /// dev: notice that if phase_max_claims is 0, this constraint is disabled
                 if phase_max_claims > 0 && minter_stats_phase.mint_count >= phase_max_claims {
-                    panic!("This wallet has exceeded max_claims in the current private phase")
+                    return Err(EditionsControlsError::ExceededAllowListMaxClaims.into());
                 }
                 
                 /// 2. construct leaf 
@@ -38,15 +42,17 @@ pub fn check_allow_list_constraints(
 
                 /// 3. verify proof against merkle root
                 if !verify(proof, merkle_root, node.to_bytes()) {
-                    panic!("Invalid merkle proof");
+                    return Err(EditionsControlsError::InvalidMerkleProof.into());
                 }
             } else {
-                panic!("Allow list price and max claims are required for allow list mint");
+                return Err(EditionsControlsError::AllowListPriceAndMaxClaimsRequired.into());
             }
         } else {
-            panic!("Merkle proof required for allow list mint");
+            return Err(EditionsControlsError::MerkleProofRequired.into());
         }
     } else {
-        panic!("Merkle root not set for allow list mint");
+        return Err(EditionsControlsError::MerkleRootNotSet.into());
     }
+
+    Ok(())
 }

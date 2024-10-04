@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 
 #[error_code]
-pub enum EditionsError {
+pub enum EditionsControlsError {
     #[msg("Ticker too long")]
     TickerTooLong,
 
@@ -49,7 +49,41 @@ pub enum EditionsError {
 
     #[msg("No phases have been added. Cannot mint.")]
     NoPhasesAdded,
+
     #[msg("Invalid phase index.")]
     InvalidPhaseIndex,
+
+    #[msg("Merkle root not set for allow list mint")]
+    MerkleRootNotSet,
+
+    #[msg("Merkle proof required for allow list mint")]
+    MerkleProofRequired,
+
+    #[msg("Allow list price and max claims are required for allow list mint")]
+    AllowListPriceAndMaxClaimsRequired,
+
+    #[msg("Invalid merkle proof")]
+    InvalidMerkleProof,
+
+    #[msg("This wallet has exceeded allow list max_claims in the current phase")]
+    ExceededAllowListMaxClaims,
+
+    #[msg("Phase not active")]
+    PhaseNotActive,
+
+    #[msg("Phase not yet started")]
+    PhaseNotStarted,
+
+    #[msg("Phase already finished")]
+    PhaseAlreadyFinished,
+
+    #[msg("Exceeded max mints for this phase")]
+    ExceededMaxMintsForPhase,
+
+    #[msg("Exceeded wallet max mints for this phase")]
+    ExceededWalletMaxMintsForPhase,
+
+    #[msg("Exceeded wallet max mints for the collection")]
+    ExceededWalletMaxMintsForCollection,
 
 }

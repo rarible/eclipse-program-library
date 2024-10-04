@@ -1,11 +1,9 @@
 use anchor_lang::{prelude::*, system_program};
-use libreplex_editions::{
-    cpi::accounts::InitialiseCtx, AddMetadata, AddRoyalties
-    program::LibreplexEditions,AddMetadataArgs, CreatorWithShare, InitialiseInput, UpdateRoyaltiesArgs
-    group_extension_program,
-};
+use libreplex_editions::{cpi::accounts::InitialiseCtx, group_extension_program, program::LibreplexEditions, AddMetadataArgs, CreatorWithShare, InitialiseInput, UpdateRoyaltiesArgs};
+use libreplex_editions::cpi::accounts::AddMetadata;
+use libreplex_editions::cpi::accounts::AddRoyalties;
 use crate::{EditionsControls, PlatformFeeRecipient, UpdatePlatformFeeArgs, DEFAULT_PLATFORM_FEE_PRIMARY_ADMIN, DEFAULT_PLATFORM_FEE_SECONDARY_ADMIN};
-use crate::errors::EditionsError;
+use crate::errors::EditionsControlsError;
 
 #[derive(AnchorDeserialize, AnchorSerialize, Clone)]
 pub struct InitialiseControlInput {
@@ -119,13 +117,13 @@ pub fn initialise_editions_controls(
     // Validate that platform_fee has up to 5 recipients
     let provided_recipients = input.platform_fee.recipients.len();
     if provided_recipients > 5 {
-        return Err(EditionsError::TooManyRecipients.into());
+        return Err(EditionsControlsError::TooManyRecipients.into());
     }
 
     // Ensure that the sum of shares equals 100
     let total_shares: u8 = input.platform_fee.recipients.iter().map(|r| r.share).sum();
     if total_shares != 100 {
-        return Err(EditionsError::InvalidFeeShares.into());
+        return Err(EditionsControlsError::InvalidFeeShares.into());
     }
 
     // Initialize an array of 5 PlatformFeeRecipient with default values

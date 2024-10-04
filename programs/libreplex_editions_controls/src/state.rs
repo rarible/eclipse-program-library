@@ -31,7 +31,7 @@ pub struct Phase {
     pub end_time: i64, // set to i64::MAX for unlimited
     pub current_mints: u64,
     pub merkle_root: Option<[u8; 32]>,
-    pub padding: [u8; 136]
+    pub padding: [u8; 200]
 }
 
 impl Phase {
@@ -45,7 +45,7 @@ impl Phase {
     + 8 // end_time
     + 8 // current_mints
     + 32 + 1 // merkle_root
-    + 136; // padding
+    + 200; // padding
 }
 
 pub const DEFAULT_PLATFORM_FEE_PRIMARY_ADMIN: &str = "674s1Sap3KVnr8WGrY5KGQ69oTYjjgr1disKJo6GpTYw";
@@ -93,7 +93,7 @@ impl EditionsControls {
         + 8                                    // platform_fee_value
         + 1                                    // is_fee_flat
         + (PlatformFeeRecipient::SIZE * 5)     // platform_fee_recipients (5 * 33 = 165)
-        + 4                                   // Vec length for phases
+        + 4                                    // Vec length for phases
         + 200;                                 // padding
 
     pub fn get_size(number_of_phases: usize) -> usize {
