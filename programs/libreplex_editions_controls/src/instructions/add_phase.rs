@@ -11,7 +11,7 @@ pub struct InitialisePhaseInput {
     pub start_time: i64, 
     pub max_mints_per_wallet: u64,
     pub max_mints_total: u64,
-    pub end_time: i64, // set to i64::MAX if not supplied
+    pub end_time: i64, 
     pub merkle_root: Option<[u8; 32]>,
 }
 
@@ -44,7 +44,6 @@ pub struct AddPhaseCtx<'info> {
 }
 
 pub fn add_phase(ctx: Context<AddPhaseCtx>, input: InitialisePhaseInput) -> Result<()> {
-    
     if !input.price_token.eq(&wrapped_sol::ID) {
         panic!("Only native price currently supported")
     }

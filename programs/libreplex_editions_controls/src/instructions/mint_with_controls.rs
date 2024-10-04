@@ -17,7 +17,7 @@ use crate::{
     check_allow_list_constraints
 };
 
-#[derive(AnchorDeserialize, AnchorSerialize, Clone)]
+#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub struct MintInput {
     pub phase_index: u32,
     pub merkle_proof: Option<Vec<[u8; 32]>>,
@@ -30,7 +30,7 @@ pub struct MintInput {
 pub struct MintWithControlsCtx<'info> {
     #[account(mut)]
     pub editions_deployment: Box<Account<'info, EditionsDeployment>>,
-
+c
     #[account(
         mut,
         seeds = [b"editions_controls", editions_deployment.key().as_ref()],
@@ -215,7 +215,7 @@ fn validate_phase(
             return Err(EditionsError::InvalidPhaseIndex.into());
         }
     }
-
+    
     Ok(())
 }
 

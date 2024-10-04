@@ -3,9 +3,7 @@ use anchor_lang::{
     prelude::*,
     solana_program::hash::hashv,
 };
-
 use rarible_merkle_verify::verify;
-
 use crate::{MinterStats, Phase};
 
 /// We need to discern between leaf and intermediate nodes to prevent trivial second

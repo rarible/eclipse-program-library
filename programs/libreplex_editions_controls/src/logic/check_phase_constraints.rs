@@ -2,7 +2,6 @@ use anchor_lang::{
     accounts::account::Account,
     prelude::*,
 };
-
 use crate::{EditionsControls, MinterStats, Phase};
 
 pub fn check_phase_constraints(
@@ -29,7 +28,7 @@ pub fn check_phase_constraints(
     /// Checks if the total mints for the phase has been exceeded (phase sold out)
     /// @dev dev: notice that if max_mints_total is 0, this constraint is disabled
     if phase.max_mints_total > 0 && phase.current_mints >= phase.max_mints_total {
-        panic!("Phase sold out")
+        panic!("Exceeded max mints for this phase")
     }
 
     /// Checks if the user has exceeded the max mints for the deployment (across all phases!)

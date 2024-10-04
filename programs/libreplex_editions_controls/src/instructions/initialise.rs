@@ -1,7 +1,9 @@
 use anchor_lang::{prelude::*, system_program};
-use libreplex_editions::{cpi::accounts::InitialiseCtx, group_extension_program, program::LibreplexEditions, AddMetadataArgs, CreatorWithShare, InitialiseInput, UpdateRoyaltiesArgs};
-use libreplex_editions::cpi::accounts::AddMetadata;
-use libreplex_editions::cpi::accounts::AddRoyalties;
+use libreplex_editions::{
+    cpi::accounts::InitialiseCtx, AddMetadata, AddRoyalties
+    program::LibreplexEditions,AddMetadataArgs, CreatorWithShare, InitialiseInput, UpdateRoyaltiesArgs
+    group_extension_program,
+};
 use crate::{EditionsControls, PlatformFeeRecipient, UpdatePlatformFeeArgs, DEFAULT_PLATFORM_FEE_PRIMARY_ADMIN, DEFAULT_PLATFORM_FEE_SECONDARY_ADMIN};
 use crate::errors::EditionsError;
 
@@ -75,7 +77,6 @@ pub fn initialise_editions_controls(
 ) -> Result<()> {
     let libreplex_editions_program = &ctx.accounts.libreplex_editions_program;
     let editions_controls = &mut ctx.accounts.editions_controls;
-
     let editions_deployment = &ctx.accounts.editions_deployment;
     let hashlist = &ctx.accounts.hashlist;
     let payer = &ctx.accounts.payer;
