@@ -8,8 +8,8 @@ skip-lint = false
 libreplex_creator = "78deTr7qycJ6498vSd3pNMhdCKKWxMipniitVHQcM8RM"
 libreplex_creator_controls = "G9whLiLT9nSkxwWzWvbiKKrTL6yWxvzh2UXqNht5VXqV"
 libreplex_default_renderer = "EfC2horkE4hCaCruMvoDDWxUhcCgVaufHeG3Hkj69eR8"
-libreplex_editions = "6hRLBM1rexUvd64qaBHQJUz4ufRAFbXZXM12ExWd7kYX"
-libreplex_editions_controls = "Ady6poZ59kW6rvbad3hiQpf8vun58RzHtNQ5Zvh7aJk3"
+libreplex_editions = "587DoLBH2H39i5bToWBc6zRgbD2iJZtc4Kb8nYsskYTq"
+libreplex_editions_controls = "4NY3NbtXX4bEL2KZCbDjmvwB9R2B29A2fGUKCrCXui7U"
 libreplex_inscriptions = "GAc6iGWe4D8ZDT3xqJXysn3wfARrpz9eLUC1jquvd3Q1"
 libreplex_legacy_inscribers = "Leg1xVbrpq5gY6mprak3Ud4q4mBwcJi5C9ZruYjWv7n"
 libreplex_metadata = "LibrQsXf9V1DmTtJLkEghoaF1kjJcAzWiEGoJn8mz7p"
@@ -22,7 +22,7 @@ url = "https://api.apr.dev"
 
 [provider]
 cluster = "Localnet"
-wallet = "~/.config/solana/id.json"
+wallet = "usb://ledger"
 
 [scripts]
 test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 js-tests/**/*.ts"
