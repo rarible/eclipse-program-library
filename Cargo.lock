@@ -699,15 +699,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8d696c370c750c948ada61c69a0ee2cbbb9c50b1019ddb86d9317157a99c2cae"
 
 [[package]]
-name = "bmp"
-version = "0.5.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "69985ff4f58085ac696454692d0b646a66ad1f9cc9be294c91dc51bb5df511ae"
-dependencies = [
- "byteorder",
-]
-
-[[package]]
 name = "borsh"
 version = "0.9.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2185,19 +2176,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "97b3888a4aecf77e811145cadf6eef5901f4782c53886191b2f693f24761847c"
 
 [[package]]
-name = "libreplex_default_renderer"
-version = "0.1.2"
-dependencies = [
- "anchor-lang",
- "assert_matches",
- "bmp",
- "mocha",
- "solana-program",
- "solana-program-test",
- "solana-sdk",
-]
-
-[[package]]
 name = "libreplex_editions"
 version = "0.2.1"
 dependencies = [
@@ -2238,22 +2216,6 @@ dependencies = [
  "spl-token-group-interface 0.2.3",
  "spl-token-metadata-interface 0.3.3",
  "spl-type-length-value 0.3.1",
-]
-
-[[package]]
-name = "libreplex_monoswap_deprecated"
-version = "0.0.0"
-dependencies = [
- "anchor-lang",
- "anchor-spl",
- "assert_matches",
- "libreplex_shared",
- "mocha",
- "mpl-token-metadata",
- "solana-program",
- "solana-program-test",
- "solana-sdk",
- "spl-associated-token-account 3.0.2",
 ]
 
 [[package]]
@@ -2461,12 +2423,6 @@ dependencies = [
  "wasi 0.11.0+wasi-snapshot-preview1",
  "windows-sys 0.48.0",
 ]
-
-[[package]]
-name = "mocha"
-version = "0.1.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9f0cb102da93ce824d7b0beb84232bf08d90768f1ebb6229be485c0b2e74787f"
 
 [[package]]
 name = "mockall"
