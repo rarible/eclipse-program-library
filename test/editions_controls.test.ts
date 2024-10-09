@@ -5,90 +5,155 @@ import {
   Keypair,
   SystemProgram,
   ComputeBudgetProgram,
+  LAMPORTS_PER_SOL,
 } from '@solana/web3.js';
-import { TOKEN_2022_PROGRAM_ID } from '@solana/spl-token';
-import { LibreplexEditionsControls } from '../../eclipse-program-library/target/types/libreplex_editions_controls';
-import { LibreplexEditions } from '../../eclipse-program-library/target/types/libreplex_editions';
+import {
+  ASSOCIATED_TOKEN_PROGRAM_ID,
+  getAssociatedTokenAddressSync,
+  TOKEN_2022_PROGRAM_ID,
+} from '@solana/spl-token';
+import {
+  LibreplexEditionsControls,
+  IDL as EditionsControlsIDL,
+} from '../../eclipse-program-library/target/types/libreplex_editions_controls';
+import {
+  LibreplexEditions,
+  IDL as EditionsIDL,
+} from '../../eclipse-program-library/target/types/libreplex_editions';
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
-import { decodeEditions, getCluster } from './utils';
+import {
+  getCluster,
+  getEditions,
+  getEditionsControls,
+  logEditions,
+  logEditionsControls,
+  createErrorHandler,
+} from './utils';
 import { Transaction } from '@solana/web3.js';
-import { decodeEditionsControls } from './utils';
+import {
+  EDITIONS_CONTROLS_PROGRAM_ID,
+  EDITIONS_PROGRAM_ID,
+  TOKEN_GROUP_EXTENSION_PROGRAM_ID,
+} from '../constants';
+import { toBufferLE } from 'bigint-buffer';
 
 describe('Editions Controls Test Suite', () => {
   const provider = anchor.AnchorProvider.env();
   anchor.setProvider(provider);
 
-  const editionsControlsProgram = anchor.workspace
-    .LibreplexEditionsControls as Program<LibreplexEditionsControls>;
-  console.log(
-    'editionsControlsProgram ID:',
-    editionsControlsProgram.programId.toBase58()
-  );
+  const handleError = createErrorHandler(EditionsIDL, EditionsControlsIDL);
 
-  const editionsProgram = anchor.workspace
-    .LibreplexEditions as Program<LibreplexEditions>;
-  console.log('editionsProgram ID:', editionsProgram.programId.toBase58());
+  let editionsControlsProgram: Program<LibreplexEditionsControls>;
+  let editionsProgram: Program<LibreplexEditions>;
 
-  const payer = (provider.wallet as anchor.Wallet).payer;
-  const creator1 = Keypair.generate();
-  const creator2 = Keypair.generate();
-  const treasury = Keypair.generate();
-  const platformFeeAdmin = Keypair.generate();
+  let editionsPda: PublicKey;
+  let editionsControlsPda: PublicKey;
+  let hashlistPda: PublicKey;
 
-  const collectionConfig = {
-    maxNumberOfTokens: new anchor.BN(1150),
-    symbol: 'COOLX55',
-    name: 'Collection name with meta, platform fee and royalties',
-    offchainUrl: 'ipfs://QmbsXNSkPUtYNmKfYw1mUSVuz9QU8nhu7YvzM1aAQsv6xw/0',
-    treasury: treasury.publicKey,
-    maxMintsPerWallet: new anchor.BN(100),
+  let payer: Keypair;
+  let creator1: Keypair;
+  let creator2: Keypair;
+  let treasury: Keypair;
+  let platformFeeAdmin: Keypair;
+  let groupMint: Keypair;
+  let group: Keypair;
+
+  let minter1: Keypair;
+  let minter2: Keypair;
+
+  let collectionConfig: {
+    symbol: string;
+    maxMintsPerWallet: anchor.BN;
+    maxNumberOfTokens: anchor.BN;
+    collectionName: string;
+    collectionUri: string;
     royalties: {
-      royaltyBasisPoints: new anchor.BN(1000),
-      creators: [
-        {
-          address: creator1.publicKey,
-          share: 50,
-        },
-        {
-          address: creator2.publicKey,
-          share: 50,
-        },
-      ],
-    },
+      royaltyBasisPoints: anchor.BN;
+      creators: { address: PublicKey; share: number }[];
+    };
     platformFee: {
-      platformFeeValue: new anchor.BN(500000),
-      recipients: [
-        {
-          address: platformFeeAdmin.publicKey,
-          share: 100,
-        },
-      ],
-      isFeeFlat: true,
-    },
-    extraMeta: [
-      { field: 'field1', value: 'value1' },
-      { field: 'field2', value: 'value2' },
-      { field: 'field3', value: 'value3' },
-      { field: 'field4', value: 'value4' },
-    ],
-    itemBaseUri: 'ipfs://QmbsXNSkPUtYNmKfYw1mUSVuz9QU8nhu7YvzM1aAQsv6xw/{}',
-    itemName: 'Item T8 V4 #{}',
-    cosignerProgramId: null,
+      platformFeeValue: anchor.BN;
+      recipients: { address: PublicKey; share: number }[];
+      isFeeFlat: boolean;
+    };
+    extraMeta: { field: string; value: string }[];
+    itemBaseUri: string;
+    itemBaseName: string;
+    treasury: PublicKey;
+    cosignerProgramId: PublicKey | null;
+  };
+
+  let allowListConfig: {
+    merkleRoot: Buffer;
+    list: {
+      address: PublicKey;
+      price: anchor.BN;
+      max_claims: anchor.BN;
+      proof: Buffer[];
+    }[];
   };
 
   before(async () => {
     const cluster = await getCluster(provider.connection);
     console.log('Cluster:', cluster);
-  });
 
-  it('should deploy a collection, add a phase, and execute a mint', async () => {
-    // Modify compute units for the transaction
-    const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({
-      units: 800000,
-    });
+    editionsControlsProgram = anchor.workspace
+      .LibreplexEditionsControls as Program<LibreplexEditionsControls>;
+    editionsProgram = anchor.workspace
+      .LibreplexEditions as Program<LibreplexEditions>;
 
-    const [editionsPda] = PublicKey.findProgramAddressSync(
+    payer = (provider.wallet as anchor.Wallet).payer;
+    creator1 = Keypair.generate();
+    creator2 = Keypair.generate();
+    treasury = Keypair.generate();
+    platformFeeAdmin = Keypair.generate();
+    groupMint = Keypair.generate();
+    group = Keypair.generate();
+
+    collectionConfig = {
+      maxNumberOfTokens: new anchor.BN(1150),
+      symbol: 'COOLX55',
+      collectionName: 'Collection name with meta, platform fee and royalties',
+      collectionUri: 'ipfs://QmbsXNSkPUtYNmKfYw1mUSVuz9QU8nhu7YvzM1aAQsv6xw/0',
+      treasury: treasury.publicKey,
+      maxMintsPerWallet: new anchor.BN(100),
+      royalties: {
+        royaltyBasisPoints: new anchor.BN(1000),
+        creators: [
+          {
+            address: creator1.publicKey,
+            share: 50,
+          },
+          {
+            address: creator2.publicKey,
+            share: 50,
+          },
+        ],
+      },
+      platformFee: {
+        platformFeeValue: new anchor.BN(500000),
+        recipients: [
+          {
+            address: platformFeeAdmin.publicKey,
+            share: 100,
+          },
+        ],
+        isFeeFlat: true,
+      },
+      extraMeta: [
+        { field: 'field1', value: 'value1' },
+        { field: 'field2', value: 'value2' },
+        { field: 'field3', value: 'value3' },
+        { field: 'field4', value: 'value4' },
+      ],
+      itemBaseUri: 'ipfs://QmbsXNSkPUtYNmKfYw1mUSVuz9QU8nhu7YvzM1aAQsv6xw/{}',
+      itemBaseName: 'Item T8 V4 #{}',
+      cosignerProgramId: null,
+    };
+    console.log('Collection config: ', collectionConfig);
+
+    [editionsPda] = PublicKey.findProgramAddressSync(
       [
         Buffer.from('editions_deployment'),
         Buffer.from(collectionConfig.symbol),
@@ -96,19 +161,22 @@ describe('Editions Controls Test Suite', () => {
       editionsProgram.programId
     );
 
-    const [editionsControlsPda] = PublicKey.findProgramAddressSync(
+    [editionsControlsPda] = PublicKey.findProgramAddressSync(
       [Buffer.from('editions_controls'), editionsPda.toBuffer()],
       editionsControlsProgram.programId
     );
-    const [hashlistPda] = PublicKey.findProgramAddressSync(
+
+    [hashlistPda] = PublicKey.findProgramAddressSync(
       [Buffer.from('hashlist'), editionsPda.toBuffer()],
       editionsProgram.programId
     );
+  });
 
-    const groupMint = Keypair.generate();
-    const group = Keypair.generate();
-
-    console.log('Collection config: ', collectionConfig);
+  it('should deploy a collection, add a phase, and execute a mint', async () => {
+    // Modify compute units for the transaction
+    const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({
+      units: 800000,
+    });
 
     console.log('\nDeploying via initialiseEditionsControls...\n');
     try {
@@ -118,14 +186,14 @@ describe('Editions Controls Test Suite', () => {
           treasury: collectionConfig.treasury,
           maxNumberOfTokens: collectionConfig.maxNumberOfTokens,
           symbol: collectionConfig.symbol,
-          name: collectionConfig.name,
-          offchainUrl: collectionConfig.offchainUrl,
+          collectionName: collectionConfig.collectionName,
+          collectionUri: collectionConfig.collectionUri,
           cosignerProgramId: collectionConfig.cosignerProgramId,
           royalties: collectionConfig.royalties,
           platformFee: collectionConfig.platformFee,
           extraMeta: collectionConfig.extraMeta,
           itemBaseUri: collectionConfig.itemBaseUri,
-          itemName: collectionConfig.itemName,
+          itemBaseName: collectionConfig.itemBaseName,
         })
         .accountsStrict({
           editionsControls: editionsControlsPda,
@@ -154,132 +222,385 @@ describe('Editions Controls Test Suite', () => {
         payer,
       ]);
 
-      console.log('Transaction signature:', txSignature);
-
+      console.log('\nTransaction signature:', txSignature, '\n');
       console.log('\ninitialiseEditionsControls done!\n');
-      // log deployed addresses
-      console.log('Editions address:', editionsPda.toBase58());
-      console.log('EditionsControls address:', editionsControlsPda.toBase58());
-      console.log('Hashlist address:', hashlistPda.toBase58());
-      console.log('GroupMint address:', groupMint.publicKey.toBase58());
-      console.log('Group address:', group.publicKey.toBase58());
 
       console.log('\nFetching and displaying deployed collection state...\n');
-
-      // Fetch and decode the Editions deployment
-      const editionsAccountInfo = await provider.connection.getAccountInfo(
-        editionsPda
+      const editionsDecoded = await getEditions(
+        provider.connection,
+        editionsPda,
+        editionsProgram
       );
-      if (!editionsAccountInfo) {
-        throw new Error('Editions account not found');
-      }
-
-      const editionsDeployment = decodeEditions(editionsProgram)(
-        editionsAccountInfo.data,
-        editionsPda
-      );
-
-      console.log('Editions Deployment:');
-      console.log({
-        creator: editionsDeployment.item.creator.toBase58(),
-        groupMint: editionsDeployment.item.groupMint.toBase58(),
-        maxNumberOfTokens: editionsDeployment.item.maxNumberOfTokens.toString(),
-        name: editionsDeployment.item.name,
-        tokensMinted: editionsDeployment.item.numberOfTokensIssued.toString(),
-        offchainUrl: editionsDeployment.item.offchainUrl,
-        symbol: editionsDeployment.item.symbol,
-        nameIsTemplate: editionsDeployment.item.nameIsTemplate,
-        urlIsTemplate: editionsDeployment.item.urlIsTemplate,
-      });
+      logEditions(editionsDecoded);
 
       // Fetch and check the EditionsControls account
-      const controlsAccountData = await provider.connection.getAccountInfo(
-        editionsControlsPda
+      const editionsControlsDecoded = await getEditionsControls(
+        provider.connection,
+        editionsControlsPda,
+        editionsControlsProgram
+      );
+      logEditionsControls(editionsControlsDecoded);
+
+      // Verify Editions deployment
+      expect(editionsDecoded.data.symbol).to.equal(collectionConfig.symbol);
+      expect(editionsDecoded.data.creator.toBase58()).to.equal(
+        editionsControlsPda.toBase58()
+      );
+      expect(editionsDecoded.data.maxNumberOfTokens.toString()).to.equal(
+        collectionConfig.maxNumberOfTokens.toString()
+      );
+      expect(editionsDecoded.data.collectionName).to.equal(
+        collectionConfig.collectionName
+      );
+      expect(editionsDecoded.data.collectionUri).to.equal(
+        collectionConfig.collectionUri
+      );
+      expect(editionsDecoded.data.itemBaseName).to.equal(
+        collectionConfig.itemBaseName
+      );
+      expect(editionsDecoded.data.itemBaseUri).to.equal(
+        collectionConfig.itemBaseUri
       );
 
-      if (!controlsAccountData || !controlsAccountData.data) {
-        console.log('Core editions deployment - no controls specified');
-      } else {
-        const editionsControlsObj = decodeEditionsControls(
-          editionsControlsProgram
-        )(controlsAccountData.data, editionsControlsPda);
+      // Verify EditionsControls deployment
+      expect(
+        editionsControlsDecoded.data.editionsDeployment.toBase58()
+      ).to.equal(editionsPda.toBase58());
+      expect(editionsControlsDecoded.data.creator.toBase58()).to.equal(
+        payer.publicKey.toBase58()
+      );
+      expect(editionsControlsDecoded.data.treasury.toBase58()).to.equal(
+        collectionConfig.treasury.toBase58()
+      );
+      expect(Number(editionsControlsDecoded.data.maxMintsPerWallet)).to.equal(
+        Number(collectionConfig.maxMintsPerWallet)
+      );
+      expect(editionsControlsDecoded.data.phases.length).to.equal(0);
 
-        console.log({
-          editionsControls: {
-            address: editionsControlsPda.toBase58(),
-            coreDeployment:
-              editionsControlsObj.item.editionsDeployment.toBase58(),
-            creator: editionsControlsObj.item.creator.toBase58(),
-            treasury: editionsControlsObj.item.treasury.toBase58(),
-            maxMintsPerWallet: Number(
-              editionsControlsObj.item.maxMintsPerWallet
-            ),
-          },
-          phases: editionsControlsObj.item.phases.map((item, idx) => ({
-            phaseIndex: idx,
-            currentMints: Number(item.currentMints),
-            maxMintsPerWallet: Number(item.maxMintsPerWallet),
-            maxMintsTotal: Number(item.maxMintsTotal),
-            startTime: Number(item.startTime),
-            endTime: Number(item.endTime),
-            priceAmount: Number(item.priceAmount),
-            priceToken: item.priceToken ? item.priceToken.toBase58() : null,
-            merkleRoot: item.merkleRoot
-              ? JSON.stringify(item.merkleRoot)
-              : null,
-          })),
-        });
-
-        // Add assertions to verify the state
-        expect(editionsControlsObj.item.editionsDeployment.toBase58()).to.equal(
-          editionsPda.toBase58()
-        );
-        expect(editionsControlsObj.item.creator.toBase58()).to.equal(
-          payer.publicKey.toBase58()
-        );
-        expect(editionsControlsObj.item.treasury.toBase58()).to.equal(
-          collectionConfig.treasury.toBase58()
-        );
-        expect(Number(editionsControlsObj.item.maxMintsPerWallet)).to.equal(
-          Number(collectionConfig.maxMintsPerWallet)
-        );
-
-        // Verify Editions deployment
-        // expect(editionsDeployment.item.creator.toBase58()).to.equal(
-        //   payer.publicKey.toBase58()
-        // );
-        // expect(editionsDeployment.item.maxNumberOfTokens.toString()).to.equal(
-        //   collectionConfig.maxNumberOfTokens.toString()
-        // );
-        // expect(editionsDeployment.item.name).to.equal(collectionConfig.name);
-        // expect(editionsDeployment.item.symbol).to.equal(
-        //   collectionConfig.symbol
-        // );
-        // expect(editionsDeployment.item.offchainUrl).to.equal(
-        //   collectionConfig.offchainUrl
-        // );
-
-        // Add more assertions as needed for phases, if any are expected to be present at this point
-      }
-
-      // 2. Add a phase (if needed)
-      // 3. Execute a mint (if needed)
-
-      // These sections can be implemented similarly to the previous version,
-      // but make sure to update any parameters that have changed in the new CLI version.
+      // Add more assertions as needed
     } catch (error) {
       console.error('Error in initialiseEditionsControls:', error);
       throw error;
     }
+  });
 
-    // Add assertions to verify the initialization was successful
+  // 2. Add a phase
+  it('Should add a phase without allowlist', async () => {
+    const phaseConfig = {
+      maxMintsPerWallet: new anchor.BN(100),
+      maxMintsTotal: new anchor.BN(1000),
+      priceAmount: new anchor.BN(10000000), // 0.01 SOL
+      startTime: new anchor.BN(new Date().getTime() / 1000),
+      endTime: new anchor.BN(new Date().getTime() / 1000 + 60 * 60 * 24), // 1 day from now
+      priceToken: new PublicKey('So11111111111111111111111111111111111111112'),
+      merkleRoot: null,
+    };
 
-    // Add more assertions as needed
+    const phaseIx = await editionsControlsProgram.methods
+      .addPhase(phaseConfig)
+      .accountsStrict({
+        editionsControls: editionsControlsPda,
+        creator: payer.publicKey,
+        payer: payer.publicKey,
+        systemProgram: SystemProgram.programId,
+        tokenProgram: TOKEN_2022_PROGRAM_ID,
+        libreplexEditionsProgram: editionsProgram.programId,
+      })
+      .signers([])
+      .instruction();
 
-    // 2. Add a phase (if needed)
-    // 3. Execute a mint (if needed)
+    const transaction = new Transaction().add(phaseIx);
+    const txSignature = await provider.sendAndConfirm(transaction, [payer]);
 
-    // These sections can be implemented similarly to the previous version,
-    // but make sure to update any parameters that have changed in the new CLI version.
+    console.log('\nTransaction signature:', txSignature, '\n');
+    console.log('\naddPhase done!\n');
+
+    // get state
+    const editionsDecoded = await getEditions(
+      provider.connection,
+      editionsPda,
+      editionsProgram
+    );
+    logEditions(editionsDecoded);
+
+    const editionsControlsDecoded = await getEditionsControls(
+      provider.connection,
+      editionsControlsPda,
+      editionsControlsProgram
+    );
+    logEditionsControls(editionsControlsDecoded);
+
+    // verify state
+    expect(editionsControlsDecoded.data.phases.length).to.equal(1);
+    expect(
+      editionsControlsDecoded.data.phases[0].maxMintsPerWallet.toString()
+    ).to.equal(phaseConfig.maxMintsPerWallet.toString());
+    expect(
+      editionsControlsDecoded.data.phases[0].maxMintsTotal.toString()
+    ).to.equal(phaseConfig.maxMintsTotal.toString());
+  });
+
+  // ADD PHASE WITH ALLOWLIST
+  before(async () => {
+    console.log('Creating minters...');
+    minter1 = Keypair.fromSecretKey(
+      new Uint8Array([
+        110, 76, 59, 154, 201, 225, 246, 121, 152, 90, 45, 211, 52, 244, 216,
+        108, 118, 248, 113, 239, 61, 248, 207, 122, 98, 26, 184, 92, 51, 97, 52,
+        218, 104, 164, 83, 51, 23, 177, 193, 29, 252, 241, 86, 132, 173, 155,
+        114, 131, 130, 73, 27, 101, 233, 95, 12, 45, 107, 255, 120, 26, 121,
+        221, 120, 54,
+      ])
+    );
+    console.log('minter1: ', minter1.publicKey.toBase58());
+    minter2 = Keypair.fromSecretKey(
+      new Uint8Array([
+        16, 27, 49, 140, 228, 142, 201, 93, 199, 209, 62, 136, 151, 212, 238,
+        114, 46, 204, 155, 132, 26, 227, 44, 245, 239, 29, 195, 63, 77, 162, 28,
+        220, 186, 39, 133, 92, 39, 241, 42, 161, 180, 15, 92, 18, 15, 101, 248,
+        80, 238, 254, 220, 231, 1, 14, 231, 145, 170, 49, 163, 111, 239, 112,
+        135, 6,
+      ])
+    );
+    console.log('minter2: ', minter2.publicKey.toBase58());
+
+    console.log('Creating allowlist...');
+    allowListConfig = {
+      merkleRoot: Buffer.from([
+        125, 184, 194, 116, 52, 36, 65, 219, 171, 135, 154, 27, 188, 122, 207,
+        204, 111, 70, 66, 115, 161, 228, 44, 84, 67, 97, 29, 70, 253, 69, 11,
+        245,
+      ]),
+      list: [
+        {
+          address: minter1.publicKey,
+          price: new anchor.BN(500000), // 0.005 SOL
+          max_claims: new anchor.BN(3),
+          proof: [
+            Buffer.from([
+              64, 131, 242, 169, 206, 112, 155, 119, 81, 214, 17, 137, 174, 140,
+              208, 220, 141, 177, 213, 131, 127, 104, 181, 15, 121, 228, 87, 25,
+              232, 172, 235, 168,
+            ]),
+          ],
+        },
+        {
+          address: minter2.publicKey,
+          price: new anchor.BN(500000), // 0.005 SOL
+          max_claims: new anchor.BN(3),
+          proof: [
+            Buffer.from([
+              86, 37, 15, 136, 192, 159, 125, 244, 163, 213, 251, 242, 217, 215,
+              159, 249, 93, 166, 82, 38, 187, 58, 199, 64, 161, 50, 122, 122,
+              17, 125, 63, 188,
+            ]),
+          ],
+        },
+      ],
+    };
+    console.log('Allowlist created');
+  });
+
+  it('Should add a phase with allowlist', async () => {
+    const phaseConfig = {
+      maxMintsPerWallet: new anchor.BN(100),
+      maxMintsTotal: new anchor.BN(1000),
+      priceAmount: new anchor.BN(10000000), // 0.01 SOL
+      startTime: new anchor.BN(new Date().getTime() / 1000),
+      endTime: new anchor.BN(new Date().getTime() / 1000 + 60 * 60 * 24), // 1 day from now
+      priceToken: new PublicKey('So11111111111111111111111111111111111111112'),
+      merkleRoot: allowListConfig.merkleRoot,
+    };
+
+    const phaseIx = await editionsControlsProgram.methods
+      .addPhase(phaseConfig)
+      .accountsStrict({
+        editionsControls: editionsControlsPda,
+        creator: payer.publicKey,
+        payer: payer.publicKey,
+        systemProgram: SystemProgram.programId,
+        tokenProgram: TOKEN_2022_PROGRAM_ID,
+        libreplexEditionsProgram: editionsProgram.programId,
+      })
+      .signers([])
+      .instruction();
+
+    const transaction = new Transaction().add(phaseIx);
+    const txSignature = await provider.sendAndConfirm(transaction, [payer]);
+
+    console.log('\nTransaction signature:', txSignature, '\n');
+    console.log('\naddPhase done!\n');
+
+    // get state
+    const editionsDecoded = await getEditions(
+      provider.connection,
+      editionsPda,
+      editionsProgram
+    );
+    logEditions(editionsDecoded);
+
+    const editionsControlsDecoded = await getEditionsControls(
+      provider.connection,
+      editionsControlsPda,
+      editionsControlsProgram
+    );
+    logEditionsControls(editionsControlsDecoded);
+
+    // verify state
+    expect(editionsControlsDecoded.data.phases.length).to.equal(2);
+    expect(
+      editionsControlsDecoded.data.phases[1].maxMintsPerWallet.toString()
+    ).to.equal(phaseConfig.maxMintsPerWallet.toString());
+    expect(
+      editionsControlsDecoded.data.phases[1].maxMintsTotal.toString()
+    ).to.equal(phaseConfig.maxMintsTotal.toString());
+  });
+
+  // mint on first allow list
+  it('Should mint on first phase without allowlist', async () => {
+    // Airdrop SOL to minter1
+    const airdropSignature = await provider.connection.requestAirdrop(
+      minter1.publicKey,
+      10 * LAMPORTS_PER_SOL
+    );
+    await provider.connection.confirmTransaction(airdropSignature);
+
+    // Airdrop SOL to treasury
+    const treasuryAirdropSignature = await provider.connection.requestAirdrop(
+      collectionConfig.treasury,
+      10 * LAMPORTS_PER_SOL
+    );
+    await provider.connection.confirmTransaction(treasuryAirdropSignature);
+
+    let minterBalance = await provider.connection.getBalance(minter1.publicKey);
+    console.log('minterBalance: ', minterBalance / LAMPORTS_PER_SOL);
+
+    let payerBalance = await provider.connection.getBalance(payer.publicKey);
+    console.log('payerBalance: ', payerBalance / LAMPORTS_PER_SOL);
+
+    let treasuryBalance = await provider.connection.getBalance(
+      collectionConfig.treasury
+    );
+    console.log('treasuryBalance: ', treasuryBalance / LAMPORTS_PER_SOL);
+
+    const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({
+      units: 850000,
+    });
+
+    const mintConfig = {
+      phaseIndex: 0,
+      merkleProof: null,
+      allowListPrice: null,
+      allowListMint: null,
+    };
+
+    const mint = Keypair.generate();
+    const member = Keypair.generate();
+
+    const tokenAccount = getAssociatedTokenAddressSync(
+      mint.publicKey,
+      minter1.publicKey,
+      false,
+      TOKEN_2022_PROGRAM_ID
+    );
+
+    const [hashlistMarker] = PublicKey.findProgramAddressSync(
+      [
+        Buffer.from('hashlist_marker'),
+        editionsPda.toBuffer(),
+        mint.publicKey.toBuffer(),
+      ],
+      new PublicKey(EDITIONS_PROGRAM_ID)
+    );
+
+    const [minterStats] = PublicKey.findProgramAddressSync(
+      [
+        Buffer.from('minter_stats'),
+        editionsPda.toBuffer(),
+        minter1.publicKey.toBuffer(),
+      ],
+      new PublicKey(EDITIONS_CONTROLS_PROGRAM_ID)
+    );
+
+    const [minterStatsPhase] = PublicKey.findProgramAddressSync(
+      [
+        Buffer.from('minter_stats_phase'),
+        editionsPda.toBuffer(),
+        minter1.publicKey.toBuffer(),
+        toBufferLE(BigInt(0), 4),
+      ],
+      new PublicKey(EDITIONS_CONTROLS_PROGRAM_ID)
+    );
+
+    const mintIx = await editionsControlsProgram.methods
+      .mintWithControls(mintConfig)
+      .accountsStrict({
+        editionsDeployment: editionsPda,
+        editionsControls: editionsControlsPda,
+        hashlist: hashlistPda,
+        hashlistMarker,
+        payer: minter1.publicKey,
+        mint: mint.publicKey,
+        member: member.publicKey,
+        signer: minter1.publicKey,
+        minter: minter1.publicKey,
+        minterStats,
+        minterStatsPhase,
+        group: group.publicKey,
+        groupMint: groupMint.publicKey,
+        platformFeeRecipient1: platformFeeAdmin.publicKey,
+        groupExtensionProgram: new PublicKey(TOKEN_GROUP_EXTENSION_PROGRAM_ID),
+        tokenAccount,
+        treasury: collectionConfig.treasury,
+        systemProgram: SystemProgram.programId,
+        tokenProgram: TOKEN_2022_PROGRAM_ID,
+        libreplexEditionsProgram: editionsProgram.programId,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+      })
+      .instruction();
+
+    const transaction = new Transaction().add(modifyComputeUnits).add(mintIx);
+    transaction.recentBlockhash = (
+      await provider.connection.getLatestBlockhash()
+    ).blockhash;
+    transaction.feePayer = minter1.publicKey;
+    transaction.sign(minter1, mint, member);
+    const rawTransaction = transaction.serialize();
+
+    try {
+      const txSignature = await provider.connection.sendRawTransaction(
+        rawTransaction,
+        {
+          skipPreflight: false,
+          preflightCommitment: 'confirmed',
+        }
+      );
+      console.log('\nTransaction signature:', txSignature, '\n');
+      console.log('\nmintWithControls done!\n');
+    } catch (error) {
+      handleError(error);
+      console.error('Error in mintWithControls:', error);
+      throw error;
+    }
+
+    // get state
+    const editionsDecoded = await getEditions(
+      provider.connection,
+      editionsPda,
+      editionsProgram
+    );
+    logEditions(editionsDecoded);
+
+    const editionsControlsDecoded = await getEditionsControls(
+      provider.connection,
+      editionsControlsPda,
+      editionsControlsProgram
+    );
+    logEditionsControls(editionsControlsDecoded);
+
+    // verify state
+    expect(
+      editionsControlsDecoded.data.phases[0].currentMints.toString()
+    ).to.equal(new anchor.BN(1).toString());
   });
 });

@@ -85,7 +85,6 @@ pub struct MintCtx<'info> {
 
     #[account()]
     pub system_program: Program<'info, System>,
-
 }
 
 pub fn mint<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> Result<()> {
@@ -120,7 +119,6 @@ pub fn mint<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> Result<()
         return Err(EditionsError::MintedOut.into());
     }
 
-
     let update_authority =
         OptionalNonZeroPubkey::try_from(Some(editions_deployment.key())).expect("Bad update auth");
 
@@ -130,14 +128,14 @@ pub fn mint<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> Result<()
         &[ctx.bumps.editions_deployment],
     ];
 
-    let name = match editions_deployment.name_is_template {
-        true => editions_deployment.name.format(&[editions_deployment.number_of_tokens_issued + 1]),
-        false => editions_deployment.name.clone()
+    let item_name = match editions_deployment.item_name_is_template {
+        true => editions_deployment.item_base_name.format(&[editions_deployment.number_of_tokens_issued + 1]),
+        false => editions_deployment.item_base_name.clone()
     };
 
-    let url = match editions_deployment.url_is_template {
-        true => editions_deployment.offchain_url.format(&[editions_deployment.number_of_tokens_issued + 1]),
-        false => editions_deployment.offchain_url.clone()
+    let item_url = match editions_deployment.item_uri_is_template {
+        true => editions_deployment.item_base_uri.format(&[editions_deployment.number_of_tokens_issued + 1]),
+        false => editions_deployment.item_base_uri.clone()
     };
     // msg!("Create token 2022 w/ metadata");
     create_token_2022_and_metadata(
@@ -150,9 +148,9 @@ pub fn mint<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> Result<()
         },
         0,
         Some(TokenMetadata {
-            name,
+            name: item_name,
             symbol: editions_deployment.symbol.clone(),
-            uri: url,
+            uri: item_url,
             update_authority,
             mint: mint.key(),
             additional_metadata: vec![],

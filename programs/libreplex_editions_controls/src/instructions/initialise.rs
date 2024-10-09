@@ -11,13 +11,13 @@ pub struct InitialiseControlInput {
     pub treasury: Pubkey,
     pub max_number_of_tokens: u64,
     pub symbol: String,
-    pub name: String,
-    pub offchain_url: String,
+    pub collection_name: String,
+    pub collection_uri: String,
     pub cosigner_program_id: Option<Pubkey>,
     pub royalties: UpdateRoyaltiesArgs,
     pub extra_meta: Vec<AddMetadataArgs>,
     pub item_base_uri: String,
-    pub item_name: String,
+    pub item_base_name: String,
     pub platform_fee: UpdatePlatformFeeArgs
 }
 
@@ -88,10 +88,10 @@ pub fn initialise_editions_controls(
     let core_input = InitialiseInput {
         max_number_of_tokens: input.max_number_of_tokens,
         symbol: input.symbol,
-        name: input.name,
-        offchain_url: input.offchain_url,
+        collection_name: input.collection_name,
+        collection_uri: input.collection_uri,
         creator_cosign_program_id: Some(crate::ID),
-        item_name: input.item_name,
+        item_base_name: input.item_base_name,
         item_base_uri: input.item_base_uri
     };
 
