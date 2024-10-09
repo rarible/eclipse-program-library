@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/libreplex_editions_controls.json`.
  */
 export type LibreplexEditionsControls = {
-  "address": "4NY3NbtXX4bEL2KZCbDjmvwB9R2B29A2fGUKCrCXui7U",
+  "address": "5hEa5j38yNJRM9vQA44Q6gXVj4Db8y3mWxkDtQeofKKs",
   "metadata": {
     "name": "libreplexEditionsControls",
     "version": "0.2.1",

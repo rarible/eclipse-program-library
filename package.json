@@ -59,7 +59,7 @@
     "libreplex_editions:deploy:hot:cli:eclispe-mainnet": "solana program deploy target/deploy/libreplex_editions.so --program-id target/deploy/libreplex_editions-keypair.json --url https://mainnetbeta-rpc.eclipse.xyz",
 
     "libreplex_editions_controls:deploy:hot:eclispe-mainnet": "anchor build -p libreplex_editions_controls && anchor deploy -p libreplex_editions_controls --provider.cluster https://mainnetbeta-rpc.eclipse.xyz --provider.wallet ~/.config/solana/prod-keypair.json",
-    "transfer-program-owner:eclipse-main-net": "solana program set-upgrade-authority --skip-new-upgrade-authority-signer-check 587DoLBH2H39i5bToWBc6zRgbD2iJZtc4Kb8nYsskYTq --new-upgrade-authority 674s1Sap3KVnr8WGrY5KGQ69oTYjjgr1disKJo6GpTYw -k ~/.config/solana/prod-keypair.json -u https://mainnetbeta-rpc.eclipse.xyz",
+    "transfer-program-owner:eclipse-main-net": "solana program set-upgrade-authority --skip-new-upgrade-authority-signer-check 5hEa5j38yNJRM9vQA44Q6gXVj4Db8y3mWxkDtQeofKKs --new-upgrade-authority 674s1Sap3KVnr8WGrY5KGQ69oTYjjgr1disKJo6GpTYw -k ~/.config/solana/prod-keypair.json -u https://mainnetbeta-rpc.eclipse.xyz",
     "libreplex_editions_controls:deploy:hot:cli:eclispe-mainnet": "solana program deploy target/deploy/libreplex_editions_controls.so --program-id target/deploy/libreplex_editions_controls-keypair.json --url https://mainnetbeta-rpc.eclipse.xyz"
   },
   "dependencies": {
