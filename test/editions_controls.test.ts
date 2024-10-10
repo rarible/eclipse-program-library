@@ -629,4 +629,153 @@ describe('Editions Controls Test Suite', () => {
       new anchor.BN(1).toString()
     );
   });
+
+  it('Should mint on second phase with allowlist', async () => {
+    const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({
+      units: 850000,
+    });
+
+    const mintConfig = {
+      phaseIndex: 1, // Use the second phase (index 1)
+      merkleProof: allowListConfig.list[0].proof, // Use the proof for minter1
+      allowListPrice: allowListConfig.list[0].price,
+      allowListMaxClaims: allowListConfig.list[0].max_claims,
+    };
+
+    const mint = Keypair.generate();
+    const member = Keypair.generate();
+
+    const tokenAccount = getAssociatedTokenAddressSync(
+      mint.publicKey,
+      minter1.publicKey,
+      false,
+      TOKEN_2022_PROGRAM_ID
+    );
+
+    const [hashlistMarker] = PublicKey.findProgramAddressSync(
+      [
+        Buffer.from('hashlist_marker'),
+        editionsPda.toBuffer(),
+        mint.publicKey.toBuffer(),
+      ],
+      new PublicKey(EDITIONS_PROGRAM_ID)
+    );
+
+    const [minterStats] = PublicKey.findProgramAddressSync(
+      [
+        Buffer.from('minter_stats'),
+        editionsPda.toBuffer(),
+        minter1.publicKey.toBuffer(),
+      ],
+      new PublicKey(EDITIONS_CONTROLS_PROGRAM_ID)
+    );
+
+    const [minterStatsPhase] = PublicKey.findProgramAddressSync(
+      [
+        Buffer.from('minter_stats_phase'),
+        editionsPda.toBuffer(),
+        minter1.publicKey.toBuffer(),
+        toBufferLE(BigInt(1), 4), // Use phase index 1
+      ],
+      new PublicKey(EDITIONS_CONTROLS_PROGRAM_ID)
+    );
+
+    const mintIx = await editionsControlsProgram.methods
+      .mintWithControls(mintConfig)
+      .accountsStrict({
+        editionsDeployment: editionsPda,
+        editionsControls: editionsControlsPda,
+        hashlist: hashlistPda,
+        hashlistMarker,
+        payer: minter1.publicKey,
+        mint: mint.publicKey,
+        member: member.publicKey,
+        signer: minter1.publicKey,
+        minter: minter1.publicKey,
+        minterStats,
+        minterStatsPhase,
+        group: group.publicKey,
+        groupMint: groupMint.publicKey,
+        platformFeeRecipient1: platformFeeAdmin.publicKey,
+        groupExtensionProgram: new PublicKey(TOKEN_GROUP_EXTENSION_PROGRAM_ID),
+        tokenAccount,
+        treasury: collectionConfig.treasury,
+        systemProgram: SystemProgram.programId,
+        tokenProgram: TOKEN_2022_PROGRAM_ID,
+        libreplexEditionsProgram: editionsProgram.programId,
+        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+      })
+      .instruction();
+
+    const transaction = new Transaction().add(modifyComputeUnits).add(mintIx);
+    transaction.recentBlockhash = (
+      await provider.connection.getLatestBlockhash()
+    ).blockhash;
+    transaction.feePayer = minter1.publicKey;
+    transaction.sign(minter1, mint, member);
+    const rawTransaction = transaction.serialize();
+
+    try {
+      const signature = await provider.connection.sendRawTransaction(
+        rawTransaction,
+        {
+          skipPreflight: false,
+          preflightCommitment: 'confirmed',
+        }
+      );
+      // wait for transaction to be confirmed
+      await provider.connection.confirmTransaction(signature);
+
+      console.log('\nmintWithControls on allowlist phase done!\n');
+
+      // Fetch updated state
+      const editionsDecoded = await getEditions(
+        provider.connection,
+        editionsPda,
+        editionsProgram
+      );
+      const editionsControlsDecoded = await getEditionsControls(
+        provider.connection,
+        editionsControlsPda,
+        editionsControlsProgram
+      );
+      const minterStatsDecoded = await getMinterStats(
+        provider.connection,
+        minterStats,
+        editionsControlsProgram
+      );
+      const minterStatsPhaseDecoded = await getMinterStats(
+        provider.connection,
+        minterStatsPhase,
+        editionsControlsProgram
+      );
+      if (VERBOSE_LOGGING) {
+        logEditions(editionsDecoded);
+        logEditionsControls(editionsControlsDecoded);
+        logMinterStats(minterStatsDecoded);
+        logMinterStatsPhase(minterStatsPhaseDecoded);
+      }
+
+      // Verify state
+      expect(
+        editionsControlsDecoded.data.phases[1].currentMints.toString()
+      ).to.equal('1');
+      expect(editionsDecoded.data.numberOfTokensIssued.toString()).to.equal(
+        '2'
+      );
+      expect(minterStatsDecoded.data.mintCount.toString()).to.equal('2');
+      expect(minterStatsPhaseDecoded.data.mintCount.toString()).to.equal('1');
+
+      console.log('Allowlist mint verified successfully');
+    } catch (error) {
+      console.error('Error in allowlist minting:', error);
+      if (error.logs) {
+        console.error('Full error logs:');
+        error.logs.forEach((log, index) => {
+          console.error(`${index + 1}: ${log}`);
+        });
+      }
+      throw error;
+    }
+  });
 });
