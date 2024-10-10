@@ -11,6 +11,8 @@ export type EditionsDeployment =
 export type EditionsControls =
   IdlAccounts<LibreplexEditionsControls>['editionsControls'];
 
+export type MinterStats = IdlAccounts<LibreplexEditionsControls>['minterStats'];
+
 export async function getCluster(connection: Connection): Promise<string> {
   // Get the genesis hash
   const genesisHash = await connection.getGenesisHash();
@@ -168,4 +170,62 @@ export const parseMetadata = (
     metadata[key] = value;
   }
   return metadata;
+};
+
+export const decodeMinterStats =
+  (program: Program<LibreplexEditionsControls>) =>
+  (buffer: Buffer | undefined, pubkey: PublicKey) => {
+    const coder = new BorshCoder(program.idl);
+    const data = buffer
+      ? coder.accounts.decode<MinterStats>('minterStats', buffer)
+      : null;
+
+    return {
+      data,
+      pubkey,
+    };
+  };
+
+export const getMinterStats = async (
+  connection: Connection,
+  minterStatsPda: PublicKey,
+  editionsControlsProgram: Program<LibreplexEditionsControls>
+) => {
+  const minterStatsAccountInfo = await connection.getAccountInfo(
+    minterStatsPda
+  );
+  if (!minterStatsAccountInfo) {
+    throw new Error('MinterStats account not found');
+  }
+  const minterStatsDecoded = decodeMinterStats(editionsControlsProgram)(
+    minterStatsAccountInfo.data,
+    minterStatsPda
+  );
+  return minterStatsDecoded;
+};
+
+export const logMinterStats = (minterStatsDecoded: {
+  data: MinterStats;
+  pubkey: PublicKey;
+}) => {
+  console.log({
+    MinterStats: {
+      address: minterStatsDecoded.pubkey.toBase58(),
+      wallet: minterStatsDecoded.data.wallet.toBase58(),
+      mintCount: minterStatsDecoded.data.mintCount.toString(),
+    },
+  });
+};
+
+export const logMinterStatsPhase = (minterStatsDecoded: {
+  data: MinterStats;
+  pubkey: PublicKey;
+}) => {
+  console.log({
+    MinterStatsPhase: {
+      address: minterStatsDecoded.pubkey.toBase58(),
+      wallet: minterStatsDecoded.data.wallet.toBase58(),
+      mintCount: minterStatsDecoded.data.mintCount.toString(),
+    },
+  });
 };

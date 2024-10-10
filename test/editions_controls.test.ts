@@ -21,8 +21,11 @@ import {
   getCluster,
   getEditions,
   getEditionsControls,
+  getMinterStats,
   logEditions,
   logEditionsControls,
+  logMinterStats,
+  logMinterStatsPhase,
   logTokenMetadata,
   parseMetadata,
 } from './utils';
@@ -33,6 +36,8 @@ import {
   TOKEN_GROUP_EXTENSION_PROGRAM_ID,
 } from '../constants';
 import { toBufferLE } from 'bigint-buffer';
+
+const VERBOSE_LOGGING = true;
 
 describe('Editions Controls Test Suite', () => {
   const provider = anchor.AnchorProvider.env();
@@ -89,8 +94,10 @@ describe('Editions Controls Test Suite', () => {
   };
 
   before(async () => {
-    const cluster = await getCluster(provider.connection);
-    console.log('Cluster:', cluster);
+    if (VERBOSE_LOGGING) {
+      const cluster = await getCluster(provider.connection);
+      console.log('Cluster:', cluster);
+    }
 
     editionsControlsProgram = anchor.workspace
       .LibreplexEditionsControls as Program<LibreplexEditionsControls>;
@@ -145,7 +152,10 @@ describe('Editions Controls Test Suite', () => {
       itemBaseName: 'Item T8 V4 #{}',
       cosignerProgramId: null,
     };
-    console.log('Collection config: ', collectionConfig);
+
+    if (VERBOSE_LOGGING) {
+      console.log('Collection config: ', collectionConfig);
+    }
 
     [editionsPda] = PublicKey.findProgramAddressSync(
       [
@@ -172,7 +182,6 @@ describe('Editions Controls Test Suite', () => {
       units: 800000,
     });
 
-    console.log('\nDeploying via initialiseEditionsControls...\n');
     try {
       const initialiseIx = await editionsControlsProgram.methods
         .initialiseEditionsControls({
@@ -210,36 +219,29 @@ describe('Editions Controls Test Suite', () => {
         .add(modifyComputeUnits)
         .add(initialiseIx);
 
-      const txSignature = await provider.sendAndConfirm(transaction, [
-        groupMint,
-        group,
-        payer,
-      ]);
+      await provider.sendAndConfirm(transaction, [groupMint, group, payer]);
 
-      console.log('\nTransaction signature:', txSignature, '\n');
-      console.log('\ninitialiseEditionsControls done!\n');
-
-      console.log('\nFetching and displaying deployed collection state...\n');
+      // Fetch updated state
       const editionsDecoded = await getEditions(
         provider.connection,
         editionsPda,
         editionsProgram
       );
-      logEditions(editionsDecoded);
-
-      // Fetch and check the EditionsControls account
       const editionsControlsDecoded = await getEditionsControls(
         provider.connection,
         editionsControlsPda,
         editionsControlsProgram
       );
-      logEditionsControls(editionsControlsDecoded);
-
       const metadata = await getTokenMetadata(
         provider.connection,
         groupMint.publicKey
       );
-      logTokenMetadata(metadata);
+
+      if (VERBOSE_LOGGING) {
+        logEditions(editionsDecoded);
+        logEditionsControls(editionsControlsDecoded);
+        logTokenMetadata(metadata);
+      }
 
       // Verify Editions deployment
       expect(editionsDecoded.data.symbol).to.equal(collectionConfig.symbol);
@@ -315,10 +317,7 @@ describe('Editions Controls Test Suite', () => {
       .instruction();
 
     const transaction = new Transaction().add(phaseIx);
-    const txSignature = await provider.sendAndConfirm(transaction, [payer]);
-
-    console.log('\nTransaction signature:', txSignature, '\n');
-    console.log('\naddPhase done!\n');
+    await provider.sendAndConfirm(transaction, [payer]);
 
     // get state
     const editionsDecoded = await getEditions(
@@ -326,20 +325,15 @@ describe('Editions Controls Test Suite', () => {
       editionsPda,
       editionsProgram
     );
-    logEditions(editionsDecoded);
-
     const editionsControlsDecoded = await getEditionsControls(
       provider.connection,
       editionsControlsPda,
       editionsControlsProgram
     );
-    logEditionsControls(editionsControlsDecoded);
-
-    const metadata = await getTokenMetadata(
-      provider.connection,
-      groupMint.publicKey
-    );
-    logTokenMetadata(metadata);
+    if (VERBOSE_LOGGING) {
+      logEditions(editionsDecoded);
+      logEditionsControls(editionsControlsDecoded);
+    }
 
     // verify state
     expect(editionsControlsDecoded.data.phases.length).to.equal(1);
@@ -351,9 +345,8 @@ describe('Editions Controls Test Suite', () => {
     ).to.equal(phaseConfig.maxMintsTotal.toString());
   });
 
-  // ADD PHASE WITH ALLOWLIST
+  // Generate allowlist variables
   before(async () => {
-    console.log('Creating minters...');
     minter1 = Keypair.fromSecretKey(
       new Uint8Array([
         110, 76, 59, 154, 201, 225, 246, 121, 152, 90, 45, 211, 52, 244, 216,
@@ -363,7 +356,6 @@ describe('Editions Controls Test Suite', () => {
         221, 120, 54,
       ])
     );
-    console.log('minter1: ', minter1.publicKey.toBase58());
     minter2 = Keypair.fromSecretKey(
       new Uint8Array([
         16, 27, 49, 140, 228, 142, 201, 93, 199, 209, 62, 136, 151, 212, 238,
@@ -373,9 +365,6 @@ describe('Editions Controls Test Suite', () => {
         135, 6,
       ])
     );
-    console.log('minter2: ', minter2.publicKey.toBase58());
-
-    console.log('Creating allowlist...');
     allowListConfig = {
       merkleRoot: Buffer.from([
         125, 184, 194, 116, 52, 36, 65, 219, 171, 135, 154, 27, 188, 122, 207,
@@ -409,7 +398,6 @@ describe('Editions Controls Test Suite', () => {
         },
       ],
     };
-    console.log('Allowlist created');
   });
 
   it('Should add a phase with allowlist', async () => {
@@ -437,31 +425,22 @@ describe('Editions Controls Test Suite', () => {
       .instruction();
 
     const transaction = new Transaction().add(phaseIx);
-    const txSignature = await provider.sendAndConfirm(transaction, [payer]);
+    await provider.sendAndConfirm(transaction, [payer]);
 
-    console.log('\nTransaction signature:', txSignature, '\n');
-    console.log('\naddPhase done!\n');
-
-    // get state
     const editionsDecoded = await getEditions(
       provider.connection,
       editionsPda,
       editionsProgram
     );
-    logEditions(editionsDecoded);
-
     const editionsControlsDecoded = await getEditionsControls(
       provider.connection,
       editionsControlsPda,
       editionsControlsProgram
     );
-    logEditionsControls(editionsControlsDecoded);
-
-    const metadata = await getTokenMetadata(
-      provider.connection,
-      groupMint.publicKey
-    );
-    logTokenMetadata(metadata);
+    if (VERBOSE_LOGGING) {
+      logEditions(editionsDecoded);
+      logEditionsControls(editionsControlsDecoded);
+    }
 
     // verify state
     expect(editionsControlsDecoded.data.phases.length).to.equal(2);
@@ -473,33 +452,33 @@ describe('Editions Controls Test Suite', () => {
     ).to.equal(phaseConfig.maxMintsTotal.toString());
   });
 
-  // mint on first allow list
-  it('Should mint on first phase without allowlist', async () => {
+  before(async () => {
     // Airdrop SOL to minter1
     const airdropSignature = await provider.connection.requestAirdrop(
       minter1.publicKey,
-      10 * LAMPORTS_PER_SOL
+      1 * LAMPORTS_PER_SOL
     );
     await provider.connection.confirmTransaction(airdropSignature);
 
     // Airdrop SOL to treasury
     const treasuryAirdropSignature = await provider.connection.requestAirdrop(
       collectionConfig.treasury,
-      10 * LAMPORTS_PER_SOL
+      1 * LAMPORTS_PER_SOL
     );
     await provider.connection.confirmTransaction(treasuryAirdropSignature);
 
-    let minterBalance = await provider.connection.getBalance(minter1.publicKey);
-    console.log('minterBalance: ', minterBalance / LAMPORTS_PER_SOL);
-
-    let payerBalance = await provider.connection.getBalance(payer.publicKey);
-    console.log('payerBalance: ', payerBalance / LAMPORTS_PER_SOL);
-
-    let treasuryBalance = await provider.connection.getBalance(
-      collectionConfig.treasury
+    // Airdrop SOL to platformFeeRecipient
+    const platformFeeRecipientAirdropSignature =
+      await provider.connection.requestAirdrop(
+        platformFeeAdmin.publicKey,
+        1 * LAMPORTS_PER_SOL
+      );
+    await provider.connection.confirmTransaction(
+      platformFeeRecipientAirdropSignature
     );
-    console.log('treasuryBalance: ', treasuryBalance / LAMPORTS_PER_SOL);
+  });
 
+  it('Should mint on first phase without allowlist', async () => {
     const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({
       units: 850000,
     });
@@ -508,7 +487,7 @@ describe('Editions Controls Test Suite', () => {
       phaseIndex: 0,
       merkleProof: null,
       allowListPrice: null,
-      allowListMint: null,
+      allowListMaxClaims: null,
     };
 
     const mint = Keypair.generate();
@@ -585,17 +564,26 @@ describe('Editions Controls Test Suite', () => {
     const rawTransaction = transaction.serialize();
 
     try {
-      const txSignature = await provider.connection.sendRawTransaction(
+      const signature = await provider.connection.sendRawTransaction(
         rawTransaction,
         {
           skipPreflight: false,
           preflightCommitment: 'confirmed',
         }
       );
-      console.log('\nTransaction signature:', txSignature, '\n');
+      await provider.connection.confirmTransaction(signature);
+
       console.log('\nmintWithControls done!\n');
     } catch (error) {
-      console.error('Error in mintWithControls:', error);
+      if (error.logs) {
+        console.error('Full error logs:');
+        error.logs.forEach((log, index) => {
+          console.error(`${index + 1}: ${log}`);
+        });
+      } else {
+        console.error(error);
+      }
+
       throw error;
     }
 
@@ -605,18 +593,40 @@ describe('Editions Controls Test Suite', () => {
       editionsPda,
       editionsProgram
     );
-    logEditions(editionsDecoded);
-
     const editionsControlsDecoded = await getEditionsControls(
       provider.connection,
       editionsControlsPda,
       editionsControlsProgram
     );
-    logEditionsControls(editionsControlsDecoded);
+    const minterStatsDecoded = await getMinterStats(
+      provider.connection,
+      minterStats,
+      editionsControlsProgram
+    );
+    const minterStatsPhaseDecoded = await getMinterStats(
+      provider.connection,
+      minterStatsPhase,
+      editionsControlsProgram
+    );
+    if (VERBOSE_LOGGING) {
+      logEditions(editionsDecoded);
+      logEditionsControls(editionsControlsDecoded);
+      logMinterStats(minterStatsDecoded);
+      logMinterStatsPhase(minterStatsPhaseDecoded);
+    }
 
     // verify state
     expect(
       editionsControlsDecoded.data.phases[0].currentMints.toString()
     ).to.equal(new anchor.BN(1).toString());
+    expect(editionsDecoded.data.numberOfTokensIssued.toString()).to.equal(
+      new anchor.BN(1).toString()
+    );
+    expect(minterStatsDecoded.data.mintCount.toString()).to.equal(
+      new anchor.BN(1).toString()
+    );
+    expect(minterStatsPhaseDecoded.data.mintCount.toString()).to.equal(
+      new anchor.BN(1).toString()
+    );
   });
 });
