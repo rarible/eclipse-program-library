@@ -137,7 +137,7 @@ pub fn mint<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> Result<()
         true => editions_deployment.item_base_uri.format(&[editions_deployment.number_of_tokens_issued + 1]),
         false => editions_deployment.item_base_uri.clone()
     };
-    // msg!("Create token 2022 w/ metadata");
+
     create_token_2022_and_metadata(
         MintAccounts2022 {
             authority: editions_deployment.to_account_info(),

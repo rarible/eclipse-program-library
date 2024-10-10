@@ -11,15 +11,10 @@ import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   getAssociatedTokenAddressSync,
   TOKEN_2022_PROGRAM_ID,
+  getTokenMetadata,
 } from '@solana/spl-token';
-import {
-  LibreplexEditionsControls,
-  IDL as EditionsControlsIDL,
-} from '../../eclipse-program-library/target/types/libreplex_editions_controls';
-import {
-  LibreplexEditions,
-  IDL as EditionsIDL,
-} from '../../eclipse-program-library/target/types/libreplex_editions';
+import { LibreplexEditionsControls } from '../../eclipse-program-library/target/types/libreplex_editions_controls';
+import { LibreplexEditions } from '../../eclipse-program-library/target/types/libreplex_editions';
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
 import {
@@ -28,7 +23,8 @@ import {
   getEditionsControls,
   logEditions,
   logEditionsControls,
-  createErrorHandler,
+  logTokenMetadata,
+  parseMetadata,
 } from './utils';
 import { Transaction } from '@solana/web3.js';
 import {
@@ -41,8 +37,6 @@ import { toBufferLE } from 'bigint-buffer';
 describe('Editions Controls Test Suite', () => {
   const provider = anchor.AnchorProvider.env();
   anchor.setProvider(provider);
-
-  const handleError = createErrorHandler(EditionsIDL, EditionsControlsIDL);
 
   let editionsControlsProgram: Program<LibreplexEditionsControls>;
   let editionsProgram: Program<LibreplexEditions>;
@@ -241,6 +235,12 @@ describe('Editions Controls Test Suite', () => {
       );
       logEditionsControls(editionsControlsDecoded);
 
+      const metadata = await getTokenMetadata(
+        provider.connection,
+        groupMint.publicKey
+      );
+      logTokenMetadata(metadata);
+
       // Verify Editions deployment
       expect(editionsDecoded.data.symbol).to.equal(collectionConfig.symbol);
       expect(editionsDecoded.data.creator.toBase58()).to.equal(
@@ -248,12 +248,6 @@ describe('Editions Controls Test Suite', () => {
       );
       expect(editionsDecoded.data.maxNumberOfTokens.toString()).to.equal(
         collectionConfig.maxNumberOfTokens.toString()
-      );
-      expect(editionsDecoded.data.collectionName).to.equal(
-        collectionConfig.collectionName
-      );
-      expect(editionsDecoded.data.collectionUri).to.equal(
-        collectionConfig.collectionUri
       );
       expect(editionsDecoded.data.itemBaseName).to.equal(
         collectionConfig.itemBaseName
@@ -276,6 +270,17 @@ describe('Editions Controls Test Suite', () => {
         Number(collectionConfig.maxMintsPerWallet)
       );
       expect(editionsControlsDecoded.data.phases.length).to.equal(0);
+
+      // Verify metadata
+      const parsedMetadata = parseMetadata(metadata.additionalMetadata);
+      expect(metadata.name).to.equal(collectionConfig.collectionName);
+      expect(metadata.uri).to.equal(collectionConfig.collectionUri);
+      expect(metadata.mint.toBase58()).to.equal(groupMint.publicKey.toBase58());
+      // Verify that every key in extraMeta is present in metadata.additionalMetadata
+      collectionConfig.extraMeta.forEach((meta) => {
+        expect(parsedMetadata).to.have.property(meta.field);
+        expect(parsedMetadata[meta.field]).to.equal(meta.value);
+      });
 
       // Add more assertions as needed
     } catch (error) {
@@ -329,6 +334,12 @@ describe('Editions Controls Test Suite', () => {
       editionsControlsProgram
     );
     logEditionsControls(editionsControlsDecoded);
+
+    const metadata = await getTokenMetadata(
+      provider.connection,
+      groupMint.publicKey
+    );
+    logTokenMetadata(metadata);
 
     // verify state
     expect(editionsControlsDecoded.data.phases.length).to.equal(1);
@@ -445,6 +456,12 @@ describe('Editions Controls Test Suite', () => {
       editionsControlsProgram
     );
     logEditionsControls(editionsControlsDecoded);
+
+    const metadata = await getTokenMetadata(
+      provider.connection,
+      groupMint.publicKey
+    );
+    logTokenMetadata(metadata);
 
     // verify state
     expect(editionsControlsDecoded.data.phases.length).to.equal(2);
@@ -578,7 +595,6 @@ describe('Editions Controls Test Suite', () => {
       console.log('\nTransaction signature:', txSignature, '\n');
       console.log('\nmintWithControls done!\n');
     } catch (error) {
-      handleError(error);
       console.error('Error in mintWithControls:', error);
       throw error;
     }

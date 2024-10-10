@@ -36,12 +36,6 @@ pub struct EditionsDeployment {
     pub symbol: String,
 
     #[max_len(NAME_LIMIT)]
-    pub collection_name: String,
-
-    #[max_len(URI_LIMIT)]
-    pub collection_uri: String,
-
-    #[max_len(NAME_LIMIT)]
     pub item_base_name: String,
 
     #[max_len(URI_LIMIT)]

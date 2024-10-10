@@ -1,15 +1,15 @@
-import {
-  Connection,
-  clusterApiUrl,
-  PublicKey,
-  LAMPORTS_PER_SOL,
-} from '@solana/web3.js';
+import { Connection, PublicKey } from '@solana/web3.js';
 import { LibreplexEditions } from '../target/types/libreplex_editions';
-import { Idl, IdlAccounts, IdlTypes, AnchorError } from '@coral-xyz/anchor';
+import { IdlAccounts } from '@coral-xyz/anchor';
 import { BorshCoder, Program } from '@coral-xyz/anchor';
 import { LibreplexEditionsControls } from '../target/types/libreplex_editions_controls';
+import { TokenMetadata } from '@solana/spl-token-metadata';
+
 export type EditionsDeployment =
   IdlAccounts<LibreplexEditions>['editionsDeployment'];
+
+export type EditionsControls =
+  IdlAccounts<LibreplexEditionsControls>['editionsControls'];
 
 export async function getCluster(connection: Connection): Promise<string> {
   // Get the genesis hash
@@ -29,9 +29,6 @@ export async function getCluster(connection: Connection): Promise<string> {
   }
 }
 
-export type EditionsControls =
-  IdlAccounts<LibreplexEditionsControls>['editionsControls'];
-
 export const getBase64FromDatabytes = (dataBytes: Buffer, dataType: string) => {
   console.log({ dataBytes });
   const base = dataBytes.toString('base64');
@@ -44,20 +41,6 @@ export const decodeEditions =
     const coder = new BorshCoder(program.idl);
     const data = buffer
       ? coder.accounts.decode<EditionsDeployment>('editionsDeployment', buffer)
-      : null;
-
-    return {
-      data,
-      pubkey,
-    };
-  };
-
-export const decodeEditionsControls =
-  (program: Program<LibreplexEditionsControls>) =>
-  (buffer: Buffer | undefined, pubkey: PublicKey) => {
-    const coder = new BorshCoder(program.idl);
-    const data = buffer
-      ? coder.accounts.decode<EditionsControls>('editionsControls', buffer)
       : null;
 
     return {
@@ -82,6 +65,42 @@ export const getEditions = async (
   return editionsDecoded;
 };
 
+export const logEditions = (editionsDecoded: {
+  data: EditionsDeployment;
+  pubkey: PublicKey;
+}) => {
+  console.log({
+    Editions: {
+      symbol: editionsDecoded.data.symbol,
+      creator: editionsDecoded.data.creator.toBase58(),
+      groupMint: editionsDecoded.data.groupMint.toBase58(),
+      maxNumberOfTokens: editionsDecoded.data.maxNumberOfTokens.toString(),
+      cosignerProgramId: editionsDecoded.data.cosignerProgramId
+        ? editionsDecoded.data.cosignerProgramId.toBase58()
+        : null,
+      tokensMinted: editionsDecoded.data.numberOfTokensIssued.toString(),
+      itemBaseName: editionsDecoded.data.itemBaseName,
+      itemBaseUri: editionsDecoded.data.itemBaseUri,
+      itemNameIsTemplate: editionsDecoded.data.itemNameIsTemplate,
+      itemUriIsTemplate: editionsDecoded.data.itemUriIsTemplate,
+    },
+  });
+};
+
+export const decodeEditionsControls =
+  (program: Program<LibreplexEditionsControls>) =>
+  (buffer: Buffer | undefined, pubkey: PublicKey) => {
+    const coder = new BorshCoder(program.idl);
+    const data = buffer
+      ? coder.accounts.decode<EditionsControls>('editionsControls', buffer)
+      : null;
+
+    return {
+      data,
+      pubkey,
+    };
+  };
+
 export const getEditionsControls = async (
   connection: Connection,
   editionsControlsPda: PublicKey,
@@ -99,30 +118,6 @@ export const getEditionsControls = async (
     editionsControlsProgram
   )(editionsControlsAccountInfo.data, editionsControlsPda);
   return editionsControlsDecoded;
-};
-
-export const logEditions = (editionsDecoded: {
-  data: EditionsDeployment;
-  pubkey: PublicKey;
-}) => {
-  console.log({
-    Editions: {
-      symbol: editionsDecoded.data.symbol,
-      creator: editionsDecoded.data.creator.toBase58(),
-      groupMint: editionsDecoded.data.groupMint.toBase58(),
-      maxNumberOfTokens: editionsDecoded.data.maxNumberOfTokens.toString(),
-      cosignerProgramId: editionsDecoded.data.cosignerProgramId
-        ? editionsDecoded.data.cosignerProgramId.toBase58()
-        : null,
-      collectionName: editionsDecoded.data.collectionName,
-      collectionUri: editionsDecoded.data.collectionUri,
-      tokensMinted: editionsDecoded.data.numberOfTokensIssued.toString(),
-      itemBaseName: editionsDecoded.data.itemBaseName,
-      itemBaseUri: editionsDecoded.data.itemBaseUri,
-      itemNameIsTemplate: editionsDecoded.data.itemNameIsTemplate,
-      itemUriIsTemplate: editionsDecoded.data.itemUriIsTemplate,
-    },
-  });
 };
 
 export const logEditionsControls = (editionsControlsDecoded: {
@@ -152,55 +147,25 @@ export const logEditionsControls = (editionsControlsDecoded: {
   });
 };
 
-export async function ensureAccountHasSol(
-  connection: Connection,
-  account: PublicKey,
-  minBalance: number
-) {
-  let balance = await connection.getBalance(account);
-  console.log(
-    `Initial balance of ${account.toBase58()}: ${
-      balance / LAMPORTS_PER_SOL
-    } SOL`
-  );
+export const logTokenMetadata = (metadata: TokenMetadata) => {
+  console.log({
+    TokenMetadata: {
+      name: metadata.name,
+      symbol: metadata.symbol,
+      uri: metadata.uri,
+      updateAuthority: metadata.updateAuthority.toBase58(),
+      mint: metadata.mint.toBase58(),
+      additionalMetadata: parseMetadata(metadata.additionalMetadata),
+    },
+  });
+};
 
-  if (balance < minBalance) {
-    const airdropAmount = minBalance - balance;
-    const signature = await connection.requestAirdrop(account, airdropAmount);
-    await connection.confirmTransaction(signature, 'confirmed');
-    balance = await connection.getBalance(account);
-    console.log(`New balance after airdrop: ${balance / LAMPORTS_PER_SOL} SOL`);
+export const parseMetadata = (
+  rawMetadata: (readonly [string, string])[]
+): Record<string, string> => {
+  const metadata: Record<string, string> = {};
+  for (const [key, value] of rawMetadata) {
+    metadata[key] = value;
   }
-}
-
-export function createErrorHandler(...idls: Idl[]) {
-  return function handleError(error: unknown): void {
-    console.error('Error occurred:', error);
-
-    if (error instanceof AnchorError) {
-      const errorCode = error.error.errorCode.number;
-      for (const idl of idls) {
-        const errorMessage = getErrorMessage(errorCode, idl);
-        if (errorMessage !== `Unknown error: ${errorCode}`) {
-          console.error('Error code:', errorCode);
-          console.error('Error message:', errorMessage);
-          console.error('Error name:', error.error.errorCode.code);
-          console.error('Program ID:', error.program.programId.toBase58());
-          return;
-        }
-      }
-      console.error(`Unknown error code: ${errorCode}`);
-    } else if (error instanceof Error) {
-      console.error('Error message:', error.message);
-      console.error('Stack trace:', error.stack);
-    } else {
-      console.error('Unexpected error:', error);
-    }
-  }
-}
-
-function getErrorMessage(code: number, idl: Idl): string {
-  const idlErrors = idl.errors ?? [];
-  const error = idlErrors.find((e) => e.code === code);
-  return error ? error.msg : `Unknown error: ${code}`;
-}
+  return metadata;
+};

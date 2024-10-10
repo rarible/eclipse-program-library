@@ -104,8 +104,6 @@ pub fn initialise(ctx: Context<InitialiseCtx>, input: InitialiseInput) -> Result
             _ => system_program::ID
         },
         symbol: input.symbol,
-        collection_name: input.collection_name,
-        collection_uri: input.collection_uri,
         item_base_name: input.item_base_name,
         item_base_uri: input.item_base_uri,
         item_name_is_template,
@@ -139,9 +137,9 @@ pub fn initialise(ctx: Context<InitialiseCtx>, input: InitialiseInput) -> Result
         },
         0,
         Some(TokenMetadata {
-            name: editions_deployment.collection_name.clone(),
+            name: input.collection_name.clone(),
             symbol: editions_deployment.symbol.clone(),
-            uri: editions_deployment.collection_uri.clone(),
+            uri: input.collection_uri.clone(),
             update_authority,
             mint: group_mint.key(),
             additional_metadata: vec![], // Leave this empty for now,
