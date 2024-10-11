@@ -53,6 +53,9 @@ pub enum EditionsControlsError {
     #[msg("Invalid phase index.")]
     InvalidPhaseIndex,
 
+    #[msg("Private phase but no merkle proof provided")]
+    PrivatePhaseNoProof,
+
     #[msg("Merkle root not set for allow list mint")]
     MerkleRootNotSet,
 

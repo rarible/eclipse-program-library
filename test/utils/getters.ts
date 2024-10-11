@@ -1,4 +1,3 @@
-import { TokenMetadata } from '@solana/spl-token-metadata';
 import { BorshCoder, Program } from '@coral-xyz/anchor';
 import { Connection, PublicKey } from '@solana/web3.js';
 import { LibreplexEditionsControls } from '../../target/types/libreplex_editions_controls';
@@ -121,6 +120,7 @@ export const logEditionsControls = (editionsControlsDecoded: {
       endTime: Number(item.endTime),
       priceAmount: Number(item.priceAmount),
       priceToken: item.priceToken ? item.priceToken.toBase58() : null,
+      isPrivate: item.isPrivate,
       merkleRoot: item.merkleRoot ? JSON.stringify(item.merkleRoot) : null,
     })),
   });

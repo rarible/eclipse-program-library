@@ -32,3 +32,14 @@ export interface AllowListConfig {
     proof: Buffer[];
   }[];
 }
+
+export interface PhaseConfig {
+  maxMintsPerWallet: anchor.BN;
+  maxMintsTotal: anchor.BN;
+  priceAmount: anchor.BN;
+  startTime: anchor.BN;
+  endTime: anchor.BN;
+  priceToken: PublicKey;
+  isPrivate: boolean;
+  merkleRoot: Buffer | null;
+}

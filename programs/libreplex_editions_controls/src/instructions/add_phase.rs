@@ -12,6 +12,7 @@ pub struct InitialisePhaseInput {
     pub max_mints_per_wallet: u64,
     pub max_mints_total: u64,
     pub end_time: i64, 
+    pub is_private: bool,
     pub merkle_root: Option<[u8; 32]>,
 }
 
@@ -58,6 +59,7 @@ pub fn add_phase(ctx: Context<AddPhaseCtx>, input: InitialisePhaseInput) -> Resu
         end_time: input.end_time,
         max_mints_total: input.max_mints_total,
         current_mints: 0,
+        is_private: input.is_private,
         merkle_root: input.merkle_root,
         padding: [0; 200],
     });

@@ -5,17 +5,8 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-libreplex_creator = "78deTr7qycJ6498vSd3pNMhdCKKWxMipniitVHQcM8RM"
-libreplex_creator_controls = "G9whLiLT9nSkxwWzWvbiKKrTL6yWxvzh2UXqNht5VXqV"
-libreplex_default_renderer = "7oHj4YFq4JhxVc1BvHqvZma5evSn8hkXwFHPoTQ1PB4f"
 libreplex_editions = "GHVmd43GebD2SSedqG1AAh76izf5CPAhz6KotkZyRzUD"
 libreplex_editions_controls = "CCWfNBFcrjbKSjKes9DqgiQYsnmCFgCVKx21mmV2xWgN"
-libreplex_inscriptions = "GAc6iGWe4D8ZDT3xqJXysn3wfARrpz9eLUC1jquvd3Q1"
-libreplex_legacy_inscribers = "Leg1xVbrpq5gY6mprak3Ud4q4mBwcJi5C9ZruYjWv7n"
-libreplex_metadata = "LibrQsXf9V1DmTtJLkEghoaF1kjJcAzWiEGoJn8mz7p"
-libreplex_monoswap_deprecated = "6taGmaEfZx27c25Pk5BwJbDCNNsirVranzWYAeNEhvHi"
-libreplex_nft = "3oR36M1JQ9LHM1xykKTHDvhuYVM5mDAqRmq989zc1Pzi"
-libreplex_shop = "ListjawGEdhxuAErSyYwcTEGWQswFoi6FScnGG1RKSB"
 
 [registry]
 url = "https://api.apr.dev"

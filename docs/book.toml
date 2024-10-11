@@ -1,9 +1,0 @@
-[book]
-authors = ["FallingHazard"]
-language = "en"
-multilingual = false
-src = "src"
-title = "Libreplex Docs"
-
-[output.html]
-default-theme = "rust"

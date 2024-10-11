@@ -165,6 +165,7 @@ pub fn mint_with_controls(
     let mut price_amount = editions_controls.phases[mint_input.phase_index as usize].price_amount;
 
     // Determine if is a normal mint or an allow list mint and perform the appropriate constraints
+    // depending on if a merkle proof was provided
     if mint_input.merkle_proof.is_some() {
         msg!("program: executing allow list mint");
         // Check allow list constraints
@@ -179,7 +180,12 @@ pub fn mint_with_controls(
         msg!("program: allow list constraints passed");
         // Override the price amount with the allow list price
         price_amount = mint_input.allow_list_price.unwrap_or(0);
-    } 
+    } else {
+        // if the phase is private, and the merkle proof was not provided, throw error
+        if editions_controls.phases[mint_input.phase_index as usize].is_private {
+            return Err(EditionsControlsError::PrivatePhaseNoProof.into());
+        }
+    }
 
     // Update minter and phase states
     update_minter_and_phase_stats(
