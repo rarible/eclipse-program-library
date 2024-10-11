@@ -25,7 +25,7 @@ cluster = "Localnet"
 wallet = "~/.config/solana/id.json"
 
 [scripts]
-test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 test/**/*.ts"
+test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 test/tests/**/*.ts -- --verbose"
 
 [test]
 startup_wait = 100000
@@ -37,6 +37,7 @@ bind_address = "0.0.0.0"
 url = "https://api.devnet.solana.com"
 ledger = ".anchor/test-ledger"
 rpc_port = 8899
+logs = "all"
 
 [[test.validator.clone]]
 address = "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"

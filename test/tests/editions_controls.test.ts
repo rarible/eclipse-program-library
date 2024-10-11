@@ -1,0 +1,1013 @@
+import * as anchor from '@coral-xyz/anchor';
+import { Program } from '@coral-xyz/anchor';
+import {
+  PublicKey,
+  Keypair,
+  SystemProgram,
+  ComputeBudgetProgram,
+  LAMPORTS_PER_SOL,
+} from '@solana/web3.js';
+import {
+  ASSOCIATED_TOKEN_PROGRAM_ID,
+  getAssociatedTokenAddressSync,
+  TOKEN_2022_PROGRAM_ID,
+} from '@solana/spl-token';
+import { LibreplexEditionsControls } from '../../target/types/libreplex_editions_controls';
+import { LibreplexEditions } from '../../target/types/libreplex_editions';
+import { expect } from 'chai';
+import { describe, it } from 'mocha';
+import { getCluster } from '../utils/utils';
+import {
+  getEditions,
+  getEditionsControls,
+  getMinterStats,
+  getTokenMetadata,
+  logEditions,
+  logEditionsControls,
+  logMinterStats,
+  logMinterStatsPhase,
+  logTokenMetadata,
+} from '../utils/getters';
+import { Transaction } from '@solana/web3.js';
+// devnote: try to make tests don't rely on hard addresses but on dynamic runtime ids.
+import { TOKEN_GROUP_EXTENSION_PROGRAM_ID } from '../../constants';
+import {
+  getEditionsPda,
+  getEditionsControlsPda,
+  getHashlistPda,
+  getHashlistMarkerPda,
+  getMinterStatsPda,
+  getMinterStatsPhasePda,
+} from '../utils/pdas';
+import { CollectionConfig, AllowListConfig } from '../utils/types';
+
+const VERBOSE_LOGGING = false;
+
+describe('Editions Controls Test Suite', () => {
+  const provider = anchor.AnchorProvider.env();
+  anchor.setProvider(provider);
+
+  let editionsControlsProgram: Program<LibreplexEditionsControls>;
+  let editionsProgram: Program<LibreplexEditions>;
+
+  let editionsPda: PublicKey;
+  let editionsControlsPda: PublicKey;
+  let hashlistPda: PublicKey;
+
+  let payer: Keypair;
+  let creator1: Keypair;
+  let creator2: Keypair;
+  let treasury: Keypair;
+  let platformFeeAdmin: Keypair;
+  let groupMint: Keypair;
+  let group: Keypair;
+
+  let minter1: Keypair;
+  let minter2: Keypair;
+
+  let collectionConfig: CollectionConfig;
+  let allowListConfig: AllowListConfig;
+
+  // Generate dynamic keypairs and collection config
+  before(async () => {
+    if (VERBOSE_LOGGING) {
+      const cluster = await getCluster(provider.connection);
+      console.log('Cluster:', cluster);
+    }
+
+    editionsControlsProgram = anchor.workspace
+      .LibreplexEditionsControls as Program<LibreplexEditionsControls>;
+    editionsProgram = anchor.workspace
+      .LibreplexEditions as Program<LibreplexEditions>;
+
+    payer = (provider.wallet as anchor.Wallet).payer;
+    creator1 = Keypair.generate();
+    creator2 = Keypair.generate();
+    treasury = Keypair.generate();
+    platformFeeAdmin = Keypair.generate();
+    groupMint = Keypair.generate();
+    group = Keypair.generate();
+
+    collectionConfig = {
+      maxNumberOfTokens: new anchor.BN(1150),
+      symbol: 'COOLX55',
+      collectionName: 'Collection name with meta, platform fee and royalties',
+      collectionUri: 'ipfs://QmbsXNSkPUtYNmKfYw1mUSVuz9QU8nhu7YvzM1aAQsv6xw/0',
+      treasury: treasury.publicKey,
+      maxMintsPerWallet: new anchor.BN(100),
+      royalties: {
+        royaltyBasisPoints: new anchor.BN(1000),
+        creators: [
+          {
+            address: creator1.publicKey,
+            share: 50,
+          },
+          {
+            address: creator2.publicKey,
+            share: 50,
+          },
+        ],
+      },
+      platformFee: {
+        platformFeeValue: new anchor.BN(500000),
+        recipients: [
+          {
+            address: platformFeeAdmin.publicKey,
+            share: 100,
+          },
+        ],
+        isFeeFlat: true,
+      },
+      extraMeta: [
+        { field: 'field1', value: 'value1' },
+        { field: 'field2', value: 'value2' },
+        { field: 'field3', value: 'value3' },
+        { field: 'field4', value: 'value4' },
+      ],
+      itemBaseUri: 'ipfs://QmbsXNSkPUtYNmKfYw1mUSVuz9QU8nhu7YvzM1aAQsv6xw/{}',
+      itemBaseName: 'Item T8 V4 #{}',
+      cosignerProgramId: null,
+    };
+    if (VERBOSE_LOGGING) {
+      console.log('Collection config: ', collectionConfig);
+    }
+
+    editionsPda = getEditionsPda(
+      collectionConfig.symbol,
+      editionsProgram.programId
+    );
+    editionsControlsPda = getEditionsControlsPda(
+      editionsPda,
+      editionsControlsProgram.programId
+    );
+    hashlistPda = getHashlistPda(editionsPda, editionsProgram.programId);
+  });
+
+  // Generate allowlist variables
+  before(async () => {
+    minter1 = Keypair.fromSecretKey(
+      new Uint8Array([
+        110, 76, 59, 154, 201, 225, 246, 121, 152, 90, 45, 211, 52, 244, 216,
+        108, 118, 248, 113, 239, 61, 248, 207, 122, 98, 26, 184, 92, 51, 97, 52,
+        218, 104, 164, 83, 51, 23, 177, 193, 29, 252, 241, 86, 132, 173, 155,
+        114, 131, 130, 73, 27, 101, 233, 95, 12, 45, 107, 255, 120, 26, 121,
+        221, 120, 54,
+      ])
+    );
+    minter2 = Keypair.fromSecretKey(
+      new Uint8Array([
+        16, 27, 49, 140, 228, 142, 201, 93, 199, 209, 62, 136, 151, 212, 238,
+        114, 46, 204, 155, 132, 26, 227, 44, 245, 239, 29, 195, 63, 77, 162, 28,
+        220, 186, 39, 133, 92, 39, 241, 42, 161, 180, 15, 92, 18, 15, 101, 248,
+        80, 238, 254, 220, 231, 1, 14, 231, 145, 170, 49, 163, 111, 239, 112,
+        135, 6,
+      ])
+    );
+    allowListConfig = {
+      merkleRoot: Buffer.from([
+        125, 184, 194, 116, 52, 36, 65, 219, 171, 135, 154, 27, 188, 122, 207,
+        204, 111, 70, 66, 115, 161, 228, 44, 84, 67, 97, 29, 70, 253, 69, 11,
+        245,
+      ]),
+      list: [
+        {
+          address: minter1.publicKey,
+          price: new anchor.BN(500000), // 0.005 SOL
+          max_claims: new anchor.BN(3),
+          proof: [
+            Buffer.from([
+              64, 131, 242, 169, 206, 112, 155, 119, 81, 214, 17, 137, 174, 140,
+              208, 220, 141, 177, 213, 131, 127, 104, 181, 15, 121, 228, 87, 25,
+              232, 172, 235, 168,
+            ]),
+          ],
+        },
+        {
+          address: minter2.publicKey,
+          price: new anchor.BN(500000), // 0.005 SOL
+          max_claims: new anchor.BN(3),
+          proof: [
+            Buffer.from([
+              86, 37, 15, 136, 192, 159, 125, 244, 163, 213, 251, 242, 217, 215,
+              159, 249, 93, 166, 82, 38, 187, 58, 199, 64, 161, 50, 122, 122,
+              17, 125, 63, 188,
+            ]),
+          ],
+        },
+      ],
+    };
+  });
+
+  // Perform needed airdrops to minter1, treasury and platformFeeRecipient
+  before(async () => {
+    // Airdrop SOL to minter1
+    const airdropSignature = await provider.connection.requestAirdrop(
+      minter1.publicKey,
+      1 * LAMPORTS_PER_SOL
+    );
+    await provider.connection.confirmTransaction(airdropSignature);
+
+    // Airdrop SOL to minter2
+    const minter2AirdropSignature = await provider.connection.requestAirdrop(
+      minter2.publicKey,
+      10 * LAMPORTS_PER_SOL
+    );
+    await provider.connection.confirmTransaction(minter2AirdropSignature);
+
+    // Airdrop SOL to treasury
+    const treasuryAirdropSignature = await provider.connection.requestAirdrop(
+      collectionConfig.treasury,
+      1 * LAMPORTS_PER_SOL
+    );
+    await provider.connection.confirmTransaction(treasuryAirdropSignature);
+
+    // Airdrop SOL to platformFeeRecipient
+    const platformFeeRecipientAirdropSignature =
+      await provider.connection.requestAirdrop(
+        platformFeeAdmin.publicKey,
+        1 * LAMPORTS_PER_SOL
+      );
+    await provider.connection.confirmTransaction(
+      platformFeeRecipientAirdropSignature
+    );
+  });
+
+  describe('Deploying', () => {
+    it('Should deploy a collection', async () => {
+      // Modify compute units for the transaction
+      const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({
+        units: 800000,
+      });
+
+      try {
+        const initialiseIx = await editionsControlsProgram.methods
+          .initialiseEditionsControls({
+            maxMintsPerWallet: collectionConfig.maxMintsPerWallet,
+            treasury: collectionConfig.treasury,
+            maxNumberOfTokens: collectionConfig.maxNumberOfTokens,
+            symbol: collectionConfig.symbol,
+            collectionName: collectionConfig.collectionName,
+            collectionUri: collectionConfig.collectionUri,
+            cosignerProgramId: collectionConfig.cosignerProgramId,
+            royalties: collectionConfig.royalties,
+            platformFee: collectionConfig.platformFee,
+            extraMeta: collectionConfig.extraMeta,
+            itemBaseUri: collectionConfig.itemBaseUri,
+            itemBaseName: collectionConfig.itemBaseName,
+          })
+          .accountsStrict({
+            editionsControls: editionsControlsPda,
+            editionsDeployment: editionsPda,
+            hashlist: hashlistPda,
+            payer: payer.publicKey,
+            creator: payer.publicKey,
+            groupMint: groupMint.publicKey,
+            group: group.publicKey,
+            systemProgram: SystemProgram.programId,
+            tokenProgram: TOKEN_2022_PROGRAM_ID,
+            libreplexEditionsProgram: editionsProgram.programId,
+            groupExtensionProgram: new PublicKey(
+              '5hx15GaPPqsYA61v6QpcGPpo125v7rfvEfZQ4dJErG5V'
+            ),
+          })
+          .instruction();
+
+        const transaction = new Transaction()
+          .add(modifyComputeUnits)
+          .add(initialiseIx);
+
+        await provider.sendAndConfirm(transaction, [groupMint, group, payer]);
+
+        // Fetch updated state
+        const editionsDecoded = await getEditions(
+          provider.connection,
+          editionsPda,
+          editionsProgram
+        );
+        const editionsControlsDecoded = await getEditionsControls(
+          provider.connection,
+          editionsControlsPda,
+          editionsControlsProgram
+        );
+        const metadata = await getTokenMetadata(
+          provider.connection,
+          groupMint.publicKey
+        );
+        if (VERBOSE_LOGGING) {
+          logEditions(editionsDecoded);
+          logEditionsControls(editionsControlsDecoded);
+          logTokenMetadata(metadata);
+        }
+
+        // Verify Editions deployment
+        expect(editionsDecoded.data.symbol).to.equal(collectionConfig.symbol);
+        expect(editionsDecoded.data.creator.toBase58()).to.equal(
+          editionsControlsPda.toBase58()
+        );
+        expect(editionsDecoded.data.maxNumberOfTokens.toString()).to.equal(
+          collectionConfig.maxNumberOfTokens.toString()
+        );
+        expect(editionsDecoded.data.itemBaseName).to.equal(
+          collectionConfig.itemBaseName
+        );
+        expect(editionsDecoded.data.itemBaseUri).to.equal(
+          collectionConfig.itemBaseUri
+        );
+
+        // Verify EditionsControls deployment
+        expect(
+          editionsControlsDecoded.data.editionsDeployment.toBase58()
+        ).to.equal(editionsPda.toBase58());
+        expect(editionsControlsDecoded.data.creator.toBase58()).to.equal(
+          payer.publicKey.toBase58()
+        );
+        expect(editionsControlsDecoded.data.treasury.toBase58()).to.equal(
+          collectionConfig.treasury.toBase58()
+        );
+        expect(Number(editionsControlsDecoded.data.maxMintsPerWallet)).to.equal(
+          Number(collectionConfig.maxMintsPerWallet)
+        );
+        expect(editionsControlsDecoded.data.phases.length).to.equal(0);
+
+        // Verify metadata
+        expect(metadata.name).to.equal(collectionConfig.collectionName);
+        expect(metadata.uri).to.equal(collectionConfig.collectionUri);
+        expect(metadata.mint.toBase58()).to.equal(
+          groupMint.publicKey.toBase58()
+        );
+        // Verify that every key in extraMeta is present in metadata.additionalMetadata
+        collectionConfig.extraMeta.forEach((meta) => {
+          expect(metadata.additionalMetadata).to.have.property(meta.field);
+          expect(metadata.additionalMetadata[meta.field]).to.equal(meta.value);
+        });
+
+        // Add more assertions as needed
+      } catch (error) {
+        console.error('Error in initialiseEditionsControls:', error);
+        throw error;
+      }
+    });
+  });
+
+  describe('Adding phases', () => {
+    it('Should add a phase without allowlist', async () => {
+      const phaseConfig = {
+        maxMintsPerWallet: new anchor.BN(100),
+        maxMintsTotal: new anchor.BN(1000),
+        priceAmount: new anchor.BN(10000000), // 0.01 SOL
+        startTime: new anchor.BN(new Date().getTime() / 1000),
+        endTime: new anchor.BN(new Date().getTime() / 1000 + 60 * 60 * 24), // 1 day from now
+        priceToken: new PublicKey(
+          'So11111111111111111111111111111111111111112'
+        ),
+        merkleRoot: null,
+      };
+
+      const phaseIx = await editionsControlsProgram.methods
+        .addPhase(phaseConfig)
+        .accountsStrict({
+          editionsControls: editionsControlsPda,
+          creator: payer.publicKey,
+          payer: payer.publicKey,
+          systemProgram: SystemProgram.programId,
+          tokenProgram: TOKEN_2022_PROGRAM_ID,
+          libreplexEditionsProgram: editionsProgram.programId,
+        })
+        .signers([])
+        .instruction();
+
+      const transaction = new Transaction().add(phaseIx);
+      await provider.sendAndConfirm(transaction, [payer]);
+
+      // get state
+      const editionsControlsDecoded = await getEditionsControls(
+        provider.connection,
+        editionsControlsPda,
+        editionsControlsProgram
+      );
+      if (VERBOSE_LOGGING) {
+        logEditionsControls(editionsControlsDecoded);
+      }
+
+      // verify state
+      expect(editionsControlsDecoded.data.phases.length).to.equal(1);
+      expect(
+        editionsControlsDecoded.data.phases[0].maxMintsPerWallet.toString()
+      ).to.equal(phaseConfig.maxMintsPerWallet.toString());
+      expect(
+        editionsControlsDecoded.data.phases[0].maxMintsTotal.toString()
+      ).to.equal(phaseConfig.maxMintsTotal.toString());
+    });
+
+    it('Should add a phase with allowlist', async () => {
+      const phaseConfig = {
+        maxMintsPerWallet: new anchor.BN(100),
+        maxMintsTotal: new anchor.BN(1000),
+        priceAmount: new anchor.BN(10000000), // 0.01 SOL
+        startTime: new anchor.BN(new Date().getTime() / 1000),
+        endTime: new anchor.BN(new Date().getTime() / 1000 + 60 * 60 * 24), // 1 day from now
+        priceToken: new PublicKey(
+          'So11111111111111111111111111111111111111112'
+        ),
+        merkleRoot: allowListConfig.merkleRoot,
+      };
+      const phaseIx = await editionsControlsProgram.methods
+        .addPhase(phaseConfig)
+        .accountsStrict({
+          editionsControls: editionsControlsPda,
+          creator: payer.publicKey,
+          payer: payer.publicKey,
+          systemProgram: SystemProgram.programId,
+          tokenProgram: TOKEN_2022_PROGRAM_ID,
+          libreplexEditionsProgram: editionsProgram.programId,
+        })
+        .signers([])
+        .instruction();
+
+      const transaction = new Transaction().add(phaseIx);
+      await provider.sendAndConfirm(transaction, [payer]);
+
+      const editionsControlsDecoded = await getEditionsControls(
+        provider.connection,
+        editionsControlsPda,
+        editionsControlsProgram
+      );
+      if (VERBOSE_LOGGING) {
+        logEditionsControls(editionsControlsDecoded);
+      }
+
+      // verify state
+      expect(editionsControlsDecoded.data.phases.length).to.equal(2);
+      expect(
+        editionsControlsDecoded.data.phases[1].maxMintsPerWallet.toString()
+      ).to.equal(phaseConfig.maxMintsPerWallet.toString());
+      expect(
+        editionsControlsDecoded.data.phases[1].maxMintsTotal.toString()
+      ).to.equal(phaseConfig.maxMintsTotal.toString());
+    });
+  });
+
+  describe('Minting', () => {
+    describe('Minting without allowlist', () => {
+      it('Should mint on first phase without allowlist', async () => {
+        const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({
+          units: 850000,
+        });
+
+        const mintConfig = {
+          phaseIndex: 0,
+          merkleProof: null,
+          allowListPrice: null,
+          allowListMaxClaims: null,
+        };
+
+        const mint = Keypair.generate();
+        const member = Keypair.generate();
+
+        const tokenAccount = getAssociatedTokenAddressSync(
+          mint.publicKey,
+          minter1.publicKey,
+          false,
+          TOKEN_2022_PROGRAM_ID
+        );
+        const hashlistMarker = getHashlistMarkerPda(
+          editionsPda,
+          mint.publicKey,
+          editionsProgram.programId
+        );
+        const minterStats = getMinterStatsPda(
+          editionsPda,
+          minter1.publicKey,
+          editionsControlsProgram.programId
+        );
+        const minterStatsPhase = getMinterStatsPhasePda(
+          editionsPda,
+          minter1.publicKey,
+          0,
+          editionsControlsProgram.programId
+        );
+
+        const mintIx = await editionsControlsProgram.methods
+          .mintWithControls(mintConfig)
+          .accountsStrict({
+            editionsDeployment: editionsPda,
+            editionsControls: editionsControlsPda,
+            hashlist: hashlistPda,
+            hashlistMarker,
+            payer: minter1.publicKey,
+            mint: mint.publicKey,
+            member: member.publicKey,
+            signer: minter1.publicKey,
+            minter: minter1.publicKey,
+            minterStats,
+            minterStatsPhase,
+            group: group.publicKey,
+            groupMint: groupMint.publicKey,
+            platformFeeRecipient1: platformFeeAdmin.publicKey,
+            groupExtensionProgram: new PublicKey(
+              TOKEN_GROUP_EXTENSION_PROGRAM_ID
+            ),
+            tokenAccount,
+            treasury: collectionConfig.treasury,
+            systemProgram: SystemProgram.programId,
+            tokenProgram: TOKEN_2022_PROGRAM_ID,
+            libreplexEditionsProgram: editionsProgram.programId,
+            associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+          })
+          .instruction();
+
+        const transaction = new Transaction()
+          .add(modifyComputeUnits)
+          .add(mintIx);
+        transaction.recentBlockhash = (
+          await provider.connection.getLatestBlockhash()
+        ).blockhash;
+        transaction.feePayer = minter1.publicKey;
+        transaction.sign(minter1, mint, member);
+        const rawTransaction = transaction.serialize();
+
+        try {
+          const signature = await provider.connection.sendRawTransaction(
+            rawTransaction
+          );
+          await provider.connection.confirmTransaction(signature);
+        } catch (error) {
+          console.error('Error in mintWithControls:', error);
+          throw error;
+        }
+
+        // get state
+        const editionsDecoded = await getEditions(
+          provider.connection,
+          editionsPda,
+          editionsProgram
+        );
+        const editionsControlsDecoded = await getEditionsControls(
+          provider.connection,
+          editionsControlsPda,
+          editionsControlsProgram
+        );
+        const minterStatsDecoded = await getMinterStats(
+          provider.connection,
+          minterStats,
+          editionsControlsProgram
+        );
+        const minterStatsPhaseDecoded = await getMinterStats(
+          provider.connection,
+          minterStatsPhase,
+          editionsControlsProgram
+        );
+        if (VERBOSE_LOGGING) {
+          logEditions(editionsDecoded);
+          logEditionsControls(editionsControlsDecoded);
+          logMinterStats(minterStatsDecoded);
+          logMinterStatsPhase(minterStatsPhaseDecoded);
+        }
+
+        // verify collection state
+        expect(editionsDecoded.data.numberOfTokensIssued.toString()).to.equal(
+          new anchor.BN(1).toString()
+        );
+        expect(
+          editionsControlsDecoded.data.phases[0].currentMints.toString()
+        ).to.equal(new anchor.BN(1).toString());
+        // verify minter state
+        expect(minterStatsDecoded.data.mintCount.toString()).to.equal(
+          new anchor.BN(1).toString()
+        );
+        expect(minterStatsPhaseDecoded.data.mintCount.toString()).to.equal(
+          new anchor.BN(1).toString()
+        );
+      });
+    });
+
+    describe('Minting with allowlist', () => {
+      it('Should mint on second phase with allowlist', async () => {
+        const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({
+          units: 850000,
+        });
+
+        const mintConfig = {
+          phaseIndex: 1, // Use the second phase (index 1)
+          merkleProof: allowListConfig.list[0].proof, // Use the proof for minter1
+          allowListPrice: allowListConfig.list[0].price,
+          allowListMaxClaims: allowListConfig.list[0].max_claims,
+        };
+
+        const mint = Keypair.generate();
+        const member = Keypair.generate();
+
+        const tokenAccount = getAssociatedTokenAddressSync(
+          mint.publicKey,
+          minter1.publicKey,
+          false,
+          TOKEN_2022_PROGRAM_ID
+        );
+        const hashlistMarker = getHashlistMarkerPda(
+          editionsPda,
+          mint.publicKey,
+          editionsProgram.programId
+        );
+        const minterStats = getMinterStatsPda(
+          editionsPda,
+          minter1.publicKey,
+          editionsControlsProgram.programId
+        );
+        const minterStatsPhase = getMinterStatsPhasePda(
+          editionsPda,
+          minter1.publicKey,
+          1,
+          editionsControlsProgram.programId
+        );
+
+        const mintIx = await editionsControlsProgram.methods
+          .mintWithControls(mintConfig)
+          .accountsStrict({
+            editionsDeployment: editionsPda,
+            editionsControls: editionsControlsPda,
+            hashlist: hashlistPda,
+            hashlistMarker,
+            payer: minter1.publicKey,
+            mint: mint.publicKey,
+            member: member.publicKey,
+            signer: minter1.publicKey,
+            minter: minter1.publicKey,
+            minterStats,
+            minterStatsPhase,
+            group: group.publicKey,
+            groupMint: groupMint.publicKey,
+            platformFeeRecipient1: platformFeeAdmin.publicKey,
+            groupExtensionProgram: new PublicKey(
+              TOKEN_GROUP_EXTENSION_PROGRAM_ID
+            ),
+            tokenAccount,
+            treasury: collectionConfig.treasury,
+            systemProgram: SystemProgram.programId,
+            tokenProgram: TOKEN_2022_PROGRAM_ID,
+            libreplexEditionsProgram: editionsProgram.programId,
+            associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+          })
+          .instruction();
+
+        const transaction = new Transaction()
+          .add(modifyComputeUnits)
+          .add(mintIx);
+        transaction.recentBlockhash = (
+          await provider.connection.getLatestBlockhash()
+        ).blockhash;
+        transaction.feePayer = minter1.publicKey;
+        transaction.sign(minter1, mint, member);
+        const rawTransaction = transaction.serialize();
+
+        try {
+          const signature = await provider.connection.sendRawTransaction(
+            rawTransaction
+          );
+          // wait for transaction to be confirmed
+          await provider.connection.confirmTransaction(signature);
+
+          // Fetch updated state
+          const editionsDecoded = await getEditions(
+            provider.connection,
+            editionsPda,
+            editionsProgram
+          );
+          const editionsControlsDecoded = await getEditionsControls(
+            provider.connection,
+            editionsControlsPda,
+            editionsControlsProgram
+          );
+          const minterStatsDecoded = await getMinterStats(
+            provider.connection,
+            minterStats,
+            editionsControlsProgram
+          );
+          const minterStatsPhaseDecoded = await getMinterStats(
+            provider.connection,
+            minterStatsPhase,
+            editionsControlsProgram
+          );
+          if (VERBOSE_LOGGING) {
+            logEditions(editionsDecoded);
+            logEditionsControls(editionsControlsDecoded);
+            logMinterStats(minterStatsDecoded);
+            logMinterStatsPhase(minterStatsPhaseDecoded);
+          }
+
+          // Verify state
+          expect(
+            editionsControlsDecoded.data.phases[1].currentMints.toString()
+          ).to.equal('1');
+          expect(editionsDecoded.data.numberOfTokensIssued.toString()).to.equal(
+            '2'
+          );
+          expect(minterStatsDecoded.data.mintCount.toString()).to.equal('2');
+          expect(minterStatsPhaseDecoded.data.mintCount.toString()).to.equal(
+            '1'
+          );
+        } catch (error) {
+          console.error('Error in allowlist minting:', error);
+          if (error.logs) {
+            console.error('Full error logs:');
+            error.logs.forEach((log, index) => {
+              console.error(`${index + 1}: ${log}`);
+            });
+          }
+          throw error;
+        }
+      });
+
+      it('Should fail to mint with allowlist if proof is incorrect', async () => {
+        const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({
+          units: 850000,
+        });
+
+        // Use an incorrect proof (e.g., the proof for minter2 instead of minter1)
+        const incorrectMinterProof = allowListConfig.list[1].proof;
+
+        const mintConfig = {
+          phaseIndex: 1, // Use the second phase (index 1)
+          merkleProof: incorrectMinterProof,
+          allowListPrice: allowListConfig.list[0].price,
+          allowListMaxClaims: allowListConfig.list[0].max_claims,
+        };
+
+        const mint = Keypair.generate();
+        const member = Keypair.generate();
+
+        const tokenAccount = getAssociatedTokenAddressSync(
+          mint.publicKey,
+          minter1.publicKey,
+          false,
+          TOKEN_2022_PROGRAM_ID
+        );
+        const hashlistMarker = getHashlistMarkerPda(
+          editionsPda,
+          mint.publicKey,
+          editionsProgram.programId
+        );
+        const minterStats = getMinterStatsPda(
+          editionsPda,
+          minter1.publicKey,
+          editionsControlsProgram.programId
+        );
+        const minterStatsPhase = getMinterStatsPhasePda(
+          editionsPda,
+          minter1.publicKey,
+          1,
+          editionsControlsProgram.programId
+        );
+
+        const mintIx = await editionsControlsProgram.methods
+          .mintWithControls(mintConfig)
+          .accountsStrict({
+            editionsDeployment: editionsPda,
+            editionsControls: editionsControlsPda,
+            hashlist: hashlistPda,
+            hashlistMarker,
+            payer: minter1.publicKey,
+            mint: mint.publicKey,
+            member: member.publicKey,
+            signer: minter1.publicKey,
+            minter: minter1.publicKey,
+            minterStats,
+            minterStatsPhase,
+            group: group.publicKey,
+            groupMint: groupMint.publicKey,
+            platformFeeRecipient1: platformFeeAdmin.publicKey,
+            groupExtensionProgram: new PublicKey(
+              TOKEN_GROUP_EXTENSION_PROGRAM_ID
+            ),
+            tokenAccount,
+            treasury: collectionConfig.treasury,
+            systemProgram: SystemProgram.programId,
+            tokenProgram: TOKEN_2022_PROGRAM_ID,
+            libreplexEditionsProgram: editionsProgram.programId,
+            associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+          })
+          .instruction();
+
+        const transaction = new Transaction()
+          .add(modifyComputeUnits)
+          .add(mintIx);
+        transaction.recentBlockhash = (
+          await provider.connection.getLatestBlockhash()
+        ).blockhash;
+        transaction.feePayer = minter1.publicKey;
+        transaction.sign(minter1, mint, member);
+        const rawTransaction = transaction.serialize();
+
+        try {
+          const signature = await provider.connection.sendRawTransaction(
+            rawTransaction
+          );
+          // wait for transaction to be confirmed
+          await provider.connection.confirmTransaction(signature);
+        } catch (error) {
+          // We expect an error to be thrown
+          expect(JSON.stringify(error)).to.include('Invalid merkle proof.'); // Replace with the actual error code for invalid Merkle proof
+        }
+
+        // Verify that no mint actually occurred
+        const editionsDecoded = await getEditions(
+          provider.connection,
+          editionsPda,
+          editionsProgram
+        );
+        const editionsControlsDecoded = await getEditionsControls(
+          provider.connection,
+          editionsControlsPda,
+          editionsControlsProgram
+        );
+        const minterStatsDecoded = await getMinterStats(
+          provider.connection,
+          minterStats,
+          editionsControlsProgram
+        );
+        const minterStatsPhaseDecoded = await getMinterStats(
+          provider.connection,
+          minterStatsPhase,
+          editionsControlsProgram
+        );
+        if (VERBOSE_LOGGING) {
+          logEditions(editionsDecoded);
+          logEditionsControls(editionsControlsDecoded);
+          logMinterStats(minterStatsDecoded);
+          logMinterStatsPhase(minterStatsPhaseDecoded);
+        }
+
+        // Verify state
+        expect(
+          editionsControlsDecoded.data.phases[1].currentMints.toString()
+        ).to.equal('1'); // Should still be 1 from the previous successful mint
+      });
+
+      it('Should fail to mint with allowlist if allowlist max_claims is reached', async () => {
+        const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({
+          units: 850000,
+        });
+
+        const mintConfig = {
+          phaseIndex: 1,
+          merkleProof: allowListConfig.list[1].proof, // Use the proof for minter2
+          allowListPrice: allowListConfig.list[1].price,
+          allowListMaxClaims: allowListConfig.list[1].max_claims,
+        };
+
+        // Function to create and send a mint transaction
+        const createAndSendMintTransaction = async (): Promise<string> => {
+          const mint = Keypair.generate();
+          const member = Keypair.generate();
+
+          const tokenAccount = getAssociatedTokenAddressSync(
+            mint.publicKey,
+            minter2.publicKey,
+            false,
+            TOKEN_2022_PROGRAM_ID
+          );
+          const hashlistMarker = getHashlistMarkerPda(
+            editionsPda,
+            mint.publicKey,
+            editionsProgram.programId
+          );
+          const minterStats = getMinterStatsPda(
+            editionsPda,
+            minter2.publicKey,
+            editionsControlsProgram.programId
+          );
+          const minterStatsPhase = getMinterStatsPhasePda(
+            editionsPda,
+            minter2.publicKey,
+            1,
+            editionsControlsProgram.programId
+          );
+
+          const mintIx = await editionsControlsProgram.methods
+            .mintWithControls(mintConfig)
+            .accountsStrict({
+              editionsDeployment: editionsPda,
+              editionsControls: editionsControlsPda,
+              hashlist: hashlistPda,
+              hashlistMarker,
+              payer: minter2.publicKey,
+              mint: mint.publicKey,
+              member: member.publicKey,
+              signer: minter2.publicKey,
+              minter: minter2.publicKey,
+              minterStats,
+              minterStatsPhase,
+              group: group.publicKey,
+              groupMint: groupMint.publicKey,
+              platformFeeRecipient1: platformFeeAdmin.publicKey,
+              groupExtensionProgram: new PublicKey(
+                TOKEN_GROUP_EXTENSION_PROGRAM_ID
+              ),
+              tokenAccount,
+              treasury: collectionConfig.treasury,
+              systemProgram: SystemProgram.programId,
+              tokenProgram: TOKEN_2022_PROGRAM_ID,
+              libreplexEditionsProgram: editionsProgram.programId,
+              associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+            })
+            .instruction();
+
+          const transaction = new Transaction()
+            .add(modifyComputeUnits)
+            .add(mintIx);
+          transaction.recentBlockhash = (
+            await provider.connection.getLatestBlockhash()
+          ).blockhash;
+          transaction.feePayer = minter2.publicKey;
+          transaction.sign(minter2, mint, member);
+          const rawTransaction = transaction.serialize();
+
+          const signature = await provider.connection.sendRawTransaction(
+            rawTransaction
+          );
+          await provider.connection.confirmTransaction(signature);
+          return signature;
+        };
+
+        // Perform 3 successful mints
+        for (let i = 0; i < 3; i++) {
+          await createAndSendMintTransaction();
+        }
+
+        const minterStats = getMinterStatsPda(
+          editionsPda,
+          minter2.publicKey,
+          editionsControlsProgram.programId
+        );
+        const minterStatsPhase = getMinterStatsPhasePda(
+          editionsPda,
+          minter2.publicKey,
+          1,
+          editionsControlsProgram.programId
+        );
+
+        // Verify the state after the 3 mints
+        const editionsControlsDecoded = await getEditionsControls(
+          provider.connection,
+          editionsControlsPda,
+          editionsControlsProgram
+        );
+        const minterStatsDecoded = await getMinterStats(
+          provider.connection,
+          minterStats,
+          editionsControlsProgram
+        );
+        const minterStatsPhaseDecoded = await getMinterStats(
+          provider.connection,
+          minterStatsPhase,
+          editionsControlsProgram
+        );
+        if (VERBOSE_LOGGING) {
+          logEditionsControls(editionsControlsDecoded);
+          logMinterStats(minterStatsDecoded);
+          logMinterStatsPhase(minterStatsPhaseDecoded);
+        }
+
+        // verify state
+        expect(minterStatsDecoded.data.mintCount.toString()).to.equal('3');
+        expect(minterStatsPhaseDecoded.data.mintCount.toString()).to.equal('3');
+
+        // Attempt the 4th mint, which should fail
+        try {
+          const signature = await createAndSendMintTransaction();
+        } catch (error) {
+          expect(JSON.stringify(error)).to.include(
+            'This wallet has exceeded allow list max_claims in the current phase.'
+          );
+        }
+
+        // Verify the state hasn't changed after the failed mint
+        const finalEditionsControlsDecoded = await getEditionsControls(
+          provider.connection,
+          editionsControlsPda,
+          editionsControlsProgram
+        );
+        const finalMinterStatsDecoded = await getMinterStats(
+          provider.connection,
+          minterStats,
+          editionsControlsProgram
+        );
+        const finalMinterStatsPhaseDecoded = await getMinterStats(
+          provider.connection,
+          minterStatsPhase,
+          editionsControlsProgram
+        );
+        if (VERBOSE_LOGGING) {
+          logEditionsControls(finalEditionsControlsDecoded);
+          logMinterStats(finalMinterStatsDecoded);
+          logMinterStatsPhase(finalMinterStatsPhaseDecoded);
+        }
+
+        // User mints should still be 3
+        expect(finalMinterStatsDecoded.data.mintCount.toString()).to.equal('3');
+        expect(finalMinterStatsPhaseDecoded.data.mintCount.toString()).to.equal(
+          '3'
+        );
+      });
+    });
+  });
+});

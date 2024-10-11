@@ -144,6 +144,7 @@ pub fn mint_with_controls(
     ctx: Context<MintWithControlsCtx>,
     mint_input: MintInput,
 ) -> Result<()> {
+    msg!("program: executing mint with controls");
     let editions_controls = &mut ctx.accounts.editions_controls;
     let minter_stats = &mut ctx.accounts.minter_stats;
     let minter_stats_phase = &mut ctx.accounts.minter_stats_phase;
@@ -158,13 +159,14 @@ pub fn mint_with_controls(
         minter_stats,
         minter_stats_phase,
         editions_controls,
-    );
+    )?;
 
     // Get the default/standard price amount for the phase
     let mut price_amount = editions_controls.phases[mint_input.phase_index as usize].price_amount;
 
     // Determine if is a normal mint or an allow list mint and perform the appropriate constraints
     if mint_input.merkle_proof.is_some() {
+        msg!("program: executing allow list mint");
         // Check allow list constraints
         check_allow_list_constraints(
             &editions_controls.phases[mint_input.phase_index as usize],
@@ -173,7 +175,8 @@ pub fn mint_with_controls(
             mint_input.merkle_proof,
             mint_input.allow_list_price,
             mint_input.allow_list_max_claims,
-        );
+        )?;
+        msg!("program: allow list constraints passed");
         // Override the price amount with the allow list price
         price_amount = mint_input.allow_list_price.unwrap_or(0);
     } 
@@ -278,7 +281,6 @@ fn process_platform_fees(
 
         let recipient_account = &ctx.accounts.platform_fee_recipient_1;
 
-        msg!("check recipients {}: {} vs {}", i, recipient_account.key(), recipient_struct.address.key());
         // Ensure that the account matches the expected recipient
         if recipient_account.key() != recipient_struct.address.key() {
             return Err(EditionsControlsError::RecipientMismatch.into());
