@@ -1,4 +1,4 @@
-import { Connection } from '@solana/web3.js';
+import { Connection, Keypair, Transaction } from '@solana/web3.js';
 
 export async function getCluster(connection: Connection): Promise<string> {
   // Get the genesis hash
@@ -16,4 +16,20 @@ export async function getCluster(connection: Connection): Promise<string> {
       // If it doesn't match any known cluster, it's likely localhost
       return 'localhost';
   }
+}
+
+
+export async function estimateTransactionFee(connection: Connection, transaction: Transaction, signers: Keypair[]): Promise<number> {
+  const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash();
+  transaction.recentBlockhash = blockhash;
+  transaction.sign(...signers);
+
+  const message = transaction.compileMessage();
+  const fees = await connection.getFeeForMessage(message);
+
+  if (fees === null) {
+    throw new Error('Failed to estimate fee');
+  }
+
+  return fees.value;
 }
