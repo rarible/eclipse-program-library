@@ -5,15 +5,15 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-libreplex_editions = "GHVmd43GebD2SSedqG1AAh76izf5CPAhz6KotkZyRzUD"
-libreplex_editions_controls = "CCWfNBFcrjbKSjKes9DqgiQYsnmCFgCVKx21mmV2xWgN"
+libreplex_editions = "587DoLBH2H39i5bToWBc6zRgbD2iJZtc4Kb8nYsskYTq"
+libreplex_editions_controls = "5hEa5j38yNJRM9vQA44Q6gXVj4Db8y3mWxkDtQeofKKs"
 
 [registry]
 url = "https://api.apr.dev"
 
 [provider]
 cluster = "Localnet"
-wallet = "~/.config/solana/id.json"
+wallet = "usb://ledger"
 
 [scripts]
 test = "yarn run ts-mocha -p ./tsconfig.json --timeout 1000000 test/tests/**/*.ts -- --verbose"

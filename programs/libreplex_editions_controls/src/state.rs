@@ -51,7 +51,7 @@ impl Phase {
 }
 
 pub const DEFAULT_PLATFORM_FEE_PRIMARY_ADMIN: &str = "674s1Sap3KVnr8WGrY5KGQ69oTYjjgr1disKJo6GpTYw";
-pub const DEFAULT_PLATFORM_FEE_SECONDARY_ADMIN: &str = "QjzRL6VwKGnpco8wx3cPjtq8ZPhewy7ohq7F5mv2eeR";
+pub const DEFAULT_PLATFORM_FEE_SECONDARY_ADMIN: &str = "9qGioKcyuh1mwXS8MbmMgdtQuBcVS6MBRtvQUas5rMGz";
 
 #[account]
 pub struct MinterStats {
