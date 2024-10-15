@@ -63,7 +63,6 @@ export const getMinterStatsPhasePda = (
   phaseIndex: number,
   editionsControlsProgramId: PublicKey
 ) => {
-  // console.log({minter: minter.toBase58(), phaseIndex})
   return PublicKey.findProgramAddressSync(
     [
       Buffer.from('minter_stats_phase'),
