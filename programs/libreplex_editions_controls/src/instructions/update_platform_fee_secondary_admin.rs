@@ -1,16 +1,12 @@
 use anchor_lang::prelude::*;
 use libreplex_editions::program::LibreplexEditions;
 use libreplex_shared::wrapped_sol;
-
-
 use crate::{EditionsControls, Phase};
-
 
 #[derive(AnchorDeserialize, AnchorSerialize, Clone)]
 pub struct UpdatePlatformFeeSecondaryAdminInput {
     pub new_admin: Pubkey,
 }
-
 
 #[derive(Accounts)]
 #[instruction(input: UpdatePlatformFeeSecondaryAdminInput)]

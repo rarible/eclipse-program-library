@@ -32,7 +32,6 @@ pub fn update_platform_fee(ctx: Context<UpdatePlatformFeeCtx>, platform_fee_inpu
     let platform_fee_value = platform_fee_input.platform_fee_value;
     let is_fee_flat = platform_fee_input.is_fee_flat;
 
-    msg!("libreplex_editions::cpi::modify_platform_ffe start");
     let editions_controls = &mut ctx.accounts.editions_controls;
 
     // Initialize an array of 5 PlatformFeeRecipient with default values
@@ -59,7 +58,6 @@ pub fn update_platform_fee(ctx: Context<UpdatePlatformFeeCtx>, platform_fee_inpu
         },
     ];
 
-    msg!("libreplex_editions_controls:: update editions_controls");
     // Populate the array with provided recipients
     for (i, recipient) in platform_fee_input.recipients.iter().enumerate() {
         recipients_array[i] = recipient.clone();
@@ -67,8 +65,6 @@ pub fn update_platform_fee(ctx: Context<UpdatePlatformFeeCtx>, platform_fee_inpu
     editions_controls.platform_fee_value = platform_fee_value;
     editions_controls.is_fee_flat = is_fee_flat;
     editions_controls.platform_fee_recipients = recipients_array;
-
-    msg!("libreplex_editions::cpi::modify_platform_fee done");
 
     Ok(())
 }

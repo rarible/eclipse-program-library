@@ -58,7 +58,7 @@ pub fn update_royalties(ctx: Context<UpdateRoyaltiesCtx>, royalties_input: Updat
         editions_deployment_key.as_ref(),
         &[ctx.bumps.editions_controls],
     ];
-    msg!("libreplex_editions::cpi::modify_royalties start");
+
     libreplex_editions::cpi::modify_royalties(
         CpiContext::new_with_signer(
             libreplex_editions_program.to_account_info(),
@@ -72,6 +72,6 @@ pub fn update_royalties(ctx: Context<UpdateRoyaltiesCtx>, royalties_input: Updat
             },
             &[seeds]
         ), royalties_input)?;
-    msg!("libreplex_editions::cpi::modify_royalties done");
+
     Ok(())
 }

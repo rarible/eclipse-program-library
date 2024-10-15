@@ -1,43 +1,50 @@
-use anchor_lang::accounts::account::Account;
-
-use anchor_lang::prelude::*;
-
-use crate::{EditionsControls, MinterStats, Phase};
+use anchor_lang::{
+    accounts::account::Account,
+    prelude::*,
+};
+use crate::{
+    EditionsControls,MinterStats,Phase,
+    errors::EditionsControlsError,
+};
 
 pub fn check_phase_constraints(
     phase: &Phase,
     minter_stats: &mut Account<MinterStats>,
     minter_stats_phase: &mut Account<MinterStats>,
     editions_controls: &Account<EditionsControls>,
-) {
-    // check
+) -> Result<()> {
     let clock = Clock::get().unwrap();
     let current_time = clock.unix_timestamp;
 
     if !phase.active {
-        panic!("Phase not active")
+        return Err(EditionsControlsError::PhaseNotActive.into());
     }
 
-    msg!("{} {}", phase.start_time, current_time);
     if phase.start_time > current_time {
-        panic!("Phase not yet started")
+        return Err(EditionsControlsError::PhaseNotStarted.into());
     }
 
     if phase.end_time <= current_time {
-        panic!("Phase already finished")
+        return Err(EditionsControlsError::PhaseAlreadyFinished.into());
     }
 
-    if phase.max_mints_per_wallet > 0 && minter_stats_phase.mint_count >= phase.max_mints_per_wallet {
-        panic!("This wallet has exceeded max mints in the current phase")
-    }
-
+    /// Checks if the total mints for the phase has been exceeded (phase sold out)
+    /// @dev dev: notice that if max_mints_total is 0, this constraint is disabled
     if phase.max_mints_total > 0 && phase.current_mints >= phase.max_mints_total {
-        panic!("Total mints exceeded in this phase")
+        return Err(EditionsControlsError::ExceededMaxMintsForPhase.into());
     }
 
+    /// Checks if the user has exceeded the max mints for the deployment (across all phases!)
+    /// dev: notice that if max_mints_per_wallet is 0, this constraint is disabled
     if editions_controls.max_mints_per_wallet > 0 && minter_stats.mint_count >= editions_controls.max_mints_per_wallet {
-        panic!("This wallet has exceeded max mints for the deployment")
+        return Err(EditionsControlsError::ExceededWalletMaxMintsForCollection.into());
     }
 
-    
+    /// Checks if the user has exceeded the max mints for the current phase
+    /// dev: notice that if max_mints_per_wallet is 0, this constraint is disabled
+    if phase.max_mints_per_wallet > 0 && minter_stats_phase.mint_count >= phase.max_mints_per_wallet {
+        return Err(EditionsControlsError::ExceededWalletMaxMintsForPhase.into());
+    }
+
+    Ok(())
 }

@@ -85,7 +85,6 @@ pub struct MintCtx<'info> {
 
     #[account()]
     pub system_program: Program<'info, System>,
-
 }
 
 pub fn mint<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> Result<()> {
@@ -120,7 +119,6 @@ pub fn mint<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> Result<()
         return Err(EditionsError::MintedOut.into());
     }
 
-
     let update_authority =
         OptionalNonZeroPubkey::try_from(Some(editions_deployment.key())).expect("Bad update auth");
 
@@ -130,16 +128,16 @@ pub fn mint<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> Result<()
         &[ctx.bumps.editions_deployment],
     ];
 
-    let name = match editions_deployment.name_is_template {
-        true => editions_deployment.name.format(&[editions_deployment.number_of_tokens_issued + 1]),
-        false => editions_deployment.name.clone()
+    let item_name = match editions_deployment.item_name_is_template {
+        true => editions_deployment.item_base_name.format(&[editions_deployment.number_of_tokens_issued + 1]),
+        false => editions_deployment.item_base_name.clone()
     };
 
-    let url = match editions_deployment.url_is_template {
-        true => editions_deployment.offchain_url.format(&[editions_deployment.number_of_tokens_issued + 1]),
-        false => editions_deployment.offchain_url.clone()
+    let item_url = match editions_deployment.item_uri_is_template {
+        true => editions_deployment.item_base_uri.format(&[editions_deployment.number_of_tokens_issued + 1]),
+        false => editions_deployment.item_base_uri.clone()
     };
-    // msg!("Create token 2022 w/ metadata");
+
     create_token_2022_and_metadata(
         MintAccounts2022 {
             authority: editions_deployment.to_account_info(),
@@ -150,9 +148,9 @@ pub fn mint<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> Result<()
         },
         0,
         Some(TokenMetadata {
-            name,
+            name: item_name,
             symbol: editions_deployment.symbol.clone(),
-            uri: url,
+            uri: item_url,
             update_authority,
             mint: mint.key(),
             additional_metadata: vec![],
@@ -167,7 +165,6 @@ pub fn mint<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> Result<()
         Some(group_extension_program.key()),
     )?;
 
-    // msg!("Minting 2022");
     mint_non_fungible_2022_logic(
         &mint.to_account_info(),
         minter_token_account,
@@ -191,10 +188,8 @@ pub fn mint<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> Result<()
     )?;
 
     // Retrieve metadata from the group mint
-    msg!("Mint: get meta start");
     let meta = get_mint_metadata(&mut group_mint.to_account_info())?;
     let additional_meta = meta.additional_metadata;
-    msg!("Mint: get meta end: meta len {}", additional_meta.len());
 
     // Process each additional metadata key-value pair, excluding platform fee metadata
     for additional_metadatum in additional_meta {
@@ -222,12 +217,11 @@ pub fn mint<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> Result<()
     }
 
     // Transfer minimum rent to the mint account
-    msg!("Mint: transfer minimum rent to mint account");
     update_account_lamports_to_minimum_balance(
         ctx.accounts.mint.to_account_info(),
         ctx.accounts.payer.to_account_info(),
         ctx.accounts.system_program.to_account_info(),
     )?;
-    msg!("Mint: done");
+    
     Ok(())
 }

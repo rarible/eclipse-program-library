@@ -3,7 +3,7 @@ use libreplex_editions::{cpi::accounts::InitialiseCtx, group_extension_program, 
 use libreplex_editions::cpi::accounts::AddMetadata;
 use libreplex_editions::cpi::accounts::AddRoyalties;
 use crate::{EditionsControls, PlatformFeeRecipient, UpdatePlatformFeeArgs, DEFAULT_PLATFORM_FEE_PRIMARY_ADMIN, DEFAULT_PLATFORM_FEE_SECONDARY_ADMIN};
-use crate::errors::EditionsError;
+use crate::errors::EditionsControlsError;
 
 #[derive(AnchorDeserialize, AnchorSerialize, Clone)]
 pub struct InitialiseControlInput {
@@ -11,13 +11,13 @@ pub struct InitialiseControlInput {
     pub treasury: Pubkey,
     pub max_number_of_tokens: u64,
     pub symbol: String,
-    pub name: String,
-    pub offchain_url: String,
+    pub collection_name: String,
+    pub collection_uri: String,
     pub cosigner_program_id: Option<Pubkey>,
     pub royalties: UpdateRoyaltiesArgs,
     pub extra_meta: Vec<AddMetadataArgs>,
     pub item_base_uri: String,
-    pub item_name: String,
+    pub item_base_name: String,
     pub platform_fee: UpdatePlatformFeeArgs
 }
 
@@ -75,7 +75,6 @@ pub fn initialise_editions_controls(
 ) -> Result<()> {
     let libreplex_editions_program = &ctx.accounts.libreplex_editions_program;
     let editions_controls = &mut ctx.accounts.editions_controls;
-
     let editions_deployment = &ctx.accounts.editions_deployment;
     let hashlist = &ctx.accounts.hashlist;
     let payer = &ctx.accounts.payer;
@@ -89,10 +88,10 @@ pub fn initialise_editions_controls(
     let core_input = InitialiseInput {
         max_number_of_tokens: input.max_number_of_tokens,
         symbol: input.symbol,
-        name: input.name,
-        offchain_url: input.offchain_url,
+        collection_name: input.collection_name,
+        collection_uri: input.collection_uri,
         creator_cosign_program_id: Some(crate::ID),
-        item_name: input.item_name,
+        item_base_name: input.item_base_name,
         item_base_uri: input.item_base_uri
     };
 
@@ -118,13 +117,13 @@ pub fn initialise_editions_controls(
     // Validate that platform_fee has up to 5 recipients
     let provided_recipients = input.platform_fee.recipients.len();
     if provided_recipients > 5 {
-        return Err(EditionsError::TooManyRecipients.into());
+        return Err(EditionsControlsError::TooManyRecipients.into());
     }
 
     // Ensure that the sum of shares equals 100
     let total_shares: u8 = input.platform_fee.recipients.iter().map(|r| r.share).sum();
     if total_shares != 100 {
-        return Err(EditionsError::InvalidFeeShares.into());
+        return Err(EditionsControlsError::InvalidFeeShares.into());
     }
 
     // Initialize an array of 5 PlatformFeeRecipient with default values
@@ -161,15 +160,15 @@ pub fn initialise_editions_controls(
         editions_deployment: editions_deployment.key(),
         creator: creator.key(),
         max_mints_per_wallet: input.max_mints_per_wallet,
-        padding: [0; 200],
         cosigner_program_id: input.cosigner_program_id.unwrap_or(system_program::ID),
-        phases: vec![],
         treasury: input.treasury,
         platform_fee_value: input.platform_fee.platform_fee_value,
         is_fee_flat: input.platform_fee.is_fee_flat,
         platform_fee_recipients: recipients_array.clone(),
         platform_fee_primary_admin: DEFAULT_PLATFORM_FEE_PRIMARY_ADMIN.parse().unwrap(),
         platform_fee_secondary_admin: DEFAULT_PLATFORM_FEE_SECONDARY_ADMIN.parse().unwrap(),
+        phases: vec![],
+        padding: [0; 200],
     });
 
     let editions_deployment_key = editions_deployment.key();

@@ -1,4 +1,4 @@
-use crate::{group_extension_program, utils::update_account_lamports_to_minimum_balance, EditionsDeployment, Hashlist, NAME_LIMIT, OFFCHAIN_URL_LIMIT, SYMBOL_LIMIT};
+use crate::{group_extension_program, utils::update_account_lamports_to_minimum_balance, EditionsDeployment, Hashlist, NAME_LIMIT, URI_LIMIT, SYMBOL_LIMIT};
 use anchor_lang::prelude::*;
 use libreplex_shared::{create_token_2022_and_metadata, MintAccounts2022, TokenGroupInput};
 use solana_program::system_program;
@@ -7,21 +7,20 @@ use spl_token_metadata_interface::state::TokenMetadata;
 
 #[derive(AnchorDeserialize, AnchorSerialize, Clone)]
 pub struct InitialiseInput {
-    pub max_number_of_tokens: u64, // this is the max *number* of tokens
     pub symbol: String,
-    // add curlies if you want this to be created dynamically. For example
-    // hippo #{} -> turns into hippo #0, hippo #1, etc
-    // without curlies the url is the same for all mints 
-    pub name: String,
+    pub collection_name: String,
+    pub collection_uri: String,
+    pub max_number_of_tokens: u64, // this is the max *number* of tokens
+    pub creator_cosign_program_id: Option<Pubkey>,
     // add curlies if you want this to be created dynamically. For example
     // ipfs://pippo/{} -> turns into ipfs://pippo/1, ipfs://pippo/2, etc
     // without curlies the url is the same for all mints 
-    pub offchain_url: String,
-    pub creator_cosign_program_id: Option<Pubkey>,
-    pub item_base_uri: String,
-    pub item_name: String,
+    pub item_base_uri: String, 
+    // add curlies if you want this to be created dynamically. For example
+    // hippo #{} -> turns into hippo #0, hippo #1, etc
+    // without curlies the url is the same for all mints 
+    pub item_base_name: String,
 }
-
 
 #[derive(Accounts)]
 #[instruction(input: InitialiseInput)]
@@ -61,24 +60,22 @@ pub struct InitialiseCtx<'info> {
     pub group_extension_program: AccountInfo<'info>,
 }
 
-
 pub fn initialise(ctx: Context<InitialiseCtx>, input: InitialiseInput) -> Result<()> {
-    if input.offchain_url.len() > OFFCHAIN_URL_LIMIT {
-        panic!("Offchain url too long");
-    }
     if input.symbol.len() > SYMBOL_LIMIT {
         panic!("Symbol too long");
     }
-    if input.name.len() > NAME_LIMIT {
+    if input.collection_name.len() > NAME_LIMIT {
         panic!("Name too long");
+    }
+    if input.collection_uri.len() > URI_LIMIT {
+        panic!("Offchain url too long");
     }
 
     let group_mint = &ctx.accounts.group_mint;
 
     let group = &ctx.accounts.group;
 
-
-    let url_is_template = match input.item_base_uri.matches("{}").count() {
+    let item_uri_is_template = match input.item_base_uri.matches("{}").count() {
         0 => false,
         1 => true,
         _ => {
@@ -86,15 +83,13 @@ pub fn initialise(ctx: Context<InitialiseCtx>, input: InitialiseInput) -> Result
         }
     };
 
-
-    let name_is_template = match input.item_name.matches("{}").count() {
+    let item_name_is_template = match input.item_base_name.matches("{}").count() {
         0 => false,
         1 => true,
         _ => {
             panic!("Only one set of curlies ({{}}) can be specified. name had multiple");
         }
     };
-
 
     ctx.accounts.editions_deployment.set_inner(EditionsDeployment {
         creator: ctx.accounts.creator.key(),
@@ -107,13 +102,12 @@ pub fn initialise(ctx: Context<InitialiseCtx>, input: InitialiseInput) -> Result
             _ => system_program::ID
         },
         symbol: input.symbol,
-        name: input.item_name,
-        url_is_template,
-        name_is_template,
-        offchain_url: input.item_base_uri,
+        item_base_name: input.item_base_name,
+        item_base_uri: input.item_base_uri,
+        item_name_is_template,
+        item_uri_is_template,
         padding: [0; 98],
     });
-
 
     let editions_deployment = &ctx.accounts.editions_deployment;
     let payer = &ctx.accounts.payer;
@@ -130,7 +124,6 @@ pub fn initialise(ctx: Context<InitialiseCtx>, input: InitialiseInput) -> Result
         &[ctx.bumps.editions_deployment],
     ];
 
-    // msg!("Create token 2022 w/ metadata");
     create_token_2022_and_metadata(
         MintAccounts2022 {
             authority: editions_deployment.to_account_info(),
@@ -141,9 +134,9 @@ pub fn initialise(ctx: Context<InitialiseCtx>, input: InitialiseInput) -> Result
         },
         0,
         Some(TokenMetadata {
-            name: input.name.clone(),
+            name: input.collection_name.clone(),
             symbol: editions_deployment.symbol.clone(),
-            uri: input.offchain_url.clone(),
+            uri: input.collection_uri.clone(),
             update_authority,
             mint: group_mint.key(),
             additional_metadata: vec![], // Leave this empty for now,

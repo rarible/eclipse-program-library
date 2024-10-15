@@ -1,6 +1,8 @@
 **/target/*
 !**/target/types
 
+.cursorrules
+
 local-scripts
 
 .anchor

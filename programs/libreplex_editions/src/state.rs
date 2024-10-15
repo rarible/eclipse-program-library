@@ -1,9 +1,9 @@
 use anchor_lang::prelude::*;
 use solana_program::pubkey::Pubkey;
 
-pub const NAME_LIMIT: usize = 400;
 pub const SYMBOL_LIMIT: usize = 100;
-pub const OFFCHAIN_URL_LIMIT: usize = 1200;
+pub const NAME_LIMIT: usize = 400;
+pub const URI_LIMIT: usize = 1200;
 pub const META_LIST_ACCOUNT_SEED: &[u8] = b"extra-account-metas";
 pub const APPROVE_ACCOUNT_SEED: &[u8] = b"approve-account";
 pub const ROYALTY_BASIS_POINTS_FIELD: &str = "royalty_basis_points";
@@ -22,6 +22,7 @@ pub struct EditionsDeployment {
     pub creator: Pubkey,
     // set to 0 for unlimited
     pub max_number_of_tokens: u64,
+
     pub number_of_tokens_issued: u64,
 
     // set to system account for no cosign
@@ -35,19 +36,17 @@ pub struct EditionsDeployment {
     pub symbol: String,
 
     #[max_len(NAME_LIMIT)]
-    pub name: String,
+    pub item_base_name: String,
 
-    #[max_len(OFFCHAIN_URL_LIMIT)]
-    pub offchain_url: String, // pub padding: Vec<u8, EXCESS>
-   
-    pub name_is_template: bool,
+    #[max_len(URI_LIMIT)]
+    pub item_base_uri: String,
 
-    pub url_is_template: bool,
+    pub item_name_is_template: bool,
+
+    pub item_uri_is_template: bool,
     
     pub padding: [u8; 98]
-
 }
-
 
 // slightly more extended 
 #[account]

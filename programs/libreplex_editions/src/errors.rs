@@ -8,7 +8,6 @@ pub enum EditionsError {
     #[msg("Mint template too long")]
     MintTemplateTooLong,
 
-
     #[msg("Deployment template too long")]
     DeploymentTemplateTooLong,
 
