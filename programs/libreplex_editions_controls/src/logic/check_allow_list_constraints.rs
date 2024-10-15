@@ -9,7 +9,6 @@ use crate::{
     errors::{EditionsControlsError},
 };
 
-
 /// We need to discern between leaf and intermediate nodes to prevent trivial second
 /// pre-image attacks.
 /// https://flawed.net.nz/2018/02/21/attacking-merkle-trees-with-a-second-preimage-attack
@@ -28,14 +27,9 @@ pub fn check_allow_list_constraints(
             if let (Some(phase_list_price), Some(phase_max_claims)) = (allow_list_price, allow_list_max_claims) {
                 /// 1. check constraints
                 /// dev: notice that if phase_max_claims is 0, this constraint is disabled
-                msg!("check_allow_list_constraints: phase_max_claims: {}", phase_max_claims);
-                msg!("check_allow_list_constraints: mint_count: {}", minter_stats_phase.mint_count);
-
                 if phase_max_claims > 0 && minter_stats_phase.mint_count >= phase_max_claims {
                     return Err(EditionsControlsError::ExceededAllowListMaxClaims.into());
                 }
-
-                msg!("check_allow_list_constraints: passed phase_max_claims");
 
                 /// 2. construct leaf 
                 let leaf = hashv(&[

@@ -22,7 +22,6 @@ pub struct InitialiseInput {
     pub item_base_name: String,
 }
 
-
 #[derive(Accounts)]
 #[instruction(input: InitialiseInput)]
 pub struct InitialiseCtx<'info> {
@@ -60,7 +59,6 @@ pub struct InitialiseCtx<'info> {
     #[account(address = group_extension_program::ID)]
     pub group_extension_program: AccountInfo<'info>,
 }
-
 
 pub fn initialise(ctx: Context<InitialiseCtx>, input: InitialiseInput) -> Result<()> {
     if input.symbol.len() > SYMBOL_LIMIT {
@@ -126,7 +124,6 @@ pub fn initialise(ctx: Context<InitialiseCtx>, input: InitialiseInput) -> Result
         &[ctx.bumps.editions_deployment],
     ];
 
-    // msg!("Create token 2022 w/ metadata");
     create_token_2022_and_metadata(
         MintAccounts2022 {
             authority: editions_deployment.to_account_info(),

@@ -165,7 +165,6 @@ pub fn mint<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> Result<()
         Some(group_extension_program.key()),
     )?;
 
-    // msg!("Minting 2022");
     mint_non_fungible_2022_logic(
         &mint.to_account_info(),
         minter_token_account,
@@ -189,10 +188,8 @@ pub fn mint<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> Result<()
     )?;
 
     // Retrieve metadata from the group mint
-    msg!("Mint: get meta start");
     let meta = get_mint_metadata(&mut group_mint.to_account_info())?;
     let additional_meta = meta.additional_metadata;
-    msg!("Mint: get meta end: meta len {}", additional_meta.len());
 
     // Process each additional metadata key-value pair, excluding platform fee metadata
     for additional_metadatum in additional_meta {
@@ -220,12 +217,11 @@ pub fn mint<'info>(ctx: Context<'_, '_, '_, 'info, MintCtx<'info>>) -> Result<()
     }
 
     // Transfer minimum rent to the mint account
-    msg!("Mint: transfer minimum rent to mint account");
     update_account_lamports_to_minimum_balance(
         ctx.accounts.mint.to_account_info(),
         ctx.accounts.payer.to_account_info(),
         ctx.accounts.system_program.to_account_info(),
     )?;
-    msg!("Mint: done");
+    
     Ok(())
 }

@@ -144,7 +144,6 @@ pub fn mint_with_controls(
     ctx: Context<MintWithControlsCtx>,
     mint_input: MintInput,
 ) -> Result<()> {
-    msg!("program: executing mint with controls");
     let editions_controls = &mut ctx.accounts.editions_controls;
     let minter_stats = &mut ctx.accounts.minter_stats;
     let minter_stats_phase = &mut ctx.accounts.minter_stats_phase;
@@ -164,11 +163,8 @@ pub fn mint_with_controls(
     // Get the default/standard price amount for the phase
     let mut price_amount = editions_controls.phases[mint_input.phase_index as usize].price_amount;
 
-    // Determine if is a normal mint or an allow list mint and perform the appropriate constraints
-    // depending on if a merkle proof was provided
+    // Check if it's a normal mint or an allow list mint based on the presence of a merkle proof
     if mint_input.merkle_proof.is_some() {
-        msg!("program: executing allow list mint");
-        // Check allow list constraints
         check_allow_list_constraints(
             &editions_controls.phases[mint_input.phase_index as usize],
             &minter.key(),
@@ -177,7 +173,6 @@ pub fn mint_with_controls(
             mint_input.allow_list_price,
             mint_input.allow_list_max_claims,
         )?;
-        msg!("program: allow list constraints passed");
         // Override the price amount with the allow list price
         price_amount = mint_input.allow_list_price.unwrap_or(0);
     } else {
