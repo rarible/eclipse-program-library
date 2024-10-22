@@ -13,10 +13,12 @@ url = "https://api.apr.dev"
 
 [provider]
 cluster = "Localnet"
-wallet = "~/.config/solana/id.json"
+### @dev testing wallet
+### wallet = "~/.config/solana/id.json"
+wallet = "usb://ledger"
 
 [scripts]
-test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 test/tests/*.ts"
+test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 test/tests/**/*.ts"
 
 [test]
 startup_wait = 100000
@@ -25,9 +27,9 @@ upgradeable = false
 
 [test.validator]
 bind_address = "0.0.0.0"
-### @dev: Utilize the testnet cluster for running the testsuite
-url = "https://api.testnet.solana.com"
-### url = "https://api.mainnet-beta.solana.com"
+### @dev: Utilize the testnet cluster for running test-suite with anchor test
+### url = "https://api.testnet.solana.com"
+url = "https://api.mainnet-beta.solana.com"
 ledger = ".anchor/test-ledger"
 rpc_port = 8899
 
