@@ -5,18 +5,20 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-libreplex_editions = "587DoLBH2H39i5bToWBc6zRgbD2iJZtc4Kb8nYsskYTq"
-libreplex_editions_controls = "5hEa5j38yNJRM9vQA44Q6gXVj4Db8y3mWxkDtQeofKKs"
+libreplex_editions = "GHVmd43GebD2SSedqG1AAh76izf5CPAhz6KotkZyRzUD"
+libreplex_editions_controls = "CCWfNBFcrjbKSjKes9DqgiQYsnmCFgCVKx21mmV2xWgN"
 
 [registry]
 url = "https://api.apr.dev"
 
 [provider]
 cluster = "Localnet"
+### @dev testing wallet
+# wallet = "~/.config/solana/id.json"
 wallet = "usb://ledger"
 
 [scripts]
-test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 js-tests/**/*.ts"
+test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 test/tests/**/*.ts"
 
 [test]
 startup_wait = 100000
@@ -25,6 +27,8 @@ upgradeable = false
 
 [test.validator]
 bind_address = "0.0.0.0"
+### @dev: Utilize the testnet cluster for running the testsuite
+# url = "https://api.testnet.solana.com"
 url = "https://api.mainnet-beta.solana.com"
 ledger = ".anchor/test-ledger"
 rpc_port = 8899
@@ -40,3 +44,7 @@ address = "cmtDvXumGCrqC1Age74AVPhSRVXJMd8PJS91L8KbNCK"
 
 [[test.validator.clone]]
 address = "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
+
+[[test.validator.clone]]
+address = "5hx15GaPPqsYA61v6QpcGPpo125v7rfvEfZQ4dJErG5V"
+

@@ -820,19 +820,19 @@ export type LibreplexEditions = {
             "type": "string"
           },
           {
-            "name": "name",
+            "name": "itemBaseName",
             "type": "string"
           },
           {
-            "name": "offchainUrl",
+            "name": "itemBaseUri",
             "type": "string"
           },
           {
-            "name": "nameIsTemplate",
+            "name": "itemNameIsTemplate",
             "type": "bool"
           },
           {
-            "name": "urlIsTemplate",
+            "name": "itemUriIsTemplate",
             "type": "bool"
           },
           {
@@ -891,20 +891,20 @@ export type LibreplexEditions = {
         "kind": "struct",
         "fields": [
           {
-            "name": "maxNumberOfTokens",
-            "type": "u64"
-          },
-          {
             "name": "symbol",
             "type": "string"
           },
           {
-            "name": "name",
+            "name": "collectionName",
             "type": "string"
           },
           {
-            "name": "offchainUrl",
+            "name": "collectionUri",
             "type": "string"
+          },
+          {
+            "name": "maxNumberOfTokens",
+            "type": "u64"
           },
           {
             "name": "creatorCosignProgramId",
@@ -917,7 +917,7 @@ export type LibreplexEditions = {
             "type": "string"
           },
           {
-            "name": "itemName",
+            "name": "itemBaseName",
             "type": "string"
           }
         ]

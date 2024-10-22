@@ -8,49 +8,22 @@
     "build-interfaces": "cd packages/libreplex-idls && yarn package && yarn build && cd .. && cd libreplex-sdk && yarn build && cd ../..",
     "build": "lerna run clean && lerna run build",
     "libre-cli": "ts-node src/cli/index.ts",
-    "libreplex_nifty_hybrid:deploy:devnet": "anchor deploy -p libreplex_nifty_hybrid --provider.cluster https://api.devnet.solana.com --provider.wallet ~/.config/solana/libreplex-deployer.json",
-    "libreplex_monoswap:deploy:devnet": "anchor deploy -p libreplex_monoswap --provider.cluster https://api.devnet.solana.com --provider.wallet ~/.config/solana/libreplex-deployer.json",
-    "libreplex_monoswap:deploy:mainnet": "anchor deploy -p libreplex_monoswap --provider.cluster https://api.mainnet-beta.solana.com --provider.wallet ~/.config/solana/libreplex-deployer.json",
-    "libreplex_pipelines:deploy:devnet": "anchor deploy -p libreplex_pipelines --provider.cluster https://api.devnet.solana.com --provider.wallet ~/.config/solana/libreplex-deployer.json",
-    "libreplex_pipelines:deploy:mainnet": "anchor deploy -p libreplex_pipelines --provider.cluster https://api.mainnet-beta.solana.com --provider.wallet ~/.config/solana/libreplex-deployer.json",
-    "libreplex_editions:deploy:devnet": "anchor deploy -p libreplex_editions --provider.cluster https://api.devnet.solana.com --provider.wallet ~/.config/solana/libreplex-deployer.json",
-    "libreplex_editions_controls:deploy:devnet": "anchor deploy -p libreplex_editions_controls --provider.cluster https://api.devnet.solana.com --provider.wallet ~/.config/solana/id.json",
-    "libreplex_editions:deploy:mainnet": "anchor deploy -p libreplex_editions --provider.cluster https://api.mainnet-beta.solana.com --provider.wallet ~/.config/solana/libreplex-deployer.json",
-    "libreplex_editions:deploy:eclipse": "anchor deploy -p libreplex_editions --provider.cluster https://testnet.dev2.eclipsenetwork.xyz --provider.wallet ~/.config/solana/libreplex-deployer.json",
-    "libreplex_editions:deploy:eclipse-dev": "anchor deploy -p libreplex_editions --provider.cluster https://staging-rpc.dev.eclipsenetwork.xyz --provider.wallet ~/.config/solana/libreplex-deployer.json",
-    "libreplex_liquidity:deploy:devnet": "anchor deploy -p libreplex_liquidity --provider.cluster https://api.devnet.solana.com --provider.wallet ~/.config/solana/libreplex-deployer.json",
-    "libreplex_liquidity:deploy:mainnet": "anchor build -p libreplex_liquidity&& anchor deploy -p libreplex_liquidity --provider.cluster https://api.mainnet-beta.solana.com --provider.wallet ~/.config/solana/libreplex-deployer.json",
-    "libreplex_inscriptions:deploy:eclipse-testnet": "anchor build -p libreplex_inscriptions && anchor deploy -p libreplex_inscriptions --provider.cluster https://testnet.dev2.eclipsenetwork.xyz --provider.wallet ~/.config/solana/libreplex-deployer.json",
-    "libreplex_inscriptions:deploy:localnet": "anchor build -p libreplex_inscriptions && anchor deploy -p libreplex_inscriptions --provider.cluster http://localhost:8899 --provider.wallet ~/.config/solana/libreplex-deployer.json",
-    "libreplex_metadata:deploy:localnet": "anchor build -p libreplex_metadata && anchor deploy -p libreplex_metadata --provider.cluster http://localhost:8899 --provider.wallet ~/.config/solana/libreplex-deployer.json",
-    "libreplex_creator:deploy:devnet": "anchor build -p libreplex_creator && anchor deploy -p libreplex_creator --provider.cluster https://api.devnet.solana.com --provider.wallet ~/.config/solana/libreplex-deployer.json",
-    "libreplex_creator_controls:deploy:devnet": "anchor build -p libreplex_creator_controls && anchor deploy -p libreplex_creator_controls --provider.cluster https://api.devnet.solana.com --provider.wallet ~/.config/solana/libreplex-deployer.json",
-    "libreplex_inscriptions:deploy:devnet": "anchor build -p libreplex_inscriptions && anchor deploy -p libreplex_inscriptions --provider.cluster https://api.devnet.solana.com --provider.wallet ~/.config/solana/libreplex-deployer.json",
-    "libreplex_metadata:deploy:devnet": "anchor build -p libreplex_metadata && anchor deploy -p libreplex_metadata --provider.cluster https://api.devnet.solana.com --provider.wallet ~/.config/solana/libreplex-deployer.json",
-    "libreplex_shop:deploy:devnet": "anchor build -p libreplex_shop && anchor deploy -p libreplex_shop --provider.cluster https://api.devnet.solana.com --provider.wallet ~/.config/solana/libreplex-deployer.json",
-    "libreplex_legacy:deploy:devnet": "anchor build -p libreplex_legacy && anchor deploy -p libreplex_legacy --provider.cluster https://api.devnet.solana.com --provider.wallet ~/.config/solana/libreplex-deployer.json",
-    "libreplex_legacy:deploy:mainnet": "anchor build -p libreplex_legacy && anchor deploy -p libreplex_legacy --provider.cluster https://api.mainnet-beta.solana.com --provider.wallet ~/.config/solana/libreplex-deployer.json",
-    "libreplex_metadata:deploy:mainnet": "anchor build -p libreplex_metadata && anchor deploy -p libreplex_metadata --provider.cluster  https://api.mainnet-beta.solana.com --provider.wallet ~/.config/solana/libreplex-deployer.json",
-    "libreplex_creator:deploy:mainnet": "anchor build -p libreplex_creator && anchor deploy -p libreplex_creator --provider.cluster  https://api.mainnet-beta.solana.com --provider.wallet ~/.config/solana/libreplex-deployer.json",
-    "libreplex_inscriptions:deploy:mainnet": "anchor build -p libreplex_inscriptions && anchor deploy -p libreplex_inscriptions --provider.cluster https://api.mainnet-beta.solana.com --provider.wallet ~/.config/solana/libreplex-deployer.json",
-    "libreplex_creator_controls:deploy:mainnet": "anchor build -p libreplex_creator_controls && anchor deploy -p libreplex_creator_controls --provider.cluster https://api.mainnet-beta.solana.com --provider.wallet ~/.config/solana/libreplex-deployer.json",
-    "libreplex_shop:deploy:mainnet": "anchor build -p libreplex_creator_controls && anchor deploy -p libreplex_creator_controls --provider.cluster https://api.mainnet-beta.solana.com --provider.wallet ~/.config/solana/libreplex-deployer.json",
+    "lint": "next lint",
     
     "libreplex_editions:deploy:eclipse-dev2": "anchor deploy -p libreplex_editions --provider.cluster https://staging-rpc.dev2.eclipsenetwork.xyz --provider.wallet ~/.config/solana/id.json",
     "libreplex_editions_controls:deploy:eclipse-dev2": "anchor build -p libreplex_editions_controls && anchor deploy -p libreplex_editions_controls --provider.cluster https://staging-rpc.dev2.eclipsenetwork.xyz --provider.wallet ~/.config/solana/id.json",
+
+    "libreplex_editions:deploy:eclipse-testnet": "anchor build -p libreplex_editions && anchor deploy -p libreplex_editions --provider.cluster https://testnet.dev2.eclipsenetwork.xyz --provider.wallet ~/.config/solana/id.json",
+    "libreplex_editions_controls:deploy:eclipse-testnet": "anchor build -p libreplex_editions_controls && anchor deploy -p libreplex_editions_controls --provider.cluster https://testnet.dev2.eclipsenetwork.xyz --provider.wallet ~/.config/solana/id.json",
     
     "libreplex_editions:deploy:solana-dev-net": "anchor build -p libreplex_editions && anchor deploy -p libreplex_editions --provider.cluster https://api.devnet.solana.com --provider.wallet ~/.config/solana/id.json",
     "libreplex_editions_controls:solana-dev-net": "anchor build -p libreplex_editions_controls && anchor deploy -p libreplex_editions_controls --provider.cluster https://api.devnet.solana.com --provider.wallet ~/.config/solana/id.json",
+    
     "transfer-program-owner:solana-dev-net": "solana program set-upgrade-authority --skip-new-upgrade-authority-signer-check 6g8ZaBxx2tng8EhVqvaad948Vht9YFJFGG5gvAejrJj9 --new-upgrade-authority 674s1Sap3KVnr8WGrY5KGQ69oTYjjgr1disKJo6GpTYw -k ~/.config/solana/id.json -u https://api.devnet.solana.com",
     "transfer-program-owner-back:solana-dev-net": "solana program set-upgrade-authority --skip-new-upgrade-authority-signer-check 6g8ZaBxx2tng8EhVqvaad948Vht9YFJFGG5gvAejrJj9 --new-upgrade-authority QjzRL6VwKGnpco8wx3cPjtq8ZPhewy7ohq7F5mv2eeR -k usb://ledger -u https://api.devnet.solana.com",
 
-
     "libreplex_editions:deploy:solana-test-net": "anchor build -p libreplex_editions && anchor deploy -p libreplex_editions --provider.cluster https://api.testnet.solana.com --provider.wallet ~/.config/solana/prod-keypair.json",
     "libreplex_editions_controls:solana-test-net": "anchor build -p libreplex_editions_controls && anchor deploy -p libreplex_editions_controls --provider.cluster https://api.testnet.solana.com --provider.wallet ~/.config/solana/prod-keypair.json",
-    
-    "libreplex_editions:deploy:eclipse-testnet": "anchor build -p libreplex_editions && anchor deploy -p libreplex_editions --provider.cluster https://testnet.dev2.eclipsenetwork.xyz --provider.wallet ~/.config/solana/prod-keypair.json",
-    "libreplex_editions_controls:deploy:eclipse-testnet": "anchor build -p libreplex_editions_controls && anchor deploy -p libreplex_editions_controls --provider.cluster https://testnet.dev2.eclipsenetwork.xyz --provider.wallet ~/.config/solana/prod-keypair.json",
-    "lint": "next lint",
 
     "libreplex_editions:deploy:ledger:solana-dev-net": "anchor build -p libreplex_editions && anchor deploy -p libreplex_editions --provider.cluster https://api.devnet.solana.com --provider.wallet usb://ledger",
     "libreplex_editions_controls:deploy:ledger:solana-dev-net": "anchor build -p libreplex_editions_controls && anchor deploy -p libreplex_editions_controls --provider.cluster https://api.devnet.solana.com --provider.wallet usb://ledger",
@@ -64,8 +37,9 @@
   },
   "dependencies": {
     "@coral-xyz/anchor": "0.30.0",
-    "@solana/spl-token": "^0.3.8",
-    "@solana/web3.js": "^1.73.0"
+    "@solana/spl-token": "^0.4.8",
+    "@solana/web3.js": "^1.73.0",
+    "@solana/spl-token-metadata": "^0.1.5"
   },
   "devDependencies": {
     "@types/chai": "^4.3.5",
