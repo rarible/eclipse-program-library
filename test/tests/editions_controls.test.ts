@@ -510,6 +510,47 @@ describe('Editions Controls Test Suite', () => {
       // verify state
       expect(editionsControlsDecoded.data.phases.length).to.equal(6);
     });
+
+    it('Should fail to add a private phase without providing the merkle root', async () => { 
+      const invalidPhaseConfig = {
+        maxMintsPerWallet: new anchor.BN(100),
+        maxMintsTotal: new anchor.BN(1000),
+        priceAmount: new anchor.BN(500000), // 0.05 SOL
+        startTime: new anchor.BN(new Date().getTime() / 1000),
+        endTime: new anchor.BN(new Date().getTime() / 1000 + 60 * 60 * 24), // 1 day from now
+        priceToken: new PublicKey('So11111111111111111111111111111111111111112'),
+        isPrivate: true,
+        merkleRoot: null, // Invalid: null merkle root for private phase
+      };
+
+      const phaseIx = await editionsControlsProgram.methods
+        .addPhase(invalidPhaseConfig)
+        .accountsStrict({
+          editionsControls: editionsControlsPda,
+          creator: payer.publicKey,
+          payer: payer.publicKey,
+          systemProgram: SystemProgram.programId,
+          tokenProgram: TOKEN_2022_PROGRAM_ID,
+          libreplexEditionsProgram: editionsProgram.programId,
+        })
+        .signers([])
+        .instruction();
+
+      const transaction = new Transaction().add(phaseIx);
+      
+      try {
+        await provider.sendAndConfirm(transaction, [payer]);
+        // If we reach this point, the test should fail
+        expect.fail('Transaction should have failed');
+      } catch (error) {
+        const errorString = JSON.stringify(error);
+        expect(errorString).to.include('Merkle root must be provided for private phases');
+      }
+
+      // Verify state hasn't changed
+      const editionsControlsDecoded = await getEditionsControls(provider.connection, editionsControlsPda, editionsControlsProgram);
+      expect(editionsControlsDecoded.data.phases.length).to.equal(6); // Should still be 6 phases
+    })
   });
 
   describe('Minting', () => {
