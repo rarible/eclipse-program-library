@@ -48,6 +48,11 @@ pub fn add_phase(ctx: Context<AddPhaseCtx>, input: InitialisePhaseInput) -> Resu
     if !input.price_token.eq(&wrapped_sol::ID) {
         panic!("Only native price currently supported")
     }
+
+    if input.is_private && input.merkle_root.is_none() {
+        panic!("Merkle root must be provided for private phases");
+    }
+
     let editions_controls = &mut ctx.accounts.editions_controls;
 
     editions_controls.phases.push(Phase{ 
