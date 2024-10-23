@@ -1,3 +1,0 @@
-# Creator Machine
-
-Work in progress...

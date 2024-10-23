@@ -1,16 +1,28 @@
-use anchor_lang::prelude::*;
-use anchor_lang::system_program;
+use anchor_lang::{prelude::*, system_program};
 use anchor_spl::{
     associated_token::AssociatedToken,
     token_2022::{self, ID as TOKEN_2022_ID},
 };
-use libreplex_editions::{cpi::accounts::MintCtx, program::LibreplexEditions, EditionsDeployment};
-use crate::{check_phase_constraints, errors::EditionsError, EditionsControls, MinterStats};
-use libreplex_editions::group_extension_program;
+use libreplex_editions::{
+    group_extension_program,
+    program::LibreplexEditions, 
+    EditionsDeployment,
+    cpi::accounts::MintCtx
+};
+use crate::{
+    EditionsControls,
+    MinterStats,
+    errors::EditionsControlsError,
+    check_phase_constraints,
+    check_allow_list_constraints
+};
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub struct MintInput {
     pub phase_index: u32,
+    pub merkle_proof: Option<Vec<[u8; 32]>>,
+    pub allow_list_price: Option<u64>,
+    pub allow_list_max_claims: Option<u64>,
 }
 
 #[derive(Accounts)]
@@ -26,11 +38,11 @@ pub struct MintWithControlsCtx<'info> {
     )]
     pub editions_controls: Box<Account<'info, EditionsControls>>,
 
-    /// CHECK: Checked via CPI
+    // CHECK: Checked via CPI
     #[account(mut)]
     pub hashlist: UncheckedAccount<'info>,
 
-    /// CHECK: Checked via CPI
+    // CHECK: Checked via CPI
     #[account(mut)]
     pub hashlist_marker: UncheckedAccount<'info>,
 
@@ -45,7 +57,7 @@ pub struct MintWithControlsCtx<'info> {
     )]
     pub signer: Signer<'info>,
 
-    /// CHECK: Anybody can sign, anybody can receive the inscription
+    // CHECK: Anybody can sign, anybody can receive the inscription
     #[account(mut)]
     pub minter: UncheckedAccount<'info>,
 
@@ -137,8 +149,8 @@ pub fn mint_with_controls(
     let minter_stats_phase = &mut ctx.accounts.minter_stats_phase;
     let minter = &ctx.accounts.minter;
 
-    // Phase validation and price retrieval
-    let price_amount = validate_phase(editions_controls, mint_input.phase_index)?;
+    // Phase validation
+    validate_phase(editions_controls, mint_input.phase_index)?;
 
     // Check phase constraints
     check_phase_constraints(
@@ -146,10 +158,32 @@ pub fn mint_with_controls(
         minter_stats,
         minter_stats_phase,
         editions_controls,
-    );
+    )?;
 
-    // Update minter statistics
-    update_minter_stats(
+    // Get the default/standard price amount for the phase
+    let mut price_amount = editions_controls.phases[mint_input.phase_index as usize].price_amount;
+
+    // Check if it's a normal mint or an allow list mint based on the presence of a merkle proof
+    if mint_input.merkle_proof.is_some() {
+        check_allow_list_constraints(
+            &editions_controls.phases[mint_input.phase_index as usize],
+            &minter.key(),
+            minter_stats_phase,
+            mint_input.merkle_proof,
+            mint_input.allow_list_price,
+            mint_input.allow_list_max_claims,
+        )?;
+        // Override the price amount with the allow list price
+        price_amount = mint_input.allow_list_price.unwrap_or(0);
+    } else {
+        // if the phase is private, and the merkle proof was not provided, throw error
+        if editions_controls.phases[mint_input.phase_index as usize].is_private {
+            return Err(EditionsControlsError::PrivatePhaseNoProof.into());
+        }
+    }
+
+    // Update minter and phase states
+    update_minter_and_phase_stats(
         minter_stats,
         minter_stats_phase,
         &minter.key(),
@@ -177,20 +211,19 @@ pub fn mint_with_controls(
 fn validate_phase(
     editions_controls: &EditionsControls,
     phase_index: u32,
-) -> Result<u64> {
+) -> Result<()> {
     if phase_index >= editions_controls.phases.len() as u32 {
         if editions_controls.phases.is_empty() {
-            return Err(EditionsError::NoPhasesAdded.into());
+            return Err(EditionsControlsError::NoPhasesAdded.into());
         } else {
-            return Err(EditionsError::InvalidPhaseIndex.into());
+            return Err(EditionsControlsError::InvalidPhaseIndex.into());
         }
     }
 
-    let price_amount = editions_controls.phases[phase_index as usize].price_amount;
-    Ok(price_amount)
+    Ok(())
 }
 
-fn update_minter_stats(
+fn update_minter_and_phase_stats(
     minter_stats: &mut MinterStats,
     minter_stats_phase: &mut MinterStats,
     minter_key: &Pubkey,
@@ -220,7 +253,7 @@ fn process_platform_fees(
     // Ensure that the sum of shares equals 100
     let total_shares: u8 = recipients.iter().map(|r| r.share).sum();
     if total_shares != 100 {
-        return Err(EditionsError::InvalidFeeShares.into());
+        return Err(EditionsControlsError::InvalidFeeShares.into());
     }
 
     let total_fee: u64;
@@ -233,12 +266,12 @@ fn process_platform_fees(
         // Calculate fee as (price_amount * platform_fee_value) / 10,000 (assuming basis points)
         total_fee = price_amount
             .checked_mul(editions_controls.platform_fee_value as u64)
-            .ok_or(EditionsError::FeeCalculationError)?
+            .ok_or(EditionsControlsError::FeeCalculationError)?
             .checked_div(10_000)
-            .ok_or(EditionsError::FeeCalculationError)?;
+            .ok_or(EditionsControlsError::FeeCalculationError)?;
 
         remaining_amount = price_amount.checked_sub(total_fee)
-            .ok_or(EditionsError::FeeCalculationError)?;
+            .ok_or(EditionsControlsError::FeeCalculationError)?;
     }
 
     // Distribute fees to recipients
@@ -249,17 +282,16 @@ fn process_platform_fees(
 
         let recipient_account = &ctx.accounts.platform_fee_recipient_1;
 
-        msg!("check recipients {}: {} vs {}", i, recipient_account.key(), recipient_struct.address.key());
         // Ensure that the account matches the expected recipient
         if recipient_account.key() != recipient_struct.address.key() {
-            return Err(EditionsError::RecipientMismatch.into());
+            return Err(EditionsControlsError::RecipientMismatch.into());
         }
 
         let recipient_fee = total_fee
             .checked_mul(recipient_struct.share as u64)
-            .ok_or(EditionsError::FeeCalculationError)?
+            .ok_or(EditionsControlsError::FeeCalculationError)?
             .checked_div(100)
-            .ok_or(EditionsError::FeeCalculationError)?;
+            .ok_or(EditionsControlsError::FeeCalculationError)?;
 
         // Transfer platform fee to recipient
         system_program::transfer(

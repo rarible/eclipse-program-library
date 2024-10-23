@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/libreplex_editions.json`.
  */
 export type LibreplexEditions = {
-  "address": "587DoLBH2H39i5bToWBc6zRgbD2iJZtc4Kb8nYsskYTq",
+  "address": "A927QYSgP2fJWWDJn1gZknSfsMXyyKnJvMf2kJoY5yeQ",
   "metadata": {
     "name": "libreplexEditions",
     "version": "0.2.1",
@@ -820,19 +820,19 @@ export type LibreplexEditions = {
             "type": "string"
           },
           {
-            "name": "name",
+            "name": "itemBaseName",
             "type": "string"
           },
           {
-            "name": "offchainUrl",
+            "name": "itemBaseUri",
             "type": "string"
           },
           {
-            "name": "nameIsTemplate",
+            "name": "itemNameIsTemplate",
             "type": "bool"
           },
           {
-            "name": "urlIsTemplate",
+            "name": "itemUriIsTemplate",
             "type": "bool"
           },
           {
@@ -891,20 +891,20 @@ export type LibreplexEditions = {
         "kind": "struct",
         "fields": [
           {
-            "name": "maxNumberOfTokens",
-            "type": "u64"
-          },
-          {
             "name": "symbol",
             "type": "string"
           },
           {
-            "name": "name",
+            "name": "collectionName",
             "type": "string"
           },
           {
-            "name": "offchainUrl",
+            "name": "collectionUri",
             "type": "string"
+          },
+          {
+            "name": "maxNumberOfTokens",
+            "type": "u64"
           },
           {
             "name": "creatorCosignProgramId",
@@ -917,7 +917,7 @@ export type LibreplexEditions = {
             "type": "string"
           },
           {
-            "name": "itemName",
+            "name": "itemBaseName",
             "type": "string"
           }
         ]
