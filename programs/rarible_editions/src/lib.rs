@@ -3,7 +3,7 @@ use anchor_lang::prelude::*;
 pub mod instructions;
 pub use instructions::*;
 
-declare_id!("bYSF2fxhcUjvqapf1c9VYmykH8CpySMPvCvxgFkfSSW");
+declare_id!("E3NtU7ozVJ73VGQk4ZaYvKzZsFHQxQaeS7ijzcGg4Sd4");
 
 pub mod errors;
 pub mod state;
@@ -21,7 +21,7 @@ pub mod group_extension_program {
 }
 
 #[program]
-pub mod libreplex_editions {
+pub mod rarible_editions {
     use super::*;
 
     // v2 endpoints. Prefer these over the original ones. 

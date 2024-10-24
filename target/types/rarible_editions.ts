@@ -2,16 +2,16 @@
  * Program IDL in camelCase format in order to be used in JS/TS.
  *
  * Note that this is only a type helper and is not the actual IDL. The original
- * IDL can be found at `target/idl/libreplex_editions.json`.
+ * IDL can be found at `target/idl/rarible_editions.json`.
  */
-export type LibreplexEditions = {
-  "address": "bYSF2fxhcUjvqapf1c9VYmykH8CpySMPvCvxgFkfSSW",
+export type RaribleEditions = {
+  "address": "E3NtU7ozVJ73VGQk4ZaYvKzZsFHQxQaeS7ijzcGg4Sd4",
   "metadata": {
-    "name": "libreplexEditions",
+    "name": "raribleEditions",
     "version": "0.2.1",
     "spec": "0.1.0",
     "description": "Created with Anchor",
-    "repository": "https://github.com/Libreplex/libreplex-program-library"
+    "repository": "https://github.com/rarible/eclipse-program-library"
   },
   "instructions": [
     {
@@ -694,63 +694,53 @@ export type LibreplexEditions = {
   "errors": [
     {
       "code": 6000,
-      "name": "sizeExceedsMaxSize",
-      "msg": "Collection size exceeds max size."
+      "name": "tickerTooLong",
+      "msg": "Ticker too long"
     },
     {
       "code": 6001,
-      "name": "maxSizeBelowCurrentSize",
-      "msg": "Max size cannot be reduced below current size."
+      "name": "mintTemplateTooLong",
+      "msg": "Mint template too long"
     },
     {
       "code": 6002,
-      "name": "creatorShareInvalid",
-      "msg": "Creators shares must add up to 100."
+      "name": "deploymentTemplateTooLong",
+      "msg": "Deployment template too long"
     },
     {
       "code": 6003,
-      "name": "missingApproveAccount",
-      "msg": "Missing approve account."
+      "name": "rootTypeTooLong",
+      "msg": "Root type too long"
     },
     {
       "code": 6004,
-      "name": "expiredApproveAccount",
-      "msg": "Approve account has expired."
+      "name": "mintedOut",
+      "msg": "Minted out"
     },
     {
       "code": 6005,
-      "name": "invalidField",
-      "msg": "Invalid field. You cannot use a public key as a field."
+      "name": "legacyMigrationsAreMintedOut",
+      "msg": "Legacy migrations are minted out"
     },
     {
       "code": 6006,
-      "name": "creatorAddressInvalid",
-      "msg": "The Address you provided is invalid. Please provide a valid address."
+      "name": "missingGlobalTreeDelegate",
+      "msg": "Global tree delegate is missing"
     },
     {
       "code": 6007,
-      "name": "royaltyBasisPointsInvalid",
-      "msg": "Royalty basis points must be less than or equal to 10000."
+      "name": "incorrectMintType",
+      "msg": "Incorrect mint type"
     },
     {
       "code": 6008,
-      "name": "platformFeeBasisPointsInvalid",
-      "msg": "Platform fee basis points must be less than or equal to 10000."
+      "name": "invalidMetadata",
+      "msg": "Invalid Metadata"
     },
     {
       "code": 6009,
-      "name": "recipientShareInvalid",
-      "msg": "Recipient shares must add up to 100."
-    },
-    {
-      "code": 6010,
-      "name": "reservedField",
-      "msg": "The provided field is invalid or reserved."
-    },
-    {
-      "code": 6011,
-      "name": "invalidNumberOfRecipients",
-      "msg": "Invalid number of platform fee recipients. Exactly 5 recipients are required."
+      "name": "creatorFeeTooHigh",
+      "msg": "Creator fee too high"
     }
   ],
   "types": [

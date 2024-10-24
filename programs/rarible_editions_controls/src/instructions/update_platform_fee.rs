@@ -1,6 +1,6 @@
 use anchor_lang::{prelude::*};
-use libreplex_editions::{EditionsDeployment};
-use libreplex_editions::program::LibreplexEditions;
+use rarible_editions::{EditionsDeployment};
+use rarible_editions::program::RaribleEditions;
 use anchor_spl::token_interface::{Mint};
 use crate::{EditionsControls, PlatformFeeRecipient, UpdatePlatformFeeArgs};
 

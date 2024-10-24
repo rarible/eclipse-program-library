@@ -2,8 +2,8 @@ import * as anchor from '@coral-xyz/anchor';
 import { Program } from '@coral-xyz/anchor';
 import { PublicKey, Keypair, SystemProgram, ComputeBudgetProgram, LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { ASSOCIATED_TOKEN_PROGRAM_ID, getAssociatedTokenAddressSync, TOKEN_2022_PROGRAM_ID } from '@solana/spl-token';
-import { LibreplexEditionsControls } from '../../target/types/libreplex_editions_controls';
-import { LibreplexEditions } from '../../target/types/libreplex_editions';
+import { RaribleEditionsControls } from '../../target/types/rarible_editions_controls';
+import { RaribleEditions } from '../../target/types/rarible_editions';
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
 import { estimateTransactionFee, getCluster } from '../utils/utils';
@@ -35,8 +35,8 @@ describe('Editions Controls Test Suite', () => {
     units: 800000,
   });
 
-  let editionsControlsProgram: Program<LibreplexEditionsControls>;
-  let editionsProgram: Program<LibreplexEditions>;
+  let editionsControlsProgram: Program<RaribleEditionsControls>;
+  let editionsProgram: Program<RaribleEditions>;
 
   let editionsPda: PublicKey;
   let editionsControlsPda: PublicKey;
@@ -71,8 +71,8 @@ describe('Editions Controls Test Suite', () => {
       console.log('Cluster:', cluster);
     }
 
-    editionsControlsProgram = anchor.workspace.LibreplexEditionsControls as Program<LibreplexEditionsControls>;
-    editionsProgram = anchor.workspace.LibreplexEditions as Program<LibreplexEditions>;
+    editionsControlsProgram = anchor.workspace.RaribleEditionsControls as Program<RaribleEditionsControls>;
+    editionsProgram = anchor.workspace.RaribleEditions as Program<RaribleEditions>;
 
     payer = (provider.wallet as anchor.Wallet).payer;
     creator1 = Keypair.generate();
@@ -233,7 +233,7 @@ describe('Editions Controls Test Suite', () => {
             group: group.publicKey,
             systemProgram: SystemProgram.programId,
             tokenProgram: TOKEN_2022_PROGRAM_ID,
-            libreplexEditionsProgram: editionsProgram.programId,
+            raribleEditionsProgram: editionsProgram.programId,
             groupExtensionProgram: new PublicKey('5hx15GaPPqsYA61v6QpcGPpo125v7rfvEfZQ4dJErG5V'),
           })
           .instruction();
@@ -304,7 +304,7 @@ describe('Editions Controls Test Suite', () => {
           payer: payer.publicKey,
           systemProgram: SystemProgram.programId,
           tokenProgram: TOKEN_2022_PROGRAM_ID,
-          libreplexEditionsProgram: editionsProgram.programId,
+          raribleEditionsProgram: editionsProgram.programId,
         })
         .signers([])
         .instruction();
@@ -341,7 +341,7 @@ describe('Editions Controls Test Suite', () => {
           payer: payer.publicKey,
           systemProgram: SystemProgram.programId,
           tokenProgram: TOKEN_2022_PROGRAM_ID,
-          libreplexEditionsProgram: editionsProgram.programId,
+          raribleEditionsProgram: editionsProgram.programId,
         })
         .signers([])
         .instruction();
@@ -379,7 +379,7 @@ describe('Editions Controls Test Suite', () => {
           payer: payer.publicKey,
           systemProgram: SystemProgram.programId,
           tokenProgram: TOKEN_2022_PROGRAM_ID,
-          libreplexEditionsProgram: editionsProgram.programId,
+          raribleEditionsProgram: editionsProgram.programId,
         })
         .signers([])
         .instruction();
@@ -417,7 +417,7 @@ describe('Editions Controls Test Suite', () => {
           payer: payer.publicKey,
           systemProgram: SystemProgram.programId,
           tokenProgram: TOKEN_2022_PROGRAM_ID,
-          libreplexEditionsProgram: editionsProgram.programId,
+          raribleEditionsProgram: editionsProgram.programId,
         })
         .signers([])
         .instruction();
@@ -455,7 +455,7 @@ describe('Editions Controls Test Suite', () => {
           payer: payer.publicKey,
           systemProgram: SystemProgram.programId,
           tokenProgram: TOKEN_2022_PROGRAM_ID,
-          libreplexEditionsProgram: editionsProgram.programId,
+          raribleEditionsProgram: editionsProgram.programId,
         })
         .signers([])
         .instruction();
@@ -493,7 +493,7 @@ describe('Editions Controls Test Suite', () => {
           payer: payer.publicKey,
           systemProgram: SystemProgram.programId,
           tokenProgram: TOKEN_2022_PROGRAM_ID,
-          libreplexEditionsProgram: editionsProgram.programId,
+          raribleEditionsProgram: editionsProgram.programId,
         })
         .signers([])
         .instruction();
@@ -531,7 +531,7 @@ describe('Editions Controls Test Suite', () => {
           payer: payer.publicKey,
           systemProgram: SystemProgram.programId,
           tokenProgram: TOKEN_2022_PROGRAM_ID,
-          libreplexEditionsProgram: editionsProgram.programId,
+          raribleEditionsProgram: editionsProgram.programId,
         })
         .signers([])
         .instruction();
@@ -594,7 +594,7 @@ describe('Editions Controls Test Suite', () => {
             associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
             groupExtensionProgram: TOKEN_GROUP_EXTENSION_PROGRAM_ID,
             systemProgram: SystemProgram.programId,
-            libreplexEditionsProgram: editionsProgram.programId,
+            raribleEditionsProgram: editionsProgram.programId,
           })
           .instruction();
         const transaction = new Transaction().add(modifiedComputeUnits).add(mintIx);
@@ -696,7 +696,7 @@ describe('Editions Controls Test Suite', () => {
             associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
             groupExtensionProgram: TOKEN_GROUP_EXTENSION_PROGRAM_ID,
             systemProgram: SystemProgram.programId,
-            libreplexEditionsProgram: editionsProgram.programId,
+            raribleEditionsProgram: editionsProgram.programId,
           })
           .instruction();
 
@@ -750,7 +750,7 @@ describe('Editions Controls Test Suite', () => {
               associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
               groupExtensionProgram: TOKEN_GROUP_EXTENSION_PROGRAM_ID,
               systemProgram: SystemProgram.programId,
-              libreplexEditionsProgram: editionsProgram.programId,
+              raribleEditionsProgram: editionsProgram.programId,
             })
             .instruction();
 
@@ -831,7 +831,7 @@ describe('Editions Controls Test Suite', () => {
             associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
             groupExtensionProgram: TOKEN_GROUP_EXTENSION_PROGRAM_ID,
             systemProgram: SystemProgram.programId,
-            libreplexEditionsProgram: editionsProgram.programId,
+            raribleEditionsProgram: editionsProgram.programId,
           })
           .instruction();
 
@@ -908,7 +908,7 @@ describe('Editions Controls Test Suite', () => {
             associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
             groupExtensionProgram: TOKEN_GROUP_EXTENSION_PROGRAM_ID,
             systemProgram: SystemProgram.programId,
-            libreplexEditionsProgram: editionsProgram.programId,
+            raribleEditionsProgram: editionsProgram.programId,
           })
           .instruction();
 
@@ -982,7 +982,7 @@ describe('Editions Controls Test Suite', () => {
               associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
               groupExtensionProgram: TOKEN_GROUP_EXTENSION_PROGRAM_ID,
               systemProgram: SystemProgram.programId,
-              libreplexEditionsProgram: editionsProgram.programId,
+              raribleEditionsProgram: editionsProgram.programId,
             })
             .instruction();
 
@@ -1051,7 +1051,7 @@ describe('Editions Controls Test Suite', () => {
               associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
               groupExtensionProgram: TOKEN_GROUP_EXTENSION_PROGRAM_ID,
               systemProgram: SystemProgram.programId,
-              libreplexEditionsProgram: editionsProgram.programId,
+              raribleEditionsProgram: editionsProgram.programId,
             })
             .instruction();
 
@@ -1147,7 +1147,7 @@ describe('Editions Controls Test Suite', () => {
               associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
               groupExtensionProgram: TOKEN_GROUP_EXTENSION_PROGRAM_ID,
               systemProgram: SystemProgram.programId,
-              libreplexEditionsProgram: editionsProgram.programId,
+              raribleEditionsProgram: editionsProgram.programId,
             })
             .instruction();
 
@@ -1219,7 +1219,7 @@ describe('Editions Controls Test Suite', () => {
               associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
               groupExtensionProgram: TOKEN_GROUP_EXTENSION_PROGRAM_ID,
               systemProgram: SystemProgram.programId,
-              libreplexEditionsProgram: editionsProgram.programId,
+              raribleEditionsProgram: editionsProgram.programId,
             })
             .instruction();
 
@@ -1295,7 +1295,7 @@ describe('Editions Controls Test Suite', () => {
                 associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
                 groupExtensionProgram: TOKEN_GROUP_EXTENSION_PROGRAM_ID,
                 systemProgram: SystemProgram.programId,
-                libreplexEditionsProgram: editionsProgram.programId,
+                raribleEditionsProgram: editionsProgram.programId,
               })
               .instruction();
 
@@ -1394,7 +1394,7 @@ describe('Editions Controls Test Suite', () => {
               associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
               groupExtensionProgram: TOKEN_GROUP_EXTENSION_PROGRAM_ID,
               systemProgram: SystemProgram.programId,
-              libreplexEditionsProgram: editionsProgram.programId,
+              raribleEditionsProgram: editionsProgram.programId,
             })
             .instruction();
 
@@ -1451,7 +1451,7 @@ describe('Editions Controls Test Suite', () => {
               associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
               groupExtensionProgram: TOKEN_GROUP_EXTENSION_PROGRAM_ID,
               systemProgram: SystemProgram.programId,
-              libreplexEditionsProgram: editionsProgram.programId,
+              raribleEditionsProgram: editionsProgram.programId,
             })
             .instruction();
 

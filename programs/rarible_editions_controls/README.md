@@ -4,7 +4,7 @@
   <h1>SPL20</h1>
 
   <h4>
-    <a href="https://libreplex.github.io/libreplex-program-library/">Documentation (stable)</a>
+    <a href="https://rarible.github.io/eclipse-program-library/">Documentation (stable)</a>
   </h4>
 </div>
 
