@@ -1,14 +1,14 @@
 [package]
-name = "libreplex_editions_controls"
+name = "rarible_editions_controls"
 version = "0.2.1"
 description = "Created with Anchor"
 edition = "2021"
 license = "MIT"
-repository = "https://github.com/Libreplex/libreplex-program-library"
+repository = "https://github.com/rarible/eclipse-program-library"
 
 [lib]
 crate-type = ["cdylib", "lib"]
-name = "libreplex_editions_controls"
+name = "rarible_editions_controls"
 
 [features]
 no-entrypoint = []
@@ -22,7 +22,7 @@ idl-build = ["anchor-lang/idl-build", "anchor-spl/idl-build"]
 anchor-lang = {version = "~0.30", features = ["init-if-needed"]}
 anchor-spl = {version = "~0.30"}
 
-libreplex_editions = {version="*", path = "../libreplex_editions", features =["cpi", "no-entrypoint"]}
+rarible_editions = {version="*", path = "../rarible_editions", features =["cpi", "no-entrypoint"]}
 rarible-merkle-verify = { version="*", path = "../../libraries/rarible-merkle-verify" }
 
 solana-program = {version = "1.17.13"}

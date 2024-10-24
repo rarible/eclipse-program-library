@@ -1,8 +1,8 @@
 use anchor_lang::{prelude::*};
-use libreplex_editions::{EditionsDeployment, UpdateRoyaltiesArgs};
-use libreplex_editions::program::LibreplexEditions;
+use rarible_editions::{EditionsDeployment, UpdateRoyaltiesArgs};
+use rarible_editions::program::RaribleEditions;
 use anchor_spl::token_interface::{Mint};
-use libreplex_editions::cpi::accounts::ModifyRoyalties;
+use rarible_editions::cpi::accounts::ModifyRoyalties;
 use crate::EditionsControls;
 
 #[derive(Accounts)]
@@ -38,14 +38,14 @@ pub struct UpdateRoyaltiesCtx<'info> {
     #[account(address = spl_token_2022::ID)]
     pub token_program: AccountInfo<'info>,
 
-    pub libreplex_editions_program: Program<'info, LibreplexEditions>
+    pub rarible_editions_program: Program<'info, RaribleEditions>
 
 }
 
 pub fn update_royalties(ctx: Context<UpdateRoyaltiesCtx>, royalties_input: UpdateRoyaltiesArgs) -> Result<()> {
 
     let editions_controls = &mut ctx.accounts.editions_controls;
-    let libreplex_editions_program = &ctx.accounts.libreplex_editions_program;
+    let rarible_editions_program = &ctx.accounts.rarible_editions_program;
     let editions_deployment = &ctx.accounts.editions_deployment;
     let payer = &ctx.accounts.payer;
     let mint = &ctx.accounts.mint;
@@ -59,9 +59,9 @@ pub fn update_royalties(ctx: Context<UpdateRoyaltiesCtx>, royalties_input: Updat
         &[ctx.bumps.editions_controls],
     ];
 
-    libreplex_editions::cpi::modify_royalties(
+    rarible_editions::cpi::modify_royalties(
         CpiContext::new_with_signer(
-            libreplex_editions_program.to_account_info(),
+            rarible_editions_program.to_account_info(),
             ModifyRoyalties {
                 editions_deployment: editions_deployment.to_account_info(),
                 payer: payer.to_account_info(),

@@ -2,16 +2,16 @@
  * Program IDL in camelCase format in order to be used in JS/TS.
  *
  * Note that this is only a type helper and is not the actual IDL. The original
- * IDL can be found at `target/idl/libreplex_editions.json`.
+ * IDL can be found at `target/idl/rarible_editions.json`.
  */
-export type LibreplexEditions = {
-  "address": "bYSF2fxhcUjvqapf1c9VYmykH8CpySMPvCvxgFkfSSW",
+export type RaribleEditions = {
+  "address": "E3NtU7ozVJ73VGQk4ZaYvKzZsFHQxQaeS7ijzcGg4Sd4",
   "metadata": {
-    "name": "libreplexEditions",
+    "name": "raribleEditions",
     "version": "0.2.1",
     "spec": "0.1.0",
     "description": "Created with Anchor",
-    "repository": "https://github.com/Libreplex/libreplex-program-library"
+    "repository": "https://github.com/rarible/eclipse-program-library"
   },
   "instructions": [
     {

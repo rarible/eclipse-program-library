@@ -2,16 +2,16 @@
  * Program IDL in camelCase format in order to be used in JS/TS.
  *
  * Note that this is only a type helper and is not the actual IDL. The original
- * IDL can be found at `target/idl/libreplex_editions_controls.json`.
+ * IDL can be found at `target/idl/rarible_editions_controls.json`.
  */
-export type LibreplexEditionsControls = {
-  "address": "5NeY3NR3ZT8D6ck9NrgBBsJjiH25cL4mmksF1x5ZrHwW",
+export type RaribleEditionsControls = {
+  "address": "DtdtodSsgeNXbu3rycGCkJEpRuZ48rjFSBfgj8JKzTV2",
   "metadata": {
-    "name": "libreplexEditionsControls",
+    "name": "raribleEditionsControls",
     "version": "0.2.1",
     "spec": "0.1.0",
     "description": "Created with Anchor",
-    "repository": "https://github.com/Libreplex/libreplex-program-library"
+    "repository": "https://github.com/rarible/eclipse-program-library"
   },
   "instructions": [
     {
@@ -50,8 +50,8 @@ export type LibreplexEditionsControls = {
           "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
         },
         {
-          "name": "libreplexEditionsProgram",
-          "address": "bYSF2fxhcUjvqapf1c9VYmykH8CpySMPvCvxgFkfSSW"
+          "name": "raribleEditionsProgram",
+          "address": "E3NtU7ozVJ73VGQk4ZaYvKzZsFHQxQaeS7ijzcGg4Sd4"
         }
       ],
       "args": [
@@ -151,8 +151,8 @@ export type LibreplexEditionsControls = {
           "address": "5hx15GaPPqsYA61v6QpcGPpo125v7rfvEfZQ4dJErG5V"
         },
         {
-          "name": "libreplexEditionsProgram",
-          "address": "bYSF2fxhcUjvqapf1c9VYmykH8CpySMPvCvxgFkfSSW"
+          "name": "raribleEditionsProgram",
+          "address": "E3NtU7ozVJ73VGQk4ZaYvKzZsFHQxQaeS7ijzcGg4Sd4"
         }
       ],
       "args": [
@@ -364,8 +364,8 @@ export type LibreplexEditionsControls = {
           "address": "11111111111111111111111111111111"
         },
         {
-          "name": "libreplexEditionsProgram",
-          "address": "bYSF2fxhcUjvqapf1c9VYmykH8CpySMPvCvxgFkfSSW"
+          "name": "raribleEditionsProgram",
+          "address": "E3NtU7ozVJ73VGQk4ZaYvKzZsFHQxQaeS7ijzcGg4Sd4"
         }
       ],
       "args": [
@@ -594,8 +594,8 @@ export type LibreplexEditionsControls = {
           "address": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"
         },
         {
-          "name": "libreplexEditionsProgram",
-          "address": "bYSF2fxhcUjvqapf1c9VYmykH8CpySMPvCvxgFkfSSW"
+          "name": "raribleEditionsProgram",
+          "address": "E3NtU7ozVJ73VGQk4ZaYvKzZsFHQxQaeS7ijzcGg4Sd4"
         }
       ],
       "args": [

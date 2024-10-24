@@ -1,5 +1,5 @@
 use anchor_lang::prelude::*;
-use libreplex_editions::program::LibreplexEditions;
+use rarible_editions::program::RaribleEditions;
 use libreplex_shared::wrapped_sol;
 
 use crate::{EditionsControls, Phase};
@@ -41,7 +41,7 @@ pub struct AddPhaseCtx<'info> {
     #[account(address = spl_token_2022::ID)]
     pub token_program: AccountInfo<'info>,
 
-    pub libreplex_editions_program: Program<'info, LibreplexEditions>
+    pub rarible_editions_program: Program<'info, RaribleEditions>
 }
 
 pub fn add_phase(ctx: Context<AddPhaseCtx>, input: InitialisePhaseInput) -> Result<()> {

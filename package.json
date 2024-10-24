@@ -5,38 +5,38 @@
     "packages/*"
   ],
   "scripts": {
-    "build-interfaces": "cd packages/libreplex-idls && yarn package && yarn build && cd .. && cd libreplex-sdk && yarn build && cd ../..",
+    "build-interfaces": "cd packages/rarible-idls && yarn package && yarn build && cd .. && cd rarible-sdk && yarn build && cd ../..",
     "build": "lerna run clean && lerna run build",
     "libre-cli": "ts-node src/cli/index.ts",
     "test": "anchor test",
 
-    "libreplex_editions:deploy-dev:solana-dev-net": "anchor build -p libreplex_editions && anchor deploy -p libreplex_editions --provider.cluster https://api.devnet.solana.com --provider.wallet ~/.config/solana/id.json",
-    "libreplex_editions_controls:deploy-dev:solana-dev-net": "anchor build -p libreplex_editions_controls && anchor deploy -p libreplex_editions_controls --provider.cluster https://api.devnet.solana.com --provider.wallet ~/.config/solana/id.json",
+    "rarible_editions:deploy-dev:solana-dev-net": "anchor build -p rarible_editions && anchor deploy -p rarible_editions --provider.cluster https://api.devnet.solana.com --provider.wallet ~/.config/solana/id.json",
+    "rarible_editions_controls:deploy-dev:solana-dev-net": "anchor build -p rarible_editions_controls && anchor deploy -p rarible_editions_controls --provider.cluster https://api.devnet.solana.com --provider.wallet ~/.config/solana/id.json",
 
-    "libreplex_editions:deploy:eclipse-dev2": "anchor deploy -p libreplex_editions --provider.cluster https://staging-rpc.dev2.eclipsenetwork.xyz --provider.wallet ~/.config/solana/id.json",
-    "libreplex_editions_controls:deploy:eclipse-dev2": "anchor build -p libreplex_editions_controls && anchor deploy -p libreplex_editions_controls --provider.cluster https://staging-rpc.dev2.eclipsenetwork.xyz --provider.wallet ~/.config/solana/id.json",
+    "rarible_editions:deploy:eclipse-dev2": "anchor deploy -p rarible_editions --provider.cluster https://staging-rpc.dev2.eclipsenetwork.xyz --provider.wallet ~/.config/solana/id.json",
+    "rarible_editions_controls:deploy:eclipse-dev2": "anchor build -p rarible_editions_controls && anchor deploy -p rarible_editions_controls --provider.cluster https://staging-rpc.dev2.eclipsenetwork.xyz --provider.wallet ~/.config/solana/id.json",
 
-    "libreplex_editions:deploy:eclipse-testnet": "anchor build -p libreplex_editions && anchor deploy -p libreplex_editions --provider.cluster https://testnet.dev2.eclipsenetwork.xyz --provider.wallet ~/.config/solana/id.json",
-    "libreplex_editions_controls:deploy:eclipse-testnet": "anchor build -p libreplex_editions_controls && anchor deploy -p libreplex_editions_controls --provider.cluster https://testnet.dev2.eclipsenetwork.xyz --provider.wallet ~/.config/solana/id.json",
+    "rarible_editions:deploy:eclipse-testnet": "anchor build -p rarible_editions && anchor deploy -p rarible_editions --provider.cluster https://testnet.dev2.eclipsenetwork.xyz --provider.wallet ~/.config/solana/id.json",
+    "rarible_editions_controls:deploy:eclipse-testnet": "anchor build -p rarible_editions_controls && anchor deploy -p rarible_editions_controls --provider.cluster https://testnet.dev2.eclipsenetwork.xyz --provider.wallet ~/.config/solana/id.json",
     
-    "libreplex_editions:deploy:solana-dev-net": "anchor build -p libreplex_editions && anchor deploy -p libreplex_editions --provider.cluster https://api.devnet.solana.com --provider.wallet ~/.config/solana/id.json",
-    "libreplex_editions_controls:solana-dev-net": "anchor build -p libreplex_editions_controls && anchor deploy -p libreplex_editions_controls --provider.cluster https://api.devnet.solana.com --provider.wallet ~/.config/solana/id.json",
+    "rarible_editions:deploy:solana-dev-net": "anchor build -p rarible_editions && anchor deploy -p rarible_editions --provider.cluster https://api.devnet.solana.com --provider.wallet ~/.config/solana/id.json",
+    "rarible_editions_controls:solana-dev-net": "anchor build -p rarible_editions_controls && anchor deploy -p rarible_editions_controls --provider.cluster https://api.devnet.solana.com --provider.wallet ~/.config/solana/id.json",
     
     "transfer-program-owner:solana-dev-net": "solana program set-upgrade-authority --skip-new-upgrade-authority-signer-check 6g8ZaBxx2tng8EhVqvaad948Vht9YFJFGG5gvAejrJj9 --new-upgrade-authority 674s1Sap3KVnr8WGrY5KGQ69oTYjjgr1disKJo6GpTYw -k ~/.config/solana/id.json -u https://api.devnet.solana.com",
     "transfer-program-owner-back:solana-dev-net": "solana program set-upgrade-authority --skip-new-upgrade-authority-signer-check 6g8ZaBxx2tng8EhVqvaad948Vht9YFJFGG5gvAejrJj9 --new-upgrade-authority QjzRL6VwKGnpco8wx3cPjtq8ZPhewy7ohq7F5mv2eeR -k usb://ledger -u https://api.devnet.solana.com",
 
-    "libreplex_editions:deploy:solana-test-net": "anchor build -p libreplex_editions && anchor deploy -p libreplex_editions --provider.cluster https://api.testnet.solana.com --provider.wallet ~/.config/solana/prod-keypair.json",
-    "libreplex_editions_controls:solana-test-net": "anchor build -p libreplex_editions_controls && anchor deploy -p libreplex_editions_controls --provider.cluster https://api.testnet.solana.com --provider.wallet ~/.config/solana/prod-keypair.json",
+    "rarible_editions:deploy:solana-test-net": "anchor build -p rarible_editions && anchor deploy -p rarible_editions --provider.cluster https://api.testnet.solana.com --provider.wallet ~/.config/solana/prod-keypair.json",
+    "rarible_editions_controls:solana-test-net": "anchor build -p rarible_editions_controls && anchor deploy -p rarible_editions_controls --provider.cluster https://api.testnet.solana.com --provider.wallet ~/.config/solana/prod-keypair.json",
 
-    "libreplex_editions:deploy:ledger:solana-dev-net": "anchor build -p libreplex_editions && anchor deploy -p libreplex_editions --provider.cluster https://api.devnet.solana.com --provider.wallet usb://ledger",
-    "libreplex_editions_controls:deploy:ledger:solana-dev-net": "anchor build -p libreplex_editions_controls && anchor deploy -p libreplex_editions_controls --provider.cluster https://api.devnet.solana.com --provider.wallet usb://ledger",
+    "rarible_editions:deploy:ledger:solana-dev-net": "anchor build -p rarible_editions && anchor deploy -p rarible_editions --provider.cluster https://api.devnet.solana.com --provider.wallet usb://ledger",
+    "rarible_editions_controls:deploy:ledger:solana-dev-net": "anchor build -p rarible_editions_controls && anchor deploy -p rarible_editions_controls --provider.cluster https://api.devnet.solana.com --provider.wallet usb://ledger",
 
-    "libreplex_editions:deploy:hot:eclispe-mainnet": "anchor build -p libreplex_editions && anchor deploy -p libreplex_editions --provider.cluster https://mainnetbeta-rpc.eclipse.xyz --provider.wallet ~/.config/solana/prod-keypair.json",
-    "libreplex_editions:deploy:hot:cli:eclispe-mainnet": "solana program deploy target/deploy/libreplex_editions.so --program-id target/deploy/libreplex_editions-keypair.json --url https://mainnetbeta-rpc.eclipse.xyz",
+    "rarible_editions:deploy:hot:eclispe-mainnet": "anchor build -p rarible_editions && anchor deploy -p rarible_editions --provider.cluster https://mainnetbeta-rpc.eclipse.xyz --provider.wallet ~/.config/solana/prod-keypair.json",
+    "rarible_editions:deploy:hot:cli:eclispe-mainnet": "solana program deploy target/deploy/rarible_editions.so --program-id target/deploy/rarible_editions-keypair.json --url https://mainnetbeta-rpc.eclipse.xyz",
 
-    "libreplex_editions_controls:deploy:hot:eclispe-mainnet": "anchor build -p libreplex_editions_controls && anchor deploy -p libreplex_editions_controls --provider.cluster https://mainnetbeta-rpc.eclipse.xyz --provider.wallet ~/.config/solana/prod-keypair.json",
+    "rarible_editions_controls:deploy:hot:eclispe-mainnet": "anchor build -p rarible_editions_controls && anchor deploy -p rarible_editions_controls --provider.cluster https://mainnetbeta-rpc.eclipse.xyz --provider.wallet ~/.config/solana/prod-keypair.json",
     "transfer-program-owner:eclipse-main-net": "solana program set-upgrade-authority --skip-new-upgrade-authority-signer-check 5hEa5j38yNJRM9vQA44Q6gXVj4Db8y3mWxkDtQeofKKs --new-upgrade-authority 674s1Sap3KVnr8WGrY5KGQ69oTYjjgr1disKJo6GpTYw -k ~/.config/solana/prod-keypair.json -u https://mainnetbeta-rpc.eclipse.xyz",
-    "libreplex_editions_controls:deploy:hot:cli:eclispe-mainnet": "solana program deploy target/deploy/libreplex_editions_controls.so --program-id target/deploy/libreplex_editions_controls-keypair.json --url https://mainnetbeta-rpc.eclipse.xyz"
+    "rarible_editions_controls:deploy:hot:cli:eclispe-mainnet": "solana program deploy target/deploy/rarible_editions_controls.so --program-id target/deploy/rarible_editions_controls-keypair.json --url https://mainnetbeta-rpc.eclipse.xyz"
   },
   "dependencies": {
     "@coral-xyz/anchor": "0.30.0",

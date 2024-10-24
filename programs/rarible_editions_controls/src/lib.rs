@@ -5,7 +5,7 @@ pub use logic::*;
 
 pub mod instructions;
 pub use instructions::*;
-declare_id!("5NeY3NR3ZT8D6ck9NrgBBsJjiH25cL4mmksF1x5ZrHwW");
+declare_id!("DtdtodSsgeNXbu3rycGCkJEpRuZ48rjFSBfgj8JKzTV2");
 
 pub mod errors;
 pub mod state;
@@ -13,7 +13,7 @@ pub mod state;
 pub use state::*;
 
 #[program]
-pub mod libreplex_editions_controls {
+pub mod rarible_editions_controls {
     use super::*;
 
     // v2 endpoints. Prefer these over the original ones.
@@ -40,7 +40,7 @@ pub mod libreplex_editions_controls {
 
     pub fn modify_royalties(
         ctx: Context<UpdateRoyaltiesCtx>,
-        input: libreplex_editions::UpdateRoyaltiesArgs) -> Result<()> {
+        input: rarible_editions::UpdateRoyaltiesArgs) -> Result<()> {
         instructions::update_royalties(ctx, input)
     }
 

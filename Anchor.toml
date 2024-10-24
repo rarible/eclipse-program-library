@@ -5,8 +5,8 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-libreplex_editions = "bYSF2fxhcUjvqapf1c9VYmykH8CpySMPvCvxgFkfSSW"
-libreplex_editions_controls = "5NeY3NR3ZT8D6ck9NrgBBsJjiH25cL4mmksF1x5ZrHwW"
+rarible_editions = "E3NtU7ozVJ73VGQk4ZaYvKzZsFHQxQaeS7ijzcGg4Sd4"
+rarible_editions_controls = "DtdtodSsgeNXbu3rycGCkJEpRuZ48rjFSBfgj8JKzTV2"
 
 [registry]
 url = "https://api.apr.dev"
