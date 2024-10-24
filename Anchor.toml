@@ -5,16 +5,14 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-libreplex_editions = "A927QYSgP2fJWWDJn1gZknSfsMXyyKnJvMf2kJoY5yeQ"
-libreplex_editions_controls = "5GSxbLSQms8VoBmNPEsPPyr8TtSApX19cP8jAg4isJ3K"
+libreplex_editions = "bYSF2fxhcUjvqapf1c9VYmykH8CpySMPvCvxgFkfSSW"
+libreplex_editions_controls = "5NeY3NR3ZT8D6ck9NrgBBsJjiH25cL4mmksF1x5ZrHwW"
 
 [registry]
 url = "https://api.apr.dev"
 
 [provider]
 cluster = "Localnet"
-### @dev testing wallet
-### wallet = "~/.config/solana/id.json"
 wallet = "usb://ledger"
 
 [scripts]
@@ -27,8 +25,6 @@ upgradeable = false
 
 [test.validator]
 bind_address = "0.0.0.0"
-### @dev: Utilize the testnet cluster for running test-suite with anchor test
-### url = "https://api.testnet.solana.com"
 url = "https://api.mainnet-beta.solana.com"
 ledger = ".anchor/test-ledger"
 rpc_port = 8899
