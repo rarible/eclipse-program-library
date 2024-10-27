@@ -3,9 +3,9 @@ use anchor_spl::{
     associated_token::AssociatedToken,
     token_2022::{self, ID as TOKEN_2022_ID},
 };
-use libreplex_editions::{
+use rarible_editions::{
     group_extension_program,
-    program::LibreplexEditions, 
+    program::RaribleEditions, 
     EditionsDeployment,
     cpi::accounts::MintCtx
 };
@@ -137,7 +137,7 @@ pub struct MintWithControlsCtx<'info> {
 
     pub system_program: Program<'info, System>,
 
-    pub libreplex_editions_program: Program<'info, LibreplexEditions>,
+    pub rarible_editions_program: Program<'info, RaribleEditions>,
 }
 
 pub fn mint_with_controls(
@@ -327,12 +327,12 @@ fn perform_mint(
     ctx: &Context<MintWithControlsCtx>,
     seeds: &[&[u8]],
 ) -> Result<()> {
-    let libreplex_editions_program = &ctx.accounts.libreplex_editions_program;
+    let rarible_editions_program = &ctx.accounts.rarible_editions_program;
     let editions_controls = &ctx.accounts.editions_controls;
 
-    libreplex_editions::cpi::mint(
+    rarible_editions::cpi::mint(
         CpiContext::new_with_signer(
-            libreplex_editions_program.to_account_info(),
+            rarible_editions_program.to_account_info(),
             MintCtx {
                 editions_deployment: ctx.accounts.editions_deployment.to_account_info(),
                 hashlist: ctx.accounts.hashlist.to_account_info(),

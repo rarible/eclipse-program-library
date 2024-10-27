@@ -30,13 +30,13 @@ This guide provides step-by-step instructions for setting up and running tests f
      ```toml
      # In Anchor.toml
      [programs.localnet]
-     libreplex_editions = "587DoLBH2H39i5bToWBc6zRgbD2iJZtc4Kb8nYsskYTq"
-     libreplex_editions_controls = "5hEa5j38yNJRM9vQA44Q6gXVj4Db8y3mWxkDtQeofKKs"
+     rarible_editions = "587DoLBH2H39i5bToWBc6zRgbD2iJZtc4Kb8nYsskYTq"
+     rarible_editions_controls = "5hEa5j38yNJRM9vQA44Q6gXVj4Db8y3mWxkDtQeofKKs"
      ```
      ```typescript
      // In constants.ts
-     export const LIBREPLEX_EDITIONS_PROGRAM_ID = new PublicKey("587DoLBH2H39i5bToWBc6zRgbD2iJZtc4Kb8nYsskYTq");
-     export const LIBREPLEX_EDITIONS_CONTROLS_PROGRAM_ID = new PublicKey("5hEa5j38yNJRM9vQA44Q6gXVj4Db8y3mWxkDtQeofKKs");
+     export const rarible_editions_PROGRAM_ID = new PublicKey("587DoLBH2H39i5bToWBc6zRgbD2iJZtc4Kb8nYsskYTq");
+     export const rarible_editions_CONTROLS_PROGRAM_ID = new PublicKey("5hEa5j38yNJRM9vQA44Q6gXVj4Db8y3mWxkDtQeofKKs");
      ```
 
 4. Run tests:

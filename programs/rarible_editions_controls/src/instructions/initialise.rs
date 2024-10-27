@@ -1,7 +1,7 @@
 use anchor_lang::{prelude::*, system_program};
-use libreplex_editions::{cpi::accounts::InitialiseCtx, group_extension_program, program::LibreplexEditions, AddMetadataArgs, CreatorWithShare, InitialiseInput, UpdateRoyaltiesArgs};
-use libreplex_editions::cpi::accounts::AddMetadata;
-use libreplex_editions::cpi::accounts::AddRoyalties;
+use rarible_editions::{cpi::accounts::InitialiseCtx, group_extension_program, program::RaribleEditions, AddMetadataArgs, CreatorWithShare, InitialiseInput, UpdateRoyaltiesArgs};
+use rarible_editions::cpi::accounts::AddMetadata;
+use rarible_editions::cpi::accounts::AddRoyalties;
 use crate::{EditionsControls, PlatformFeeRecipient, UpdatePlatformFeeArgs, DEFAULT_PLATFORM_FEE_PRIMARY_ADMIN, DEFAULT_PLATFORM_FEE_SECONDARY_ADMIN};
 use crate::errors::EditionsControlsError;
 
@@ -32,7 +32,7 @@ pub struct InitialiseEditionControlsCtx<'info> {
     )]
     pub editions_controls: Account<'info, EditionsControls>,
 
-    /// CHECK: CPI: Passed into libreplex_editions program for initialisation. Checking seed here for early warning
+    /// CHECK: CPI: Passed into rarible_editions program for initialisation. Checking seed here for early warning
     #[account(mut)]
     pub editions_deployment: UncheckedAccount<'info>,
 
@@ -66,14 +66,14 @@ pub struct InitialiseEditionControlsCtx<'info> {
     #[account(address = group_extension_program::ID)]
     pub group_extension_program: AccountInfo<'info>,
 
-    pub libreplex_editions_program: Program<'info, LibreplexEditions>,
+    pub rarible_editions_program: Program<'info, RaribleEditions>,
 }
 
 pub fn initialise_editions_controls(
     ctx: Context<InitialiseEditionControlsCtx>,
     input: InitialiseControlInput,
 ) -> Result<()> {
-    let libreplex_editions_program = &ctx.accounts.libreplex_editions_program;
+    let rarible_editions_program = &ctx.accounts.rarible_editions_program;
     let editions_controls = &mut ctx.accounts.editions_controls;
     let editions_deployment = &ctx.accounts.editions_deployment;
     let hashlist = &ctx.accounts.hashlist;
@@ -96,9 +96,9 @@ pub fn initialise_editions_controls(
     };
 
     // Initialize the editions using CPI
-    libreplex_editions::cpi::initialise(
+    rarible_editions::cpi::initialise(
         CpiContext::new(
-            libreplex_editions_program.to_account_info(),
+            rarible_editions_program.to_account_info(),
             InitialiseCtx {
                 editions_deployment: editions_deployment.to_account_info(),
                 hashlist: hashlist.to_account_info(),
@@ -179,9 +179,9 @@ pub fn initialise_editions_controls(
     ];
 
     // Add royalties
-    libreplex_editions::cpi::add_royalties(
+    rarible_editions::cpi::add_royalties(
         CpiContext::new_with_signer(
-            libreplex_editions_program.to_account_info(),
+            rarible_editions_program.to_account_info(),
             AddRoyalties {
                 editions_deployment: editions_deployment.to_account_info(),
                 payer: payer.to_account_info(),
@@ -196,9 +196,9 @@ pub fn initialise_editions_controls(
     )?;
 
     // Add metadata CPI call
-    libreplex_editions::cpi::add_metadata(
+    rarible_editions::cpi::add_metadata(
         CpiContext::new_with_signer(
-            libreplex_editions_program.to_account_info(),
+            rarible_editions_program.to_account_info(),
             AddMetadata {
                 editions_deployment: editions_deployment.to_account_info(),
                 payer: payer.to_account_info(),

@@ -1,20 +1,20 @@
 import { BorshCoder, Program } from '@coral-xyz/anchor';
 import { Connection, PublicKey } from '@solana/web3.js';
-import { LibreplexEditionsControls } from '../../target/types/libreplex_editions_controls';
-import { LibreplexEditions } from '../../target/types/libreplex_editions';
+import { RaribleEditionsControls } from '../../target/types/rarible_editions_controls';
+import { RaribleEditions } from '../../target/types/rarible_editions';
 import { IdlAccounts } from '@coral-xyz/anchor';
 import { getTokenMetadata as getSplTokenMetadata } from '@solana/spl-token';
 
 export type EditionsDeployment =
-  IdlAccounts<LibreplexEditions>['editionsDeployment'];
+  IdlAccounts<RaribleEditions>['editionsDeployment'];
 
 export type EditionsControls =
-  IdlAccounts<LibreplexEditionsControls>['editionsControls'];
+  IdlAccounts<RaribleEditionsControls>['editionsControls'];
 
-export type MinterStats = IdlAccounts<LibreplexEditionsControls>['minterStats'];
+export type MinterStats = IdlAccounts<RaribleEditionsControls>['minterStats'];
 
 export const decodeEditions =
-  (program: Program<LibreplexEditions>) =>
+  (program: Program<RaribleEditions>) =>
   (buffer: Buffer | undefined, pubkey: PublicKey) => {
     const coder = new BorshCoder(program.idl);
     const data = buffer
@@ -30,7 +30,7 @@ export const decodeEditions =
 export const getEditions = async (
   connection: Connection,
   editionsPda: PublicKey,
-  editionsProgram: Program<LibreplexEditions>
+  editionsProgram: Program<RaribleEditions>
 ) => {
   const editionsAccountInfo = await connection.getAccountInfo(editionsPda);
   if (!editionsAccountInfo) {
@@ -66,7 +66,7 @@ export const logEditions = (editionsDecoded: {
 };
 
 export const decodeEditionsControls =
-  (program: Program<LibreplexEditionsControls>) =>
+  (program: Program<RaribleEditionsControls>) =>
   (buffer: Buffer | undefined, pubkey: PublicKey) => {
     const coder = new BorshCoder(program.idl);
     const data = buffer
@@ -82,7 +82,7 @@ export const decodeEditionsControls =
 export const getEditionsControls = async (
   connection: Connection,
   editionsControlsPda: PublicKey,
-  editionsControlsProgram: Program<LibreplexEditionsControls>
+  editionsControlsProgram: Program<RaribleEditionsControls>
 ) => {
   const editionsControlsAccountInfo = await connection.getAccountInfo(
     editionsControlsPda
@@ -170,7 +170,7 @@ export const logTokenMetadata = (metadata: {
 };
 
 export const decodeMinterStats =
-  (program: Program<LibreplexEditionsControls>) =>
+  (program: Program<RaribleEditionsControls>) =>
   (buffer: Buffer | undefined, pubkey: PublicKey) => {
     const coder = new BorshCoder(program.idl);
     const data = buffer
@@ -186,7 +186,7 @@ export const decodeMinterStats =
 export const getMinterStats = async (
   connection: Connection,
   minterStatsPda: PublicKey,
-  editionsControlsProgram: Program<LibreplexEditionsControls>
+  editionsControlsProgram: Program<RaribleEditionsControls>
 ) => {
   const minterStatsAccountInfo = await connection.getAccountInfo(
     minterStatsPda

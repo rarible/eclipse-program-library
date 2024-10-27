@@ -2176,49 +2176,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "97b3888a4aecf77e811145cadf6eef5901f4782c53886191b2f693f24761847c"
 
 [[package]]
-name = "libreplex_editions"
-version = "0.2.1"
-dependencies = [
- "anchor-lang",
- "anchor-spl",
- "arrayref",
- "dyn-fmt",
- "libreplex_shared",
- "serde",
- "serde_json",
- "solana-program",
- "solana-program-test",
- "solana-sdk",
- "spl-pod 0.2.2",
- "spl-tlv-account-resolution 0.6.3",
- "spl-token-2022 3.0.2",
- "spl-token-group-interface 0.2.3",
- "spl-token-metadata-interface 0.3.3",
- "spl-transfer-hook-interface 0.6.3",
- "spl-type-length-value 0.3.1",
-]
-
-[[package]]
-name = "libreplex_editions_controls"
-version = "0.2.1"
-dependencies = [
- "anchor-lang",
- "anchor-spl",
- "arrayref",
- "libreplex_editions",
- "libreplex_shared",
- "rarible-merkle-verify",
- "solana-program",
- "solana-program-test",
- "solana-sdk",
- "spl-pod 0.2.2",
- "spl-token-2022 3.0.2",
- "spl-token-group-interface 0.2.3",
- "spl-token-metadata-interface 0.3.3",
- "spl-type-length-value 0.3.1",
-]
-
-[[package]]
 name = "libreplex_shared"
 version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3181,6 +3138,49 @@ dependencies = [
  "anchor-lang",
  "anchor-spl",
  "solana-program",
+]
+
+[[package]]
+name = "rarible_editions"
+version = "0.2.1"
+dependencies = [
+ "anchor-lang",
+ "anchor-spl",
+ "arrayref",
+ "dyn-fmt",
+ "libreplex_shared",
+ "serde",
+ "serde_json",
+ "solana-program",
+ "solana-program-test",
+ "solana-sdk",
+ "spl-pod 0.2.2",
+ "spl-tlv-account-resolution 0.6.3",
+ "spl-token-2022 3.0.2",
+ "spl-token-group-interface 0.2.3",
+ "spl-token-metadata-interface 0.3.3",
+ "spl-transfer-hook-interface 0.6.3",
+ "spl-type-length-value 0.3.1",
+]
+
+[[package]]
+name = "rarible_editions_controls"
+version = "0.2.1"
+dependencies = [
+ "anchor-lang",
+ "anchor-spl",
+ "arrayref",
+ "libreplex_shared",
+ "rarible-merkle-verify",
+ "rarible_editions",
+ "solana-program",
+ "solana-program-test",
+ "solana-sdk",
+ "spl-pod 0.2.2",
+ "spl-token-2022 3.0.2",
+ "spl-token-group-interface 0.2.3",
+ "spl-token-metadata-interface 0.3.3",
+ "spl-type-length-value 0.3.1",
 ]
 
 [[package]]

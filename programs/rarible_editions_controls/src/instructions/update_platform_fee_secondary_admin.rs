@@ -1,5 +1,5 @@
 use anchor_lang::prelude::*;
-use libreplex_editions::program::LibreplexEditions;
+use rarible_editions::program::RaribleEditions;
 use libreplex_shared::wrapped_sol;
 use crate::{EditionsControls, Phase};
 
@@ -12,7 +12,7 @@ pub struct UpdatePlatformFeeSecondaryAdminInput {
 #[instruction(input: UpdatePlatformFeeSecondaryAdminInput)]
 pub struct UpdatePlatformFeeSecondaryAdminCtx<'info> {
     #[account(mut)]
-    pub editions_deployment: Box<Account<'info, libreplex_editions::EditionsDeployment>>,
+    pub editions_deployment: Box<Account<'info, rarible_editions::EditionsDeployment>>,
 
     #[account(mut,
         seeds = [b"editions_controls", editions_deployment.key().as_ref()],
