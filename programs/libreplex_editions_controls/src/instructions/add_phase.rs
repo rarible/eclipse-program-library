@@ -53,6 +53,11 @@ pub fn add_phase(ctx: Context<AddPhaseCtx>, input: InitialisePhaseInput) -> Resu
         panic!("Merkle root must be provided for private phases");
     }
 
+    // Disable hybrid phases for now
+    if !input.is_private && input.merkle_root.is_some() {
+        panic!("Allowlists are currently disabled on public phases");
+    }
+
     let editions_controls = &mut ctx.accounts.editions_controls;
 
     editions_controls.phases.push(Phase{ 
