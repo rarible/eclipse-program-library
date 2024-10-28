@@ -360,7 +360,7 @@ describe('Editions Controls Test Suite', () => {
     });
 
     // add a public phase accounting for the skipped test above [Phase Index 1]: Open: 0.1 SOL, Allowlist: 0.05 SOL
-    it('Should add a public phase with allowlist. [Phase Index 1]: Open: 0.1 SOL, Allowlist: 0.05 SOL', async () => {
+    it('Should add a public phase with allowlist (accounting for skipped test). [Phase Index 1]: Open: 0.1 SOL, Allowlist: 0.05 SOL', async () => {
       phase1Config = {
         maxMintsPerWallet: new anchor.BN(5),
         maxMintsTotal: new anchor.BN(10),
