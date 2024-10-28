@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/rarible_editions.json`.
  */
 export type RaribleEditions = {
-  "address": "E3NtU7ozVJ73VGQk4ZaYvKzZsFHQxQaeS7ijzcGg4Sd4",
+  "address": "ATBinC7ZuN1YPkEDoVPpoPbwoaoaik5tEK4M2zt6g622",
   "metadata": {
     "name": "raribleEditions",
     "version": "0.2.1",

@@ -5,8 +5,8 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-rarible_editions = "E3NtU7ozVJ73VGQk4ZaYvKzZsFHQxQaeS7ijzcGg4Sd4"
-rarible_editions_controls = "DtdtodSsgeNXbu3rycGCkJEpRuZ48rjFSBfgj8JKzTV2"
+rarible_editions = "ATBinC7ZuN1YPkEDoVPpoPbwoaoaik5tEK4M2zt6g622"
+rarible_editions_controls = "Ge7qXDjDbMykjwfFPQ5XfwEbGUfbSunwdLZHvquxZzoS"
 
 [registry]
 url = "https://api.apr.dev"
