@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/rarible_editions_controls.json`.
  */
 export type RaribleEditionsControls = {
-  "address": "DtdtodSsgeNXbu3rycGCkJEpRuZ48rjFSBfgj8JKzTV2",
+  "address": "Ge7qXDjDbMykjwfFPQ5XfwEbGUfbSunwdLZHvquxZzoS",
   "metadata": {
     "name": "raribleEditionsControls",
     "version": "0.2.1",
@@ -51,7 +51,7 @@ export type RaribleEditionsControls = {
         },
         {
           "name": "raribleEditionsProgram",
-          "address": "E3NtU7ozVJ73VGQk4ZaYvKzZsFHQxQaeS7ijzcGg4Sd4"
+          "address": "ATBinC7ZuN1YPkEDoVPpoPbwoaoaik5tEK4M2zt6g622"
         }
       ],
       "args": [
@@ -152,7 +152,7 @@ export type RaribleEditionsControls = {
         },
         {
           "name": "raribleEditionsProgram",
-          "address": "E3NtU7ozVJ73VGQk4ZaYvKzZsFHQxQaeS7ijzcGg4Sd4"
+          "address": "ATBinC7ZuN1YPkEDoVPpoPbwoaoaik5tEK4M2zt6g622"
         }
       ],
       "args": [
@@ -365,7 +365,7 @@ export type RaribleEditionsControls = {
         },
         {
           "name": "raribleEditionsProgram",
-          "address": "E3NtU7ozVJ73VGQk4ZaYvKzZsFHQxQaeS7ijzcGg4Sd4"
+          "address": "ATBinC7ZuN1YPkEDoVPpoPbwoaoaik5tEK4M2zt6g622"
         }
       ],
       "args": [
@@ -595,7 +595,7 @@ export type RaribleEditionsControls = {
         },
         {
           "name": "raribleEditionsProgram",
-          "address": "E3NtU7ozVJ73VGQk4ZaYvKzZsFHQxQaeS7ijzcGg4Sd4"
+          "address": "ATBinC7ZuN1YPkEDoVPpoPbwoaoaik5tEK4M2zt6g622"
         }
       ],
       "args": [
